@@ -33,9 +33,10 @@ before_build:
 build_script:
   - cd pdfium
   - mkdir out
-  - copy %APPVEYOR_BUILD_FOLDER%/args.gn out\args.gn
+  - copy %APPVEYOR_BUILD_FOLDER%\args.gn out\args.gn
   - if "%CONFIGURATION%"=="Release" echo is_debug=false >> out\args.gn
   - if "%PLATFORM%"=="x86" echo target_cpu="x86" >> out\args.gn
+  - type out\args.gn
   - gn gen out
   - cd out
   - ninja pdfium
