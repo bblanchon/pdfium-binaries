@@ -1,0 +1,32 @@
+# File system layout
+# %APPVEYOR_BUILD_FOLDER%/
+#   - depot_tools/ (in PATH)
+#   - repo/
+#       - pdfium/
+#           - out/
+
+environment:
+  GYP_MSVS_VERSION: 2017
+  DEPOT_TOOLS_WIN_TOOLCHAIN: 0
+  PATH: %APPVEYOR_BUILD_FOLDER%/depot_tools;%PATH%
+
+install:
+  - appveyor DownloadFile https://storage.googleapis.com/chrome-infra/depot_tools.zip
+  - 7z -bd x depot_tools.zip -odepot_tools
+  - gclient --version
+
+before_build:
+  - mkdir repo
+  - cd repo
+  - gclient config --unmanaged https://pdfium.googlesource.com/pdfium.git
+  - cd pdfium
+  - build\install-build-deps.sh
+  - mkdir out
+  - cd out
+  - copy %APPVEYOR_BUILD_FOLDER%\debug.args.gn args.gn
+  - gn gen .
+  - ninja pdfium
+
+artifacts:
+  - path: 'public/**/*.*'
+  - path: 'out/obj/pdfium.lib'
