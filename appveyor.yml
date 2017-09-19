@@ -32,15 +32,15 @@ build_script:
 
 after_build:
   - cd %APPVEYOR_BUILD_FOLDER%
-  - mkdir artifacts
-  - move repo\pdfium\public artifacts\include
-  - mkdir artifacts\lib
-  - move repo\pdfium\out\obj\pdfium.lib artifacts\lib
+  - mkdir staging
+  - move repo\pdfium\public staging\include
+  - mkdir staging\x64\vs15\lib
+  - move repo\pdfium\out\obj\pdfium.lib staging\x64\vs15\lib\pdfium.lib
+  - 7z a pdfium-x64-vs15-debug.zip staging\*
 
 artifacts:
-  - path: 'artifacts/**/*.*'
-    name: PDFium binaries
-    type: zip
+  - path: pdfium-vs15-debug.zip
+    name: PDFium for Visual Studio 2017, Debug
 
 cache:
   - depot_tools\win_tools-2_7_6_bin -> depot_tools\python_bin_reldir.txt
