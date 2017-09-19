@@ -6,6 +6,7 @@
 #           - out/
 
 environment:
+  APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
   GYP_MSVS_VERSION: 2017
   DEPOT_TOOLS_WIN_TOOLCHAIN: 0
   PATH: "%APPVEYOR_BUILD_FOLDER%/depot_tools;%PATH%"
