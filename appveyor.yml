@@ -38,6 +38,28 @@ after_build:
   - move repo\pdfium\out\obj\pdfium.lib artifacts\lib
 
 artifacts:
-  - path: 'artifacts/**'
+  - path: 'artifacts/**/*.*'
     name: PDFium binaries
     type: zip
+
+cache:
+  - depot_tools\win_tools-2_7_6_bin -> depot_tools\python_bin_reldir.txt
+  - repo\pdfium\base -> repo\pdfium\DEPS
+  - repo\pdfium\build -> repo\pdfium\DEPS
+  - repo\pdfium\buildtools -> repo\pdfium\DEPS
+  - repo\pdfium\testing\corpus -> repo\pdfium\DEPS
+  - repo\pdfium\testing\gmock -> repo\pdfium\DEPS
+  - repo\pdfium\testing\gtest -> repo\pdfium\DEPS
+  - repo\pdfium\third_party\freetype\src -> repo\pdfium\DEPS
+  - repo\pdfium\third_party\icu -> repo\pdfium\DEPS
+  - repo\pdfium\third_party\instrumented_libraries -> repo\pdfium\DEPS
+  - repo\pdfium\third_party\jinja2 -> repo\pdfium\DEPS
+  - repo\pdfium\third_party\libjpeg_turbo -> repo\pdfium\DEPS
+  - repo\pdfium\third_party\markupsafe -> repo\pdfium\DEPS
+  - repo\pdfium\third_party\skia -> repo\pdfium\DEPS
+  - repo\pdfium\third_party\yasm\source\patched-yasm -> repo\pdfium\DEPS
+  - repo\pdfium\third_party\zlib -> repo\pdfium\DEPS
+  - repo\pdfium\tools\clang -> repo\pdfium\DEPS
+  - repo\pdfium\tools\gyp -> repo\pdfium\DEPS
+  - repo\pdfium\tools\memory -> repo\pdfium\DEPS
+  - repo\pdfium\v8 -> repo\pdfium\DEPS
