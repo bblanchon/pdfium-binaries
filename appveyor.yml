@@ -42,7 +42,8 @@ after_build:
   - move repo\pdfium\public staging\include
   - mkdir staging\%MY_ARCHITECTURE%\%MY_TOOLSET%\lib
   - move repo\pdfium\out\obj\pdfium.lib staging\%MY_ARCHITECTURE%\%MY_TOOLSET%\lib\%MY_LIB_FILENAME%
-  - 7z a pdfium-%MY_ARCHITECTURE%-%MY_TOOLSET%-%MY_BUILD_CONFIGURATION%.zip staging\*
+  - cd staging
+  - 7z a pdfium-%MY_ARCHITECTURE%-%MY_TOOLSET%-%MY_BUILD_CONFIGURATION%.zip *
 
 artifacts:
   - path: 'pdfium-x64-vs15-debug.zip'
