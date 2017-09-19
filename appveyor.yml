@@ -51,8 +51,18 @@ after_build:
   - if "%CONFIGURATION%"=="Debug" rename %LIB_FOLDER%\pdfium.lib pdfiumd.lib
   - cd staging
   - if "%CONFIGURATION%"=="Debug" set SUFFIX=-debug
-  - 7z a pdfium-%PLATFORM%-%MY_TOOLSET%%SUFFIX%.zip *
+  - 7z a %APPVEYOR_BUILD_FOLDER%\pdfium-%PLATFORM%-%MY_TOOLSET%%SUFFIX%.zip *
 
 artifacts:
   - path: 'pdfium-*.zip'
     name: PDFium library
+
+deploy:
+  - provider: GitHub
+    release: 'Latest build from master'
+    description: "This is the latest build from the 'master' branch"
+    prerelease: true
+    auth_token:
+      secure: JH8IVbdgVLz16ZXQLO41jQ5OsC7wR8IMRPAzinrdqpvgfhe/btgtr1xZ5trO2Eux
+    on:
+      branch: master
