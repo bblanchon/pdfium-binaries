@@ -19,8 +19,11 @@ before_build:
   - mkdir repo
   - cd repo
   - gclient config --unmanaged https://pdfium.googlesource.com/pdfium.git
-  - cd pdfium
-  - build\install-build-deps.sh
+  - gclient sync
+  - pdfium\build\install-build-deps.sh
+
+build_script:
+  - cd repo\pdfium
   - mkdir out
   - cd out
   - copy %APPVEYOR_BUILD_FOLDER%\debug.args.gn args.gn
