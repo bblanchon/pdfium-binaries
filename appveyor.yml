@@ -4,12 +4,18 @@
 #   - repo/
 #       - pdfium/
 #           - out/
-
 environment:
   APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
   GYP_MSVS_VERSION: 2017
-  DEPOT_TOOLS_WIN_TOOLCHAIN: 0
   PATH: "%APPVEYOR_BUILD_FOLDER%/depot_tools;%PATH%"
+  DEPOT_TOOLS_WIN_TOOLCHAIN: 0
+  MY_TOOLSET: vs15
+  MY_ARCHITECTURE: x64
+  matrix:
+    - MY_BUILD_CONFIGURATION: debug
+      MY_LIB_FILENAME: pdfiumd.lib
+    - MY_BUILD_CONFIGURATION: release
+      MY_LIB_FILENAME: pdfium.lib
 
 install:
   - appveyor DownloadFile https://storage.googleapis.com/chrome-infra/depot_tools.zip
@@ -25,7 +31,7 @@ before_build:
 build_script:
   - cd pdfium
   - mkdir out
-  - copy %APPVEYOR_BUILD_FOLDER%\debug.args.gn out\args.gn
+  - copy %APPVEYOR_BUILD_FOLDER%\%MY_BUILD_CONFIGURATION%.args.gn out\args.gn
   - gn gen out
   - cd out
   - ninja pdfium
@@ -34,10 +40,12 @@ after_build:
   - cd %APPVEYOR_BUILD_FOLDER%
   - mkdir staging
   - move repo\pdfium\public staging\include
-  - mkdir staging\x64\vs15\lib
-  - move repo\pdfium\out\obj\pdfium.lib staging\x64\vs15\lib\pdfium.lib
-  - 7z a pdfium-x64-vs15-debug.zip staging\*
+  - mkdir staging\%MY_ARCHITECTURE%\%MY_TOOLSET%\lib
+  - move repo\pdfium\out\obj\pdfium.lib staging\%MY_ARCHITECTURE%\%MY_TOOLSET%\lib\%MY_LIB_FILENAME%
+  - 7z a pdfium-%MY_ARCHITECTURE%-%MY_TOOLSET%-%MY_BUILD_CONFIGURATION%.zip staging\*
 
 artifacts:
-  - path: pdfium-vs15-debug.zip
-    name: PDFium for Visual Studio 2017, Debug
+  - path: 'pdfium-x64-vs15-debug.zip'
+    name: PDFium for Visual Studio 2017, x64, Debug
+  - path: 'pdfium-x64-vs15-release.zip'
+    name: PDFium for Visual Studio 2017, x64, Release

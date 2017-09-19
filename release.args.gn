@@ -2,7 +2,7 @@
 is_component_build = false
 
 # Debug build
-is_debug = true
+is_debug = false
 
 # Build PDFium either with or without v8 support (default = true)
 pdf_enable_v8 = false
