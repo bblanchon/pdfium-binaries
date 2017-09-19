@@ -23,11 +23,12 @@ before_build:
   - gclient sync
 
 build_script:
-  - cd repo\pdfium
+  - cd
+  - cd pdfium
   - mkdir out
+  - copy %APPVEYOR_BUILD_FOLDER%\debug.args.gn out\args.gn
+  - gn gen out
   - cd out
-  - copy %APPVEYOR_BUILD_FOLDER%\debug.args.gn args.gn
-  - gn gen .
   - ninja pdfium
 
 artifacts:
