@@ -21,7 +21,6 @@ before_build:
   - cd repo
   - gclient config --unmanaged https://pdfium.googlesource.com/pdfium.git
   - gclient sync
-  - pdfium\build\install-build-deps.sh
 
 build_script:
   - cd repo\pdfium
