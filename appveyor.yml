@@ -23,7 +23,6 @@ before_build:
   - gclient sync
 
 build_script:
-  - cd
   - cd pdfium
   - mkdir out
   - copy %APPVEYOR_BUILD_FOLDER%\debug.args.gn out\args.gn
@@ -31,9 +30,17 @@ build_script:
   - cd out
   - ninja pdfium
 
+after_build:
+  - cd %APPVEYOR_BUILD_FOLDER%
+  - mkdir artifacts
+  - move repo\pdfium\public artifacts\include
+  - mkdir artifacts\lib
+  - move repo\pdfium\out\obj\pdfium.lib artifacts\lib
+
 artifacts:
-  - path: 'public/**/*.*'
-  - path: 'out/obj/pdfium.lib'
+  - path: 'artifacts/**'
+    name: PDFium binaries
+    type: zip
 
 cache:
   - depot_tools/win_tools*_bin -> depot_tools/python_bin_reldir.txt
