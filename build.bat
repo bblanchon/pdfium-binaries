@@ -31,6 +31,7 @@ echo on
 : Prepare directories
 mkdir %PDFium_BUILD_DIR%
 mkdir %PDFium_STAGING_DIR%
+mkdir %PDFium_BIN_DIR%
 mkdir %PDFium_LIB_DIR%
 
 : Download depot_tools
@@ -44,8 +45,9 @@ call gclient config --unmanaged %PDFium_URL%
 call gclient sync
 
 : Patch
+echo on
 cd %PDFium_SOURCE_DIR%
-call git apply %PDFium_PATCH%
+call git apply -v %PDFium_PATCH%
 
 : Configure
 if "%CONFIGURATION%"=="Release" echo is_debug=false >> %PDFium_ARGS%
