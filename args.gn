@@ -4,8 +4,5 @@ is_component_build = false
 # Build PDFium either with or without v8 support (default = true)
 pdf_enable_v8 = false
 
-# Build a complete static library (default = false)
-pdf_is_complete_lib = true
-
 # Build PDFium standalone (default = false)
 pdf_is_standalone = true
