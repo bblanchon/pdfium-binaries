@@ -44,7 +44,10 @@ build_script:
 after_build:
   - cd %APPVEYOR_BUILD_FOLDER%
   - mkdir staging
+  - move repo\pdfium\LICENSE staging
   - move repo\pdfium\public staging\include
+  - del staging\include\DEPS
+  - del staging\include\README
   - set LIB_FOLDER=staging\%PLATFORM%\%MY_TOOLSET%\lib
   - mkdir %LIB_FOLDER%
   - move repo\pdfium\out\obj\pdfium.lib %LIB_FOLDER%
@@ -59,9 +62,11 @@ artifacts:
 
 deploy:
   - provider: GitHub
+    tag: latest
     release: 'Latest build from master'
     description: "This is the latest build from the 'master' branch"
     prerelease: true
+    force_update: true
     auth_token:
       secure: JH8IVbdgVLz16ZXQLO41jQ5OsC7wR8IMRPAzinrdqpvgfhe/btgtr1xZ5trO2Eux
     on:
