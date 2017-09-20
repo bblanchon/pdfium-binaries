@@ -26,14 +26,16 @@ set PDFium_LIB_FILE=%PDFium_LIB_DIR%\%PDFium_NAME%.lib
 set PDFium_ARTIFACT=%CD%\pdfium-%PLATFORM%.zip
 if "%CONFIGURATION%"=="Debug" set PDFium_ARTIFACT=%CD%\pdfium-%PLATFORM%-debug.zip
 
+echo on
+
 : Prepare directories
 mkdir %PDFium_BUILD_DIR%
 mkdir %PDFium_STAGING_DIR%
 mkdir %PDFium_LIB_DIR%
 
 : Download depot_tools
-curl -fsSL -o depot_tools.zip %DepotTools_URL%
-7z -bd x depot_tools.zip -o%DepotTools_DIR%
+call curl -fsSL -o depot_tools.zip %DepotTools_URL%
+call 7z -bd x depot_tools.zip -o%DepotTools_DIR%
 set PATH=%DepotTools_DIR%;%PATH%
 set DEPOT_TOOLS_WIN_TOOLCHAIN=0
 
@@ -43,7 +45,7 @@ call gclient sync
 
 : Patch
 cd %PDFium_SOURCE_DIR%
-git apply %PDFium_PATCH%
+call git apply %PDFium_PATCH%
 
 : Configure
 if "%CONFIGURATION%"=="Release" echo is_debug=false >> %PDFium_ARGS%
@@ -54,7 +56,7 @@ move %PDFium_ARGS% %PDFium_BUILD_DIR%\args.gn
 call gn gen %PDFium_BUILD_DIR%
 
 : Build
-ninja -C %PDFium_BUILD_DIR% pdfium
+call ninja -C %PDFium_BUILD_DIR% pdfium
 
 : Install
 move %PDFium_CMAKE_CONFIG% %PDFium_STAGING_DIR%
@@ -68,4 +70,4 @@ if "%CONFIGURATION%"=="Debug" move %PDFium_BUILD_DIR%\pdfium.dll.pdb %PDFium_PDB
 cd %PDFium_STAGING_DIR%
 
 : Pack
-7z a %PDFium_ARTIFACT% *
+call 7z a %PDFium_ARTIFACT% *
