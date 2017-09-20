@@ -44,6 +44,7 @@ build_script:
 after_build:
   - cd %APPVEYOR_BUILD_FOLDER%
   - mkdir staging
+  - move PDFiumConfig.cmake staging
   - move repo\pdfium\LICENSE staging
   - move repo\pdfium\public staging\include
   - del staging\include\DEPS
