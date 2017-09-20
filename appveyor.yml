@@ -23,10 +23,11 @@ init:
   - set PDFium_SOURCE_DIR=%APPVEYOR_BUILD_FOLDER%\repo\pdfium
   - set PDFium_BUILD_DIR=%PDFium_SOURCE_DIR%\out
   - set PDFium_PATCH=%APPVEYOR_BUILD_FOLDER%\shared_library.patch
+  - set PDFium_CMAKE_CONFIG=%APPVEYOR_BUILD_FOLDER%\PDFiumConfig.cmake
   - set PDFium_ARGS=%APPVEYOR_BUILD_FOLDER%\args.gn
   # Output
   - set PDFium_NAME=pdfium
-  - if "%CONFIGURATION%"=="Debug" PDFium_NAME=pdfiumd
+  - if "%CONFIGURATION%"=="Debug" set PDFium_NAME=pdfiumd
   - set PDFium_STAGING_DIR=%APPVEYOR_BUILD_FOLDER%\staging
   - set PDFium_INCLUDE_DIR=%PDFium_STAGING_DIR%\include
   - set PDFium_BIN_DIR=%PDFium_STAGING_DIR%\%PLATFORM%\bin
@@ -60,7 +61,7 @@ build_script:
 
 after_build:
   - mkdir %PDFium_STAGING_DIR%
-  - move PDFiumConfig.cmake %PDFium_STAGING_DIR%
+  - move %PDFium_CMAKE_CONFIG% %PDFium_STAGING_DIR%
   - move %PDFium_SOURCE_DIR%\LICENSE %PDFium_STAGING_DIR%
   - move %PDFium_SOURCE_DIR%\public %PDFium_INCLUDE_DIR%
   - del %PDFium_INCLUDE_DIR%\DEPS
