@@ -72,5 +72,5 @@ rm -f "$PDFium_INCLUDE_DIR/README"
 mv "$PDFium_BUILD_DIR/libpdfium.so" "$PDFium_LIB_DIR"
 
 # Pack
-cd %PDFium_STAGING_DIR%
+cd "$PDFium_STAGING_DIR"
 tar cvf "$PDFium_ARTIFACT" ./*
