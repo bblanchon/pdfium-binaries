@@ -45,7 +45,7 @@ if [[ -v PDFium_BRANCH ]]; then
 fi
 
 # Install build deps
-sudo ./build/install-build-deps.sh --no-arm --no-chromeos-fonts --no-nacl --no-syms
+sudo "$PDFium_SOURCE_DIR/build/install-build-deps.sh" --no-arm --no-chromeos-fonts --no-nacl --no-syms
 
 # Patch
 cd "$PDFium_SOURCE_DIR"
@@ -60,6 +60,7 @@ gn gen "$PDFium_BUILD_DIR"
 
 # Build
 ninja -C "$PDFium_BUILD_DIR" pdfium
+ls -l "$PDFium_BUILD_DIR"
 
 # Install
 mv "$PDFium_CMAKE_CONFIG" "$PDFium_STAGING_DIR"
