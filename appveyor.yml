@@ -1,4 +1,3 @@
-skip_non_tags: true
 test: off
 
 environment:
