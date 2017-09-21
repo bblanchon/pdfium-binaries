@@ -3,4 +3,4 @@ language: cpp
 env:
   - CONFIGURATION=Release
 
-script: build.sh
+script: bash build.sh
