@@ -13,20 +13,31 @@ if(NOT MSVC)
 endif()
 
 if(CMAKE_CL_64)
-    set(PDFium_ARCH x64)
+  set(PDFium_ARCH x64)
 else()
-    set(PDFium_ARCH x86)
+  set(PDFium_ARCH x86)
 endif()
 
 if(NOT PDFium_FIND_QUIETLY)
   message(STATUS "PDFium ARCH: ${PDFium_ARCH}")
 endif()
 
-add_library(pdfium STATIC IMPORTED)
+set(PDFium_BIN_PATH "${CMAKE_CURRENT_LIST_DIR}/${PDFium_ARCH}/bin")
+set(PDFium_LIB_PATH "${CMAKE_CURRENT_LIST_DIR}/${PDFium_ARCH}/lib")
+set(PDFium_INCLUDE_PATH "${CMAKE_CURRENT_LIST_DIR}/include")
+
+add_library(pdfium SHARED IMPORTED)
 set_target_properties(pdfium
   PROPERTIES
-  IMPORTED_LOCATION "C:\\Libraries\\pdfium\\${PDFium_ARCH}\\vs15\\lib\\pdfium.lib"
-  IMPORTED_LOCATION_DEBUG "C:\\Libraries\\pdfium\\${PDFium_ARCH}\\vs15\\lib\\pdfiumd.lib"
-  INTERFACE_INCLUDE_DIRECTORIES "C:\\Libraries\\pdfium\\include"
-  IMPORTED_LINK_INTERFACE_LIBRARIES_DEBUG "-ignore:4099"
+  IMPORTED_LOCATION             "${PDFium_BIN_PATH}/pdfium.dll"
+  IMPORTED_IMPLIB               "${PDFium_LIB_PATH}/pdfium.dll.lib"
+  INTERFACE_INCLUDE_DIRECTORIES "${PDFium_INCLUDE_PATH}"
 )
+
+file(TO_NATIVE_PATH "${PDFium_BIN_PATH}" PDFium_BIN_PATH)
+file(TO_NATIVE_PATH "${PDFium_LIB_PATH}" PDFium_LIB_PATH)
+
+if(NOT PDFium_FIND_QUIETLY)
+  message(STATUS "Found PDFium in ${PDFium_LIB_PATH}")
+  message(STATUS "You may need to add ${PDFium_BIN_PATH} to the PATH.")
+endif()

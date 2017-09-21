@@ -14,15 +14,10 @@ set PDFium_CMAKE_CONFIG=%CD%\PDFiumConfig.cmake
 set PDFium_ARGS=%CD%\args.gn
 
 : Output
-set PDFium_NAME=pdfium
-if "%CONFIGURATION%"=="Debug" set PDFium_NAME=pdfiumd
 set PDFium_STAGING_DIR=%CD%\staging
 set PDFium_INCLUDE_DIR=%PDFium_STAGING_DIR%\include
 set PDFium_BIN_DIR=%PDFium_STAGING_DIR%\%PLATFORM%\bin
-set PDFium_DLL_FILE=%PDFium_BIN_DIR%\%PDFium_NAME%.dll
-set PDFium_PDB_FILE=%PDFium_BIN_DIR%\%PDFium_NAME%.pdb
 set PDFium_LIB_DIR=%PDFium_STAGING_DIR%\%PLATFORM%\lib
-set PDFium_LIB_FILE=%PDFium_LIB_DIR%\%PDFium_NAME%.lib
 set PDFium_ARTIFACT=%CD%\pdfium-%PLATFORM%.zip
 if "%CONFIGURATION%"=="Debug" set PDFium_ARTIFACT=%CD%\pdfium-%PLATFORM%-debug.zip
 
@@ -66,9 +61,9 @@ move %PDFium_SOURCE_DIR%\LICENSE %PDFium_STAGING_DIR%
 move %PDFium_SOURCE_DIR%\public %PDFium_INCLUDE_DIR%
 del %PDFium_INCLUDE_DIR%\DEPS
 del %PDFium_INCLUDE_DIR%\README
-move %PDFium_BUILD_DIR%\pdfium.dll.lib %PDFium_LIB_FILE%
-move %PDFium_BUILD_DIR%\pdfium.dll %PDFium_DLL_FILE%
-if "%CONFIGURATION%"=="Debug" move %PDFium_BUILD_DIR%\pdfium.dll.pdb %PDFium_PDB_FILE%
+move %PDFium_BUILD_DIR%\pdfium.dll.lib %PDFium_LIB_DiR%
+move %PDFium_BUILD_DIR%\pdfium.dll %PDFium_BIN_DIR%
+if "%CONFIGURATION%"=="Debug" move %PDFium_BUILD_DIR%\pdfium.dll.pdb %PDFium_BIN_DIR%
 cd %PDFium_STAGING_DIR%
 
 : Pack
