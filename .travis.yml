@@ -1,0 +1,6 @@
+sudo: required
+language: cpp
+env:
+  - CONFIGURATION=Release
+
+script: build.sh
