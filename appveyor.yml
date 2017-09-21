@@ -1,12 +1,10 @@
-# File system layout
-# %APPVEYOR_BUILD_FOLDER%/
-#   - depot_tools/ (in PATH)
-#   - repo/
-#       - pdfium/
-#           - out/
+skip_non_tags: true
+test: off
+
 environment:
   APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
   GYP_MSVS_VERSION: 2017
+  PDFium_BRANCH: $(APPVEYOR_REPO_TAG)
 
 configuration:
   - Debug
@@ -25,12 +23,10 @@ artifacts:
 
 deploy:
   - provider: GitHub
-    tag: latest
-    release: 'Latest build from master'
-    description: "This is the latest build from the 'master' branch"
-    prerelease: true
+    tag: $(APPVEYOR_REPO_TAG)
+    description: "This version was built with branch $(APPVEYOR_REPO_TAG) of PDFium"
     force_update: true
     auth_token:
       secure: JH8IVbdgVLz16ZXQLO41jQ5OsC7wR8IMRPAzinrdqpvgfhe/btgtr1xZ5trO2Eux
     on:
-      branch: master
+      appveyor_repo_tag: true

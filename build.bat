@@ -2,6 +2,7 @@
 : GYP_MSVS_VERSION = 2017 | 2015
 : CONFIGURATION = Debug | Release
 : PLATFORM = x86 | x64
+: PDFium_BRANCH = master | chromium/3211 | ...
 
 : Input
 set DepotTools_URL=https://storage.googleapis.com/chrome-infra/depot_tools.zip
@@ -35,8 +36,14 @@ call 7z -bd x depot_tools.zip -o%DepotTools_DIR%
 set PATH=%DepotTools_DIR%;%PATH%
 set DEPOT_TOOLS_WIN_TOOLCHAIN=0
 
-: Checkout
+: Clone
 call gclient config --unmanaged %PDFium_URL%
+call gclient sync
+
+: Checkout
+echo on
+cd %PDFium_SOURCE_DIR%
+call git checkout %PDFium_BRANCH%
 call gclient sync
 
 : Patch
