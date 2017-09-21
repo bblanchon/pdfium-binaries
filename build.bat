@@ -19,8 +19,8 @@ set PDFium_STAGING_DIR=%CD%\staging
 set PDFium_INCLUDE_DIR=%PDFium_STAGING_DIR%\include
 set PDFium_BIN_DIR=%PDFium_STAGING_DIR%\%PLATFORM%\bin
 set PDFium_LIB_DIR=%PDFium_STAGING_DIR%\%PLATFORM%\lib
-set PDFium_ARTIFACT=%CD%\pdfium-%PLATFORM%.zip
-if "%CONFIGURATION%"=="Debug" set PDFium_ARTIFACT=%CD%\pdfium-%PLATFORM%-debug.zip
+set PDFium_ARTIFACT=%CD%\pdfium-windows-%PLATFORM%.zip
+if "%CONFIGURATION%"=="Debug" set PDFium_ARTIFACT=%CD%\pdfium-windows-%PLATFORM%-debug.zip
 
 echo on
 

@@ -4,7 +4,7 @@ test: off
 environment:
   APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
   GYP_MSVS_VERSION: 2017
-  PDFium_BRANCH: $(APPVEYOR_REPO_TAG)
+  PDFium_BRANCH: $(APPVEYOR_REPO_TAG_NAME)
 
 configuration:
   - Debug
@@ -23,8 +23,8 @@ artifacts:
 
 deploy:
   - provider: GitHub
-    tag: $(APPVEYOR_REPO_TAG)
-    description: "This version was built with branch $(APPVEYOR_REPO_TAG) of PDFium"
+    tag: $(APPVEYOR_REPO_TAG_NAME)
+    description: "This version was built with branch $(APPVEYOR_REPO_TAG_NAME) of PDFium"
     force_update: true
     auth_token:
       secure: JH8IVbdgVLz16ZXQLO41jQ5OsC7wR8IMRPAzinrdqpvgfhe/btgtr1xZ5trO2Eux
