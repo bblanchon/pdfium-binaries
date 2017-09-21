@@ -1,5 +1,9 @@
 test: off
 
+branches:
+  except:
+  - /travis/
+
 environment:
   APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
   GYP_MSVS_VERSION: 2017
