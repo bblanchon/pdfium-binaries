@@ -1,6 +1,19 @@
 sudo: required
 language: cpp
-env:
-  - CONFIGURATION=Release
+matrix:
+  include:
+    - env: CONFIGURATION=Release
+    - env: CONFIGURATION=Debug
 
 script: bash build.sh
+
+deploy:
+  provider: releases
+  api_key:
+    secure: "UWXZSVhLWqT83CxNpvmEzTh+tBn9dd0pw7xnqnyXX1FbdRWPlKdfHfB/FmxJEWilPvH8+xm6KFNiX9VqbR5S8PWObTZs0LrSGIzgT00Yo/eZxHQG07PxaB45RIoIuyCo+CdJSzWbKvgkeJ4E4WBfR5Wdya6KLXW7q+VOo4OKR6MikXQkcY6lnJDbR2TYpHGPGNFpWu91QprOzPaD7UMm/Xt+zTiwSVio49BgKv2jl/0cXAo3bdSRHnmL+40F2IFM+n1ep/fD6bXlJAmkVS0SU4sYf39qvX+gE1+jnj2Rgrujuai6fq5sdUVFaU8PGbS31/+pk8pIsDLykYFXppRlb9sJUy9XLmRiOfsYtGZvwXeqqyY1qPdsczXs4aGNeegfqUg6R6J5WfHgyZI1JtJqyLVwijC6a60WtJv5p8ogEop+Z9vKJvZI2FTntOm1GrBzH4tRErsMo6GWuuO0FLN6vGZ0mtbJd9Rh3LKMQ5Htqp3NrwWb+kMQZZWAfpQtbdN4zIfgpYjmLWh6ok3/I6Sgw0YQygMrsnPww7EeEkEMP2xcPUKeagFbQk1ZT01Xv36pp7OHuJAxOtv5bgtsZ4YjVkuc/NdwzfrpPrGLcPF5+WCWSuelLcAnHPFTuEbTFBThPpG6DBHOGvY8oMvUtrONQ6kYt/KkSWjfV0zbWMCe2Ik="
+  file_glob: true
+  file: "pdfium*.tgz"
+  skip_cleanup: true
+  overwrite: true
+  on:
+    tags: true
