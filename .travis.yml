@@ -4,17 +4,7 @@ language: cpp
 matrix:
   include:
     - env: CONFIGURATION=Release
-    - os: linux
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-          packages:
-            - g++-6
-      env:
-        - CC=gcc-6
-        - CXX=g++-6
-        - CONFIGURATION=Debug
+    - env: CONFIGURATION=Debug
 
 script: bash build.sh
 
