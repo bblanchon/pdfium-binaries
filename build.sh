@@ -23,7 +23,6 @@ PDFium_LIB_DIR="$PDFium_STAGING_DIR/lib"
 PDFium_ARTIFACT="$PWD/pdfium-linux.tgz"
 [ "$CONFIGURATION" == "Debug" ] && PDFium_ARTIFACT="$PWD/pdfium-linux-debug.tgz"
 
-
 # Prepare directories
 mkdir -p "$PDFium_BUILD_DIR"
 mkdir -p "$PDFium_STAGING_DIR"
@@ -45,7 +44,7 @@ if [[ -v PDFium_BRANCH ]]; then
 fi
 
 # Install build deps
-sudo "$PDFium_SOURCE_DIR/build/install-build-deps.sh" --no-arm --no-chromeos-fonts --no-nacl --no-syms
+sudo "$PDFium_SOURCE_DIR/build/install-build-deps.sh" --no-arm --no-chromeos-fonts --no-nacl --no-syms --no-prompt
 
 # Patch
 cd "$PDFium_SOURCE_DIR"
