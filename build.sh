@@ -14,7 +14,7 @@ PDFium_SOURCE_DIR="$PWD/pdfium"
 PDFium_BUILD_DIR="$PDFium_SOURCE_DIR/out"
 PDFium_PATCH="$PWD/shared_library.patch"
 PDFium_CMAKE_CONFIG="$PWD/PDFiumConfig.cmake"
-PDFium_ARGS="$PWD/args.gn"
+PDFium_ARGS="$PWD/Linux.args.gn"
 
 # Output
 PDFium_STAGING_DIR="$PWD/staging"
@@ -51,9 +51,6 @@ cd "$PDFium_SOURCE_DIR"
 git apply -v "$PDFium_PATCH"
 
 # Configure
-echo 'is_clang=false' >> "$PDFium_ARGS"
-echo 'use_cxx11=true' >> "$PDFium_ARGS"
-echo 'libcpp_is_static=true' >> "$PDFium_ARGS"
 [ "$CONFIGURATION" == "Release" ] && echo 'is_debug=false' >> "$PDFium_ARGS"
 mv "$PDFium_ARGS" "$PDFium_BUILD_DIR/args.gn"
 
@@ -76,4 +73,4 @@ mv "$PDFium_BUILD_DIR/libpdfium.so" "$PDFium_LIB_DIR"
 
 # Pack
 cd "$PDFium_STAGING_DIR"
-tar cvf "$PDFium_ARTIFACT" ./*
+tar cvf "$PDFium_ARTIFACT" *
