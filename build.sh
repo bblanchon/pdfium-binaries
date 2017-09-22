@@ -66,13 +66,13 @@ ls -l "$PDFium_BUILD_DIR"
 
 # Install
 gn args --list "$PDFium_BUILD_DIR" > "$PDFium_STAGING_DIR/config.txt"
+ldd "$PDFium_BUILD_DIR/libpdfium.so"
 mv "$PDFium_CMAKE_CONFIG" "$PDFium_STAGING_DIR"
 mv "$PDFium_SOURCE_DIR/LICENSE" "$PDFium_STAGING_DIR"
 mv "$PDFium_SOURCE_DIR/public" "$PDFium_INCLUDE_DIR"
 rm -f "$PDFium_INCLUDE_DIR/DEPS"
 rm -f "$PDFium_INCLUDE_DIR/README"
 mv "$PDFium_BUILD_DIR/libpdfium.so" "$PDFium_LIB_DIR"
-ldd "$PDFium_BUILD_DIR/libpdfium.so"
 
 # Pack
 cd "$PDFium_STAGING_DIR"
