@@ -12,7 +12,7 @@ DepotTools_DIR="$PWD/depot_tools"
 PDFium_URL='https://pdfium.googlesource.com/pdfium.git'
 PDFium_SOURCE_DIR="$PWD/pdfium"
 PDFium_BUILD_DIR="$PDFium_SOURCE_DIR/out"
-PDFium_PATCH="$PWD/shared_library.patch"
+PDFium_PATCH_DIR="$PWD"
 PDFium_CMAKE_CONFIG="$PWD/PDFiumConfig.cmake"
 PDFium_ARGS="$PWD/Linux.args.gn"
 
@@ -48,7 +48,9 @@ sudo "$PDFium_SOURCE_DIR/build/install-build-deps.sh" --no-arm --no-chromeos-fon
 
 # Patch
 cd "$PDFium_SOURCE_DIR"
-git apply -v "$PDFium_PATCH"
+git apply -v "$PDFium_PATCH_DIR/shared_library.patch"
+cd "$PDFium_SOURCE_DIR/build"
+git apply -v "$PDFium_PATCH_DIR/static_libstdcxx.patch"
 
 # Configure
 [ "$CONFIGURATION" == "Release" ] && echo 'is_debug=false' >> "$PDFium_ARGS"
