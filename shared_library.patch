@@ -19,3 +19,16 @@ index b4b93b584..d57bb555d 100644
    sources = [
      "fpdfsdk/cba_annotiterator.cpp",
      "fpdfsdk/cba_annotiterator.h",
+diff --git a/public/fpdfview.h b/public/fpdfview.h
+index 135d00a8f..256d6c31b 100644
+--- a/public/fpdfview.h
++++ b/public/fpdfview.h
+@@ -147,7 +147,7 @@ typedef int FPDF_OBJECT_TYPE;
+ #define FPDF_EXPORT __declspec(dllexport)
+ #define FPDF_CALLCONV __stdcall
+ #else
+-#define FPDF_EXPORT
++#define FPDF_EXPORT __attribute__((visibility("default")))
+ #define FPDF_CALLCONV
+ #endif
+ 
