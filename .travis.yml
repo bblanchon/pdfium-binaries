@@ -1,9 +1,20 @@
 sudo: required
 language: cpp
+
 matrix:
   include:
     - env: CONFIGURATION=Release
-    - env: CONFIGURATION=Debug
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-6
+      env:
+        - CC=gcc-6
+        - CXX=g++-6
+        - CONFIGURATION=Debug
 
 script: bash build.sh
 

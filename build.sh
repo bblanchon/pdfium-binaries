@@ -51,6 +51,7 @@ cd "$PDFium_SOURCE_DIR"
 git apply -v "$PDFium_PATCH"
 
 # Configure
+echo 'is_clang=false' >> "$PDFium_ARGS"
 [ "$CONFIGURATION" == "Release" ] && echo 'is_debug=false' >> "$PDFium_ARGS"
 mv "$PDFium_ARGS" "$PDFium_BUILD_DIR/args.gn"
 
