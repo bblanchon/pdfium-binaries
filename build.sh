@@ -53,6 +53,7 @@ git apply -v "$PDFium_PATCH"
 # Configure
 echo 'is_clang=false' >> "$PDFium_ARGS"
 echo 'use_cxx11=true' >> "$PDFium_ARGS"
+echo 'libcpp_is_static=true' >> "$PDFium_ARGS"
 [ "$CONFIGURATION" == "Release" ] && echo 'is_debug=false' >> "$PDFium_ARGS"
 mv "$PDFium_ARGS" "$PDFium_BUILD_DIR/args.gn"
 
@@ -60,7 +61,7 @@ mv "$PDFium_ARGS" "$PDFium_BUILD_DIR/args.gn"
 gn gen "$PDFium_BUILD_DIR"
 
 # Build
-ninja -C "$PDFium_BUILD_DIR" pdfium
+ninja -v -C "$PDFium_BUILD_DIR" pdfium
 ls -l "$PDFium_BUILD_DIR"
 
 # Install
@@ -71,6 +72,7 @@ mv "$PDFium_SOURCE_DIR/public" "$PDFium_INCLUDE_DIR"
 rm -f "$PDFium_INCLUDE_DIR/DEPS"
 rm -f "$PDFium_INCLUDE_DIR/README"
 mv "$PDFium_BUILD_DIR/libpdfium.so" "$PDFium_LIB_DIR"
+ldd "$PDFium_BUILD_DIR/libpdfium.so"
 
 # Pack
 cd "$PDFium_STAGING_DIR"
