@@ -8,3 +8,4 @@ pdf_enable_v8 = false
 pdf_is_standalone = true
 
 libcpp_is_static = true
+
