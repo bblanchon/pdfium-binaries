@@ -27,6 +27,11 @@ Here are the download links for latest release:
     <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest">pdfium-windows-x64.zip</a></td>
     <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest">pdfium-windows-x64-debug.zip</a></td>
   </tr>
+  <tr>
+    <td>Linux</td>
+    <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest">pdfium-linux.zip</a></td>
+    <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest">pdfium-linux-debug.zip</a></td>
+  </tr>
 </table>
 
 ### How too use in a CMake project

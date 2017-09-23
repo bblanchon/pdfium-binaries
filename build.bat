@@ -12,7 +12,7 @@ set PDFium_SOURCE_DIR=%CD%\pdfium
 set PDFium_BUILD_DIR=%PDFium_SOURCE_DIR%\out
 set PDFium_PATCH=%CD%\shared_library.patch
 set PDFium_CMAKE_CONFIG=%CD%\PDFiumConfig.cmake
-set PDFium_ARGS=%CD%\args.gn
+set PDFium_ARGS=%CD%\Windows.args.gn
 
 : Output
 set PDFium_STAGING_DIR=%CD%\staging
@@ -71,7 +71,7 @@ del %PDFium_INCLUDE_DIR%\README
 move %PDFium_BUILD_DIR%\pdfium.dll.lib %PDFium_LIB_DiR%
 move %PDFium_BUILD_DIR%\pdfium.dll %PDFium_BIN_DIR%
 if "%CONFIGURATION%"=="Debug" move %PDFium_BUILD_DIR%\pdfium.dll.pdb %PDFium_BIN_DIR%
-cd %PDFium_STAGING_DIR%
 
 : Pack
+cd %PDFium_STAGING_DIR%
 call 7z a %PDFium_ARTIFACT% *
