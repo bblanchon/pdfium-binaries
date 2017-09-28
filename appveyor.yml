@@ -19,6 +19,8 @@ platform:
 
 build_script:
   - call build.bat
+  - cd %APPVEYOR_BUILD_FOLDER%
+  - call test.bat
 
 artifacts:
   - path: pdfium-*.zip

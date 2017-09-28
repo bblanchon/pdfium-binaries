@@ -6,22 +6,32 @@
 
 set -ex
 
+OS=$(uname)
+case $OS in
+MINGW*)
+  OS="windows"
+  ;;
+*)
+  OS=$(echo $OS | tr '[:upper:]' '[:lower:]')
+  ;;
+esac
+
 # Input
 DepotTools_URL='https://chromium.googlesource.com/chromium/tools/depot_tools.git'
 DepotTools_DIR="$PWD/depot_tools"
 PDFium_URL='https://pdfium.googlesource.com/pdfium.git'
 PDFium_SOURCE_DIR="$PWD/pdfium"
 PDFium_BUILD_DIR="$PDFium_SOURCE_DIR/out"
-PDFium_PATCH_DIR="$PWD"
+PDFium_PATCH_DIR="$PWD/patches"
 PDFium_CMAKE_CONFIG="$PWD/PDFiumConfig.cmake"
-PDFium_ARGS="$PWD/Linux.args.gn"
+PDFium_ARGS="$PWD/args/$OS.args.gn"
 
 # Output
 PDFium_STAGING_DIR="$PWD/staging"
 PDFium_INCLUDE_DIR="$PDFium_STAGING_DIR/include"
 PDFium_LIB_DIR="$PDFium_STAGING_DIR/lib"
-PDFium_ARTIFACT="$PWD/pdfium-linux.tgz"
-[ "$CONFIGURATION" == "Debug" ] && PDFium_ARTIFACT="$PWD/pdfium-linux-debug.tgz"
+PDFium_ARTIFACT="$PWD/pdfium-$OS.tgz"
+[ "$CONFIGURATION" == "Debug" ] && PDFium_ARTIFACT="$PWD/pdfium-$OS-debug.tgz"
 
 # Prepare directories
 mkdir -p "$PDFium_BUILD_DIR"
@@ -37,14 +47,9 @@ gclient config --unmanaged "$PDFium_URL"
 gclient sync
 
 # Checkout
-if [[ -v PDFium_BRANCH ]]; then
-	cd "$PDFium_SOURCE_DIR"
-	git checkout "$PDFium_BRANCH"
-	gclient sync
-fi
-
-# Install build deps
-sudo "$PDFium_SOURCE_DIR/build/install-build-deps.sh" --no-arm --no-chromeos-fonts --no-nacl --no-syms --no-prompt
+cd "$PDFium_SOURCE_DIR"
+git checkout "${PDFium_BRANCH:-master}"
+gclient sync
 
 # Patch
 cd "$PDFium_SOURCE_DIR"
@@ -69,8 +74,9 @@ mv "$PDFium_SOURCE_DIR/LICENSE" "$PDFium_STAGING_DIR"
 mv "$PDFium_SOURCE_DIR/public" "$PDFium_INCLUDE_DIR"
 rm -f "$PDFium_INCLUDE_DIR/DEPS"
 rm -f "$PDFium_INCLUDE_DIR/README"
-mv "$PDFium_BUILD_DIR/libpdfium.so" "$PDFium_LIB_DIR"
+[ "$OS" == "linux" ] && mv "$PDFium_BUILD_DIR/libpdfium.so" "$PDFium_LIB_DIR"
+[ "$OS" == "darwin" ] && mv "$PDFium_BUILD_DIR/libpdfium.dylib" "$PDFium_LIB_DIR"
 
 # Pack
 cd "$PDFium_STAGING_DIR"
-tar cvf "$PDFium_ARTIFACT" *
+tar cvf "$PDFium_ARTIFACT" -- *

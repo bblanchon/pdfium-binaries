@@ -10,9 +10,9 @@ set DepotTools_DIR=%CD%/depot_tools
 set PDFium_URL=https://pdfium.googlesource.com/pdfium.git
 set PDFium_SOURCE_DIR=%CD%\pdfium
 set PDFium_BUILD_DIR=%PDFium_SOURCE_DIR%\out
-set PDFium_PATCH=%CD%\shared_library.patch
+set PDFium_PATCH=%CD%\patches\shared_library.patch
 set PDFium_CMAKE_CONFIG=%CD%\PDFiumConfig.cmake
-set PDFium_ARGS=%CD%\Windows.args.gn
+set PDFium_ARGS=%CD%\args\windows.args.gn
 
 : Output
 set PDFium_STAGING_DIR=%CD%\staging

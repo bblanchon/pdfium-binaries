@@ -29,7 +29,7 @@ if(MSVC)
     PROPERTIES
     IMPORTED_LOCATION             "${PDFium_BIN_PATH}/pdfium.dll"
     IMPORTED_IMPLIB               "${PDFium_LIB_PATH}/pdfium.dll.lib"
-    INTERFACE_INCLUDE_DIRECTORIES "${PDFium_INCLUDE_PATH}"
+    INTERFACE_INCLUDE_DIRECTORIES "${PDFium_INCLUDE_PATH};${PDFium_INCLUDE_PATH}/cpp"
   )
 
   file(TO_NATIVE_PATH "${PDFium_BIN_PATH}" PDFium_BIN_PATH)
@@ -45,8 +45,8 @@ else()
   add_library(pdfium SHARED IMPORTED)
   set_target_properties(pdfium
     PROPERTIES
-    IMPORTED_LOCATION             "${PDFium_LIB_PATH}/libpdfium.so"
-    INTERFACE_INCLUDE_DIRECTORIES "${PDFium_INCLUDE_PATH}"
+    IMPORTED_LOCATION             "${PDFium_LIB_PATH}/libpdfium${CMAKE_SHARED_LIBRARY_SUFFIX}"
+    INTERFACE_INCLUDE_DIRECTORIES "${PDFium_INCLUDE_PATH};${PDFium_INCLUDE_PATH}/cpp"
   )
 
   if(NOT PDFium_FIND_QUIETLY)

@@ -1,0 +1,9 @@
+# Disable component build (must be false)
+is_component_build = false
+
+# Build PDFium either with or without v8 support (default = true)
+pdf_enable_v8 = false
+
+# Build PDFium standalone (default = false)
+pdf_is_standalone = true
+

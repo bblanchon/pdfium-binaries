@@ -1,5 +1,6 @@
 [![Total number of downloads](https://img.shields.io/github/downloads/bblanchon/pdfium-binaries/total.svg)](https://github.com/bblanchon/pdfium-binaries/releases)
 [![Windows Build status](https://ci.appveyor.com/api/projects/status/85rqdhpyxt589700?svg=true)](https://ci.appveyor.com/project/bblanchon/pdfium-binaries)
+[![Linux/macOS Build Status](https://travis-ci.org/bblanchon/pdfium-binaries.svg?branch=master)](https://travis-ci.org/bblanchon/pdfium-binaries)
 
 # Pre-compiled binaries of PDFium
 
@@ -13,7 +14,7 @@ Here are the download links for latest release:
 
 <table>
   <tr>
-    <th>Plateform</th>
+    <th>Platform</th>
     <th>Release build</th>
     <th>Debug build</th>
   </tr>
@@ -31,6 +32,11 @@ Here are the download links for latest release:
     <td>Linux</td>
     <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest">pdfium-linux.zip</a></td>
     <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest">pdfium-linux-debug.zip</a></td>
+  </tr>
+  <tr>
+    <td>macOS</td>
+    <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest">pdfium-darwin.zip</a></td>
+    <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest">pdfium-darwin-debug.zip</a></td>
   </tr>
 </table>
 

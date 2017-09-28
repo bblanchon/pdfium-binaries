@@ -3,10 +3,20 @@ language: cpp
 
 matrix:
   include:
-    - env: CONFIGURATION=Release
-    - env: CONFIGURATION=Debug
+    - os: linux
+      env: CONFIGURATION=Release
+    - os: linux
+      env: CONFIGURATION=Debug
+    - os: osx
+      osx_image: xcode9
+      env: CONFIGURATION=Release
+    - os: osx
+      osx_image: xcode9
+      env: CONFIGURATION=Debug
 
-script: bash build.sh
+script:
+  - bash build.sh
+  - bash test.sh
 
 deploy:
   provider: releases
