@@ -8,7 +8,13 @@
 #   3. then link you excecutable with PDFium
 #       target_link_libraries(my_exe pdfium)
 
-set(PDFium_INCLUDE_PATH "${CMAKE_CURRENT_LIST_DIR}/include")
+include(FindPackageHandleStandardArgs)
+
+find_path(PDFium_INCLUDE_DIR
+    NAMES "fpdfview.h"
+    PATHS "${CMAKE_CURRENT_LIST_DIR}"
+    PATH_SUFFIXES "include"
+)
 
 if(MSVC)
   if(CMAKE_CL_64)
@@ -17,39 +23,41 @@ if(MSVC)
     set(PDFium_ARCH x86)
   endif()
 
-  if(NOT PDFium_FIND_QUIETLY)
-    message(STATUS "PDFium ARCH: ${PDFium_ARCH}")
-  endif()
+  find_file(PDFium_LIBRARY
+        NAMES "pdfium.dll"
+        PATHS "${CMAKE_CURRENT_LIST_DIR}"
+        PATH_SUFFIXES "${PDFium_ARCH}/bin")
 
-  set(PDFium_BIN_PATH "${CMAKE_CURRENT_LIST_DIR}/${PDFium_ARCH}/bin")
-  set(PDFium_LIB_PATH "${CMAKE_CURRENT_LIST_DIR}/${PDFium_ARCH}/lib")
+  find_file(PDFium_IMPLIB
+        NAMES "pdfium.dll.lib"
+        PATHS "${CMAKE_CURRENT_LIST_DIR}"
+        PATH_SUFFIXES "${PDFium_ARCH}/lib")
 
   add_library(pdfium SHARED IMPORTED)
   set_target_properties(pdfium
     PROPERTIES
-    IMPORTED_LOCATION             "${PDFium_BIN_PATH}/pdfium.dll"
-    IMPORTED_IMPLIB               "${PDFium_LIB_PATH}/pdfium.dll.lib"
-    INTERFACE_INCLUDE_DIRECTORIES "${PDFium_INCLUDE_PATH};${PDFium_INCLUDE_PATH}/cpp"
+    IMPORTED_LOCATION             "${PDFium_LIBRARY}"
+    IMPORTED_IMPLIB               "${PDFium_IMPLIB}"
+    INTERFACE_INCLUDE_DIRECTORIES "${PDFium_INCLUDE_DIR};${PDFium_INCLUDE_DIR}/cpp"
   )
 
-  file(TO_NATIVE_PATH "${PDFium_BIN_PATH}" PDFium_BIN_PATH)
-  file(TO_NATIVE_PATH "${PDFium_LIB_PATH}" PDFium_LIB_PATH)
-
-  if(NOT PDFium_FIND_QUIETLY)
-    message(STATUS "Found PDFium in ${PDFium_LIB_PATH}")
-    message(STATUS "You may need to add ${PDFium_BIN_PATH} to the PATH.")
-  endif()
+  find_package_handle_standard_args(PDFium
+    REQUIRED_VARS PDFium_LIBRARY PDFium_IMPLIB PDFium_INCLUDE_DIR
+  )
 else()
-  set(PDFium_LIB_PATH "${CMAKE_CURRENT_LIST_DIR}/lib")
+  find_library(PDFium_LIBRARY
+        NAMES "pdfium"
+        PATHS "${CMAKE_CURRENT_LIST_DIR}"
+        PATH_SUFFIXES "lib")
 
   add_library(pdfium SHARED IMPORTED)
   set_target_properties(pdfium
     PROPERTIES
-    IMPORTED_LOCATION             "${PDFium_LIB_PATH}/libpdfium${CMAKE_SHARED_LIBRARY_SUFFIX}"
-    INTERFACE_INCLUDE_DIRECTORIES "${PDFium_INCLUDE_PATH};${PDFium_INCLUDE_PATH}/cpp"
+    IMPORTED_LOCATION             "${PDFium_LIBRARY}"
+    INTERFACE_INCLUDE_DIRECTORIES "${PDFium_INCLUDE_DIR};${PDFium_INCLUDE_DIR}/cpp"
   )
 
-  if(NOT PDFium_FIND_QUIETLY)
-    message(STATUS "Found PDFium in ${PDFium_LIB_PATH}")
-  endif()
+  find_package_handle_standard_args(PDFium
+    REQUIRED_VARS PDFium_LIBRARY PDFium_INCLUDE_DIR
+  )
 endif()
