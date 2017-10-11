@@ -10,7 +10,7 @@ set DepotTools_DIR=%CD%/depot_tools
 set PDFium_URL=https://pdfium.googlesource.com/pdfium.git
 set PDFium_SOURCE_DIR=%CD%\pdfium
 set PDFium_BUILD_DIR=%PDFium_SOURCE_DIR%\out
-set PDFium_PATCH=%CD%\patches\shared_library.patch
+set PDFium_PATCH_DIR=%CD%\patches
 set PDFium_CMAKE_CONFIG=%CD%\PDFiumConfig.cmake
 set PDFium_ARGS=%CD%\args\windows.args.gn
 
@@ -49,7 +49,8 @@ call gclient sync
 : Patch
 echo on
 cd %PDFium_SOURCE_DIR%
-call git apply -v %PDFium_PATCH%
+call git apply -v "%PDFium_PATCH_DIR%\shared_library.patch"
+call git apply -v "%PDFium_PATCH_DIR%\relative_includes.patch"
 
 : Configure
 if "%CONFIGURATION%"=="Release" echo is_debug=false >> %PDFium_ARGS%
