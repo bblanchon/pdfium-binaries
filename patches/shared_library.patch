@@ -15,7 +15,7 @@ index abdd41456..ec82e8fd8 100644
  }
  
 -jumbo_static_library("pdfium") {
-+jumbo_shared_library("pdfium") {
++shared_library("pdfium") {
    sources = [
      "fpdfsdk/cba_annotiterator.cpp",
      "fpdfsdk/cba_annotiterator.h",
