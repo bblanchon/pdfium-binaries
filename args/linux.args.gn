@@ -13,3 +13,4 @@ use_cxx11=true
 
 # Static link to c++ library
 libcpp_is_static=true
+use_custom_libcxx=true
