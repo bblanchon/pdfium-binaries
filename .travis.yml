@@ -7,12 +7,12 @@ matrix:
       env: CONFIGURATION=Release
     - os: linux
       env: CONFIGURATION=Debug
-    - os: osx
-      osx_image: xcode9
-      env: CONFIGURATION=Release
-    - os: osx
-      osx_image: xcode9
-      env: CONFIGURATION=Debug
+#    - os: osx
+#      osx_image: xcode9
+#      env: CONFIGURATION=Release
+#    - os: osx
+#      osx_image: xcode9
+#      env: CONFIGURATION=Debug
 
 script:
   - bash build.sh
