@@ -4,15 +4,15 @@ language: cpp
 matrix:
   include:
     - os: linux
-      env: CONFIGURATION=Release
+      env: PDFium_BRANCH=$TRAVIS_BRANCH CONFIGURATION=Release
     - os: linux
-      env: CONFIGURATION=Debug
+      env: PDFium_BRANCH=$TRAVIS_BRANCH CONFIGURATION=Debug
     - os: osx
       osx_image: xcode9
-      env: CONFIGURATION=Release
+      env: PDFium_BRANCH=$TRAVIS_BRANCH CONFIGURATION=Release
     - os: osx
       osx_image: xcode9
-      env: CONFIGURATION=Debug
+      env: PDFium_BRANCH=$TRAVIS_BRANCH CONFIGURATION=Debug
 
 script:
   - bash build.sh
