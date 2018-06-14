@@ -53,9 +53,9 @@ call git apply -v "%PDFium_PATCH_DIR%\shared_library.patch"
 call git apply -v "%PDFium_PATCH_DIR%\relative_includes.patch"
 
 : Configure
-if "%CONFIGURATION%"=="Release" echo is_debug=false >> %PDFium_ARGS%
-if "%PLATFORM%"=="x86" echo target_cpu="x86" >> %PDFium_ARGS%
-move %PDFium_ARGS% %PDFium_BUILD_DIR%\args.gn
+copy %PDFium_ARGS% %PDFium_BUILD_DIR%\args.gn
+if "%CONFIGURATION%"=="Release" echo is_debug=false >> %PDFium_BUILD_DIR%\args.gn
+if "%PLATFORM%"=="x86" echo target_cpu="x86" >> %PDFium_BUILD_DIR%\args.gn
 
 : Generate Ninja files
 call gn gen %PDFium_BUILD_DIR%
@@ -64,12 +64,13 @@ call gn gen %PDFium_BUILD_DIR%
 call ninja -C %PDFium_BUILD_DIR% pdfium
 
 : Install
-move %PDFium_CMAKE_CONFIG% %PDFium_STAGING_DIR%
-move %PDFium_SOURCE_DIR%\LICENSE %PDFium_STAGING_DIR%
-move %PDFium_SOURCE_DIR%\public %PDFium_INCLUDE_DIR%
+copy %PDFium_CMAKE_CONFIG% %PDFium_STAGING_DIR%
+copy %PDFium_SOURCE_DIR%\LICENSE %PDFium_STAGING_DIR%
+xcopy /S /Y %PDFium_SOURCE_DIR%\public %PDFium_INCLUDE_DIR%\
 del %PDFium_INCLUDE_DIR%\DEPS
 del %PDFium_INCLUDE_DIR%\README
-move %PDFium_BUILD_DIR%\pdfium.dll.lib %PDFium_LIB_DiR%
+del %PDFium_INCLUDE_DIR%\PRESUBMIT.py
+move %PDFium_BUILD_DIR%\pdfium.dll.lib %PDFium_LIB_DIR%
 move %PDFium_BUILD_DIR%\pdfium.dll %PDFium_BIN_DIR%
 if "%CONFIGURATION%"=="Debug" move %PDFium_BUILD_DIR%\pdfium.dll.pdb %PDFium_BIN_DIR%
 
