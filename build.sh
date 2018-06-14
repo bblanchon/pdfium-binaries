@@ -17,21 +17,21 @@ MINGW*)
 esac
 
 # Input
-export DepotTools_URL='https://chromium.googlesource.com/chromium/tools/depot_tools.git'
-export DepotTools_DIR="$PWD/depot_tools"
-export PDFium_URL='https://pdfium.googlesource.com/pdfium.git'
-export PDFium_SOURCE_DIR="$PWD/pdfium"
-export PDFium_BUILD_DIR="$PDFium_SOURCE_DIR/out"
-export PDFium_PATCH_DIR="$PWD/patches"
-export PDFium_CMAKE_CONFIG="$PWD/PDFiumConfig.cmake"
-export PDFium_ARGS="$PWD/args/$OS.args.gn"
+DepotTools_URL='https://chromium.googlesource.com/chromium/tools/depot_tools.git'
+DepotTools_DIR="$PWD/depot_tools"
+PDFium_URL='https://pdfium.googlesource.com/pdfium.git'
+PDFium_SOURCE_DIR="$PWD/pdfium"
+PDFium_BUILD_DIR="$PDFium_SOURCE_DIR/out"
+PDFium_PATCH_DIR="$PWD/patches"
+PDFium_CMAKE_CONFIG="$PWD/PDFiumConfig.cmake"
+PDFium_ARGS="$PWD/args/$OS.args.gn"
 
 # Output
-export PDFium_STAGING_DIR="$PWD/staging"
-export PDFium_INCLUDE_DIR="$PDFium_STAGING_DIR/include"
-export PDFium_LIB_DIR="$PDFium_STAGING_DIR/lib"
-export PDFium_ARTIFACT="$PWD/pdfium-$OS.tgz"
-[ "$CONFIGURATION" == "Debug" ] && export PDFium_ARTIFACT="$PWD/pdfium-$OS-debug.tgz"
+PDFium_STAGING_DIR="$PWD/staging"
+PDFium_INCLUDE_DIR="$PDFium_STAGING_DIR/include"
+PDFium_LIB_DIR="$PDFium_STAGING_DIR/lib"
+PDFium_ARTIFACT="$PWD/pdfium-$OS.tgz"
+[ "$CONFIGURATION" == "Debug" ] && PDFium_ARTIFACT="$PWD/pdfium-$OS-debug.tgz"
 
 # Prepare directories
 mkdir -p "$PDFium_BUILD_DIR"
