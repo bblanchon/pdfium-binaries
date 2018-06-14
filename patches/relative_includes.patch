@@ -1,17 +1,19 @@
 diff --git a/public/cpp/fpdf_deleters.h b/public/cpp/fpdf_deleters.h
-index 238ef30e6..720074222 100644
+index 51e7cba7f..955391e3f 100644
 --- a/public/cpp/fpdf_deleters.h
 +++ b/public/cpp/fpdf_deleters.h
-@@ -5,12 +5,12 @@
+@@ -5,13 +5,13 @@
  #ifndef PUBLIC_CPP_FPDF_DELETERS_H_
  #define PUBLIC_CPP_FPDF_DELETERS_H_
  
+-#include "public/fpdf_annot.h"
 -#include "public/fpdf_dataavail.h"
 -#include "public/fpdf_edit.h"
 -#include "public/fpdf_formfill.h"
 -#include "public/fpdf_structtree.h"
 -#include "public/fpdf_text.h"
 -#include "public/fpdfview.h"
++#include "../fpdf_annot.h"
 +#include "../fpdf_dataavail.h"
 +#include "../fpdf_edit.h"
 +#include "../fpdf_formfill.h"

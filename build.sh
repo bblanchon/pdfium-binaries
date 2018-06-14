@@ -40,7 +40,7 @@ mkdir -p "$PDFium_LIB_DIR"
 
 # Download depot_tools
 git clone "$DepotTools_URL" "$DepotTools_DIR"
-PATH="$DepotTools_DIR:$PATH"
+export PATH="$DepotTools_DIR:$PATH"
 
 # Clone
 gclient config --unmanaged "$PDFium_URL"
@@ -55,12 +55,11 @@ gclient sync
 cd "$PDFium_SOURCE_DIR"
 git apply -v "$PDFium_PATCH_DIR/shared_library.patch"
 git apply -v "$PDFium_PATCH_DIR/relative_includes.patch"
-cd "$PDFium_SOURCE_DIR/build"
-git apply -v "$PDFium_PATCH_DIR/static_libstdcxx.patch"
+#git apply -v "$PDFium_PATCH_DIR/static_libstdcxx.patch"
 
 # Configure
-[ "$CONFIGURATION" == "Release" ] && echo 'is_debug=false' >> "$PDFium_ARGS"
-mv "$PDFium_ARGS" "$PDFium_BUILD_DIR/args.gn"
+cp "$PDFium_ARGS" "$PDFium_BUILD_DIR/args.gn"
+[ "$CONFIGURATION" == "Release" ] && echo 'is_debug=false' >> "$PDFium_BUILD_DIR/args.gn"
 
 # Generate Ninja files
 gn gen "$PDFium_BUILD_DIR"
@@ -70,11 +69,12 @@ ninja -C "$PDFium_BUILD_DIR" pdfium
 ls -l "$PDFium_BUILD_DIR"
 
 # Install
-mv "$PDFium_CMAKE_CONFIG" "$PDFium_STAGING_DIR"
-mv "$PDFium_SOURCE_DIR/LICENSE" "$PDFium_STAGING_DIR"
-mv "$PDFium_SOURCE_DIR/public" "$PDFium_INCLUDE_DIR"
+cp "$PDFium_CMAKE_CONFIG" "$PDFium_STAGING_DIR"
+cp "$PDFium_SOURCE_DIR/LICENSE" "$PDFium_STAGING_DIR"
+cp -R "$PDFium_SOURCE_DIR/public" "$PDFium_INCLUDE_DIR"
 rm -f "$PDFium_INCLUDE_DIR/DEPS"
 rm -f "$PDFium_INCLUDE_DIR/README"
+rm -f "$PDFium_INCLUDE_DIR/PRESUBMIT.py"
 [ "$OS" == "linux" ] && mv "$PDFium_BUILD_DIR/libpdfium.so" "$PDFium_LIB_DIR"
 [ "$OS" == "darwin" ] && mv "$PDFium_BUILD_DIR/libpdfium.dylib" "$PDFium_LIB_DIR"
 

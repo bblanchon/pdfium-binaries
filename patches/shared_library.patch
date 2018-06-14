@@ -1,29 +1,29 @@
 diff --git a/BUILD.gn b/BUILD.gn
-index b4b93b584..d57bb555d 100644
+index 132f3c28e..a2d6cfa84 100644
 --- a/BUILD.gn
 +++ b/BUILD.gn
-@@ -23,6 +23,7 @@ config("pdfium_common_config") {
+@@ -24,6 +24,7 @@ config("pdfium_common_config") {
      "OPJ_STATIC",
      "PNG_PREFIX",
      "PNG_USE_READ_MACROS",
-+    "FPDFSDK_EXPORTS"
++    "FPDFSDK_EXPORTS",
    ]
  
-   if (pdf_use_skia) {
-@@ -100,7 +101,7 @@ config("xfa_warnings") {
+   if (pdf_enable_v8) {
+@@ -105,7 +106,7 @@ config("xfa_warnings") {
    }
  }
  
--static_library("pdfium") {
+-jumbo_static_library("pdfium") {
 +shared_library("pdfium") {
    sources = [
-     "fpdfsdk/cba_annotiterator.cpp",
-     "fpdfsdk/cba_annotiterator.h",
+     "fpdfsdk/cfx_systemhandler.cpp",
+     "fpdfsdk/cfx_systemhandler.h",
 diff --git a/public/fpdfview.h b/public/fpdfview.h
-index 135d00a8f..89c89ed9c 100644
+index de0421eb3..ff491d96b 100644
 --- a/public/fpdfview.h
 +++ b/public/fpdfview.h
-@@ -142,13 +142,22 @@ typedef int FPDF_ANNOTATION_SUBTYPE;
+@@ -153,13 +153,22 @@ typedef int FPDF_ANNOT_APPEARANCEMODE;
  // Dictionary value types.
  typedef int FPDF_OBJECT_TYPE;
  

@@ -7,9 +7,6 @@ pdf_enable_v8 = false
 # Build PDFium standalone (default = false)
 pdf_is_standalone = true
 
-# Use GCC
-is_clang=false
-use_cxx11=true
-
 # Static link to c++ library
+use_custom_libcxx=true
 libcpp_is_static=true
