@@ -1,8 +1,8 @@
 diff --git a/BUILD.gn b/BUILD.gn
-index 132f3c28e..a2d6cfa84 100644
+index 3faf5cd18..71e593150 100644
 --- a/BUILD.gn
 +++ b/BUILD.gn
-@@ -24,6 +24,7 @@ config("pdfium_common_config") {
+@@ -23,6 +23,7 @@ config("pdfium_common_config") {
      "OPJ_STATIC",
      "PNG_PREFIX",
      "PNG_USE_READ_MACROS",
@@ -10,20 +10,20 @@ index 132f3c28e..a2d6cfa84 100644
    ]
  
    if (pdf_enable_v8) {
-@@ -105,7 +106,7 @@ config("xfa_warnings") {
-   }
+@@ -91,7 +92,7 @@ config("pdfium_core_config") {
+   configs += [ "//build/config/compiler:no_size_t_to_int_warning" ]
  }
  
 -jumbo_static_library("pdfium") {
 +shared_library("pdfium") {
    sources = [
-     "fpdfsdk/cfx_systemhandler.cpp",
-     "fpdfsdk/cfx_systemhandler.h",
+     "fpdfsdk/fpdf_annot.cpp",
+     "fpdfsdk/fpdf_attachment.cpp",
 diff --git a/public/fpdfview.h b/public/fpdfview.h
-index de0421eb3..ff491d96b 100644
+index ac109b9b3..96ef68555 100644
 --- a/public/fpdfview.h
 +++ b/public/fpdfview.h
-@@ -153,13 +153,22 @@ typedef int FPDF_ANNOT_APPEARANCEMODE;
+@@ -154,13 +154,22 @@ typedef int FPDF_ANNOT_APPEARANCEMODE;
  // Dictionary value types.
  typedef int FPDF_OBJECT_TYPE;
  
