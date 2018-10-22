@@ -1,5 +1,5 @@
 diff --git a/BUILD.gn b/BUILD.gn
-index 3faf5cd18..71e593150 100644
+index c19e2227a..bbd94ef88 100644
 --- a/BUILD.gn
 +++ b/BUILD.gn
 @@ -23,6 +23,7 @@ config("pdfium_common_config") {
@@ -10,8 +10,8 @@ index 3faf5cd18..71e593150 100644
    ]
  
    if (pdf_enable_v8) {
-@@ -91,7 +92,7 @@ config("pdfium_core_config") {
-   configs += [ "//build/config/compiler:no_size_t_to_int_warning" ]
+@@ -117,7 +118,7 @@ jumbo_source_set("pdfium_public_headers") {
+   ]
  }
  
 -jumbo_static_library("pdfium") {
