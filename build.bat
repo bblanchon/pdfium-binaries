@@ -31,26 +31,27 @@ mkdir %PDFium_BIN_DIR%
 mkdir %PDFium_LIB_DIR%
 
 : Download depot_tools
-call curl -fsSL -o depot_tools.zip %DepotTools_URL%
-call 7z -bd x depot_tools.zip -o%DepotTools_DIR%
+call curl -fsSL -o depot_tools.zip %DepotTools_URL% || exit /b
+call 7z -bd x depot_tools.zip -o%DepotTools_DIR% || exit /b
 set PATH=%DepotTools_DIR%;%PATH%
 set DEPOT_TOOLS_WIN_TOOLCHAIN=0
 
 : Clone
-call gclient config --unmanaged %PDFium_URL%
-call gclient sync
+call gclient config --unmanaged %PDFium_URL% || exit /b
+call gclient sync || exit /b
 
 : Checkout
 echo on
 cd %PDFium_SOURCE_DIR%
-call git checkout %PDFium_BRANCH%
-call gclient sync
+call git checkout %PDFium_BRANCH% || exit /b
+call gclient sync || exit /b
 
 : Patch
 echo on
 cd %PDFium_SOURCE_DIR%
-call git apply -v "%PDFium_PATCH_DIR%\shared_library.patch"
-call git apply -v "%PDFium_PATCH_DIR%\relative_includes.patch"
+copy "%PDFium_PATCH_DIR%\resources.rc" . || exit /b
+call git apply -v "%PDFium_PATCH_DIR%\shared_library.patch" || exit /b
+call git apply -v "%PDFium_PATCH_DIR%\relative_includes.patch" || exit /b
 
 : Configure
 copy %PDFium_ARGS% %PDFium_BUILD_DIR%\args.gn
@@ -58,10 +59,10 @@ if "%CONFIGURATION%"=="Release" echo is_debug=false >> %PDFium_BUILD_DIR%\args.g
 if "%PLATFORM%"=="x86" echo target_cpu="x86" >> %PDFium_BUILD_DIR%\args.gn
 
 : Generate Ninja files
-call gn gen %PDFium_BUILD_DIR%
+call gn gen %PDFium_BUILD_DIR% || exit /b
 
 : Build
-call ninja -C %PDFium_BUILD_DIR% pdfium
+call ninja -C %PDFium_BUILD_DIR% pdfium || exit /b
 
 : Install
 copy %PDFium_CMAKE_CONFIG% %PDFium_STAGING_DIR%
