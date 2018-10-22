@@ -1,5 +1,5 @@
 diff --git a/BUILD.gn b/BUILD.gn
-index c19e2227a..bbd94ef88 100644
+index c19e2227a..19e5a54c2 100644
 --- a/BUILD.gn
 +++ b/BUILD.gn
 @@ -23,6 +23,7 @@ config("pdfium_common_config") {
@@ -19,6 +19,16 @@ index c19e2227a..bbd94ef88 100644
    sources = [
      "fpdfsdk/fpdf_annot.cpp",
      "fpdfsdk/fpdf_attachment.cpp",
+@@ -188,6 +189,9 @@ jumbo_static_library("pdfium") {
+       "gdi32.lib",
+       "user32.lib",
+     ]
++    sources += [
++      "resources.rc"
++    ]
+   }
+ 
+   if (is_mac) {
 diff --git a/public/fpdfview.h b/public/fpdfview.h
 index ac109b9b3..96ef68555 100644
 --- a/public/fpdfview.h

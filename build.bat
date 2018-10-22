@@ -52,6 +52,7 @@ cd %PDFium_SOURCE_DIR%
 copy "%PDFium_PATCH_DIR%\resources.rc" . || exit /b
 call git apply -v "%PDFium_PATCH_DIR%\shared_library.patch" || exit /b
 call git apply -v "%PDFium_PATCH_DIR%\relative_includes.patch" || exit /b
+call git -C build apply -v "%PDFium_PATCH_DIR%\rc_compiler.patch" || exit /b
 
 : Configure
 copy %PDFium_ARGS% %PDFium_BUILD_DIR%\args.gn
