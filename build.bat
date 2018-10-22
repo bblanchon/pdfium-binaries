@@ -40,11 +40,10 @@ set DEPOT_TOOLS_WIN_TOOLCHAIN=0
 call gclient config --unmanaged %PDFium_URL% || exit /b
 call gclient sync || exit /b
 
-: Checkout
+: Checkout branch (or ignore if it doesn't exist)
 echo on
 cd %PDFium_SOURCE_DIR%
-call git checkout %PDFium_BRANCH% || exit /b
-call gclient sync || exit /b
+call git checkout %PDFium_BRANCH% && call gclient sync
 
 : Patch
 echo on
