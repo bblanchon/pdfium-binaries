@@ -43,15 +43,14 @@ call gclient sync || exit /b
 : Checkout branch (or ignore if it doesn't exist)
 echo on
 cd %PDFium_SOURCE_DIR%
-call git checkout %PDFium_BRANCH% && call gclient sync
+git.exe checkout %PDFium_BRANCH% && call gclient sync
 
 : Patch
-echo on
 cd %PDFium_SOURCE_DIR%
 copy "%PDFium_PATCH_DIR%\resources.rc" . || exit /b
-call git apply -v "%PDFium_PATCH_DIR%\shared_library.patch" || exit /b
-call git apply -v "%PDFium_PATCH_DIR%\relative_includes.patch" || exit /b
-call git -C build apply -v "%PDFium_PATCH_DIR%\rc_compiler.patch" || exit /b
+git.exe apply -v "%PDFium_PATCH_DIR%\shared_library.patch" || exit /b
+git.exe apply -v "%PDFium_PATCH_DIR%\relative_includes.patch" || exit /b
+git.exe -C build apply -v "%PDFium_PATCH_DIR%\rc_compiler.patch" || exit /b
 
 : Configure
 copy %PDFium_ARGS% %PDFium_BUILD_DIR%\args.gn
@@ -65,14 +64,15 @@ call gn gen %PDFium_BUILD_DIR% || exit /b
 call ninja -C %PDFium_BUILD_DIR% pdfium || exit /b
 
 : Install
-copy %PDFium_CMAKE_CONFIG% %PDFium_STAGING_DIR%
-copy %PDFium_SOURCE_DIR%\LICENSE %PDFium_STAGING_DIR%
-xcopy /S /Y %PDFium_SOURCE_DIR%\public %PDFium_INCLUDE_DIR%\
+echo on
+copy %PDFium_CMAKE_CONFIG% %PDFium_STAGING_DIR% || exit /b
+copy %PDFium_SOURCE_DIR%\LICENSE %PDFium_STAGING_DIR% || exit /b
+xcopy /S /Y %PDFium_SOURCE_DIR%\public %PDFium_INCLUDE_DIR%\ || exit /b
 del %PDFium_INCLUDE_DIR%\DEPS
 del %PDFium_INCLUDE_DIR%\README
 del %PDFium_INCLUDE_DIR%\PRESUBMIT.py
-move %PDFium_BUILD_DIR%\pdfium.dll.lib %PDFium_LIB_DIR%
-move %PDFium_BUILD_DIR%\pdfium.dll %PDFium_BIN_DIR%
+move %PDFium_BUILD_DIR%\pdfium.dll.lib %PDFium_LIB_DIR% || exit /b
+move %PDFium_BUILD_DIR%\pdfium.dll %PDFium_BIN_DIR% || exit /b
 if "%CONFIGURATION%"=="Debug" move %PDFium_BUILD_DIR%\pdfium.dll.pdb %PDFium_BIN_DIR%
 
 : Pack
