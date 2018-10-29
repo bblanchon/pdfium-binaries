@@ -5,6 +5,7 @@
 : PDFium_BRANCH = master | chromium/3211 | ...
 
 : Input
+set WindowsSDK_DIR=C:\Program Files (x86)\Windows Kits\10\bin\%PLATFORM%
 set DepotTools_URL=https://storage.googleapis.com/chrome-infra/depot_tools.zip
 set DepotTools_DIR=%CD%/depot_tools
 set PDFium_URL=https://pdfium.googlesource.com/pdfium.git
@@ -33,8 +34,11 @@ mkdir %PDFium_LIB_DIR%
 : Download depot_tools
 call curl -fsSL -o depot_tools.zip %DepotTools_URL% || exit /b
 call 7z -bd x depot_tools.zip -o%DepotTools_DIR% || exit /b
-set PATH=%DepotTools_DIR%;%PATH%
+set PATH=%DepotTools_DIR%;%WindowsSDK_DIR%;%PATH%
 set DEPOT_TOOLS_WIN_TOOLCHAIN=0
+
+: check that rc.exe is in PATH
+where rc.exe || exit /b
 
 : Clone
 call gclient config --unmanaged %PDFium_URL% || exit /b
