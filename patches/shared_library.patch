@@ -1,16 +1,16 @@
 diff --git a/BUILD.gn b/BUILD.gn
-index 990733e26..84a010887 100644
+index 6885fc27d..f4533ee76 100644
 --- a/BUILD.gn
 +++ b/BUILD.gn
-@@ -23,6 +23,7 @@ config("pdfium_common_config") {
-     "OPJ_STATIC",
+@@ -22,6 +22,7 @@ config("pdfium_common_config") {
+   defines = [
      "PNG_PREFIX",
      "PNG_USE_READ_MACROS",
-+    "FPDFSDK_EXPORTS",
++    "FPDFSDK_EXPORTS"
    ]
  
-   if (pdf_enable_click_logging) {
-@@ -126,7 +127,7 @@ jumbo_source_set("pdfium_public_headers") {
+   if (!use_system_libopenjpeg2) {
+@@ -132,7 +133,7 @@ jumbo_source_set("pdfium_public_headers") {
    public_configs = [ ":pdfium_public_config" ]
  }
  
@@ -19,7 +19,7 @@ index 990733e26..84a010887 100644
    sources = [
      "fpdfsdk/fpdf_annot.cpp",
      "fpdfsdk/fpdf_attachment.cpp",
-@@ -197,6 +198,9 @@ jumbo_static_library("pdfium") {
+@@ -202,6 +203,9 @@ jumbo_static_library("pdfium") {
        "gdi32.lib",
        "user32.lib",
      ]

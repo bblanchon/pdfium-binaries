@@ -38,8 +38,14 @@ mkdir -p "$PDFium_BUILD_DIR"
 mkdir -p "$PDFium_STAGING_DIR"
 mkdir -p "$PDFium_LIB_DIR"
 
-# Download depot_tools
-git clone "$DepotTools_URL" "$DepotTools_DIR"
+# Download depot_tools if not exists in this location or update utherwise
+if [ ! -d "$DepotTools_DIR" ]; then
+  git clone "$DepotTools_URL" "$DepotTools_DIR"
+else 
+  cd "$DepotTools_DIR"
+  git pull
+  cd ..
+fi
 export PATH="$DepotTools_DIR:$PATH"
 
 # Clone
