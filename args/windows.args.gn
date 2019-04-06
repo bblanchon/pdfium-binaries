@@ -6,3 +6,6 @@ pdf_enable_v8 = false
 
 # Build PDFium standalone (default = false)
 pdf_is_standalone = true
+
+# Enable experimental win32 GDI APIs.
+pdf_use_win32_gdi_override = true
