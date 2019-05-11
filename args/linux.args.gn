@@ -1,5 +1,5 @@
-# Enable component build
-is_component_build = true
+# Disable component build
+is_component_build = false
 
 # Build PDFium either with or without v8 support (default = true)
 pdf_enable_v8 = false

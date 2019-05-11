@@ -1,5 +1,5 @@
-# Enable component build
-is_component_build = true
+# Disable component build
+is_component_build = false
 
 # Build PDFium standalone (default = false)
 pdf_is_standalone = true
