@@ -59,7 +59,6 @@ gclient sync
 
 # Patch
 cd "$PDFium_SOURCE_DIR"
-git apply -v "$PDFium_PATCH_DIR/shared_library.patch"
 git apply -v "$PDFium_PATCH_DIR/relative_includes.patch"
 #git apply -v "$PDFium_PATCH_DIR/static_libstdcxx.patch"
 

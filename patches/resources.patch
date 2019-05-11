@@ -1,0 +1,14 @@
+diff --git a/BUILD.gn b/BUILD.gn
+index 97dfbd6ad..c02522b48 100644
+--- a/BUILD.gn
++++ b/BUILD.gn
+@@ -201,6 +201,9 @@ jumbo_component("pdfium") {
+       "gdi32.lib",
+       "user32.lib",
+     ]
++    sources += [
++      "resources.rc"
++    ]
+   }
+ 
+   if (is_mac) {
