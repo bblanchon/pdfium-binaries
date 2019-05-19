@@ -1,17 +1,17 @@
 diff --git a/BUILD.gn b/BUILD.gn
-index 97dfbd6ad..0dc75a6ee 100644
+index 42f20931a..5a72184a8 100644
 --- a/BUILD.gn
 +++ b/BUILD.gn
-@@ -129,7 +129,7 @@ jumbo_source_set("pdfium_public_headers") {
-   public_configs = [ ":pdfium_public_config" ]
+@@ -142,7 +142,7 @@ group("pdfium_public_headers") {
+   ]
  }
  
 -jumbo_component("pdfium") {
 +shared_library("pdfium") {
-   sources = [
-     "fpdfsdk/fpdf_annot.cpp",
-     "fpdfsdk/fpdf_attachment.cpp",
-@@ -201,6 +201,9 @@ jumbo_component("pdfium") {
+   libs = []
+   configs += [ ":pdfium_core_config" ]
+   public_configs = [ ":pdfium_public_config" ]
+@@ -182,6 +182,9 @@ jumbo_component("pdfium") {
        "gdi32.lib",
        "user32.lib",
      ]
