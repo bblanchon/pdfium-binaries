@@ -1,5 +1,5 @@
 diff --git a/BUILD.gn b/BUILD.gn
-index 42f20931a..5a72184a8 100644
+index 42f20931a..4e063bb7c 100644
 --- a/BUILD.gn
 +++ b/BUILD.gn
 @@ -142,7 +142,7 @@ group("pdfium_public_headers") {
@@ -15,7 +15,7 @@ index 42f20931a..5a72184a8 100644
        "gdi32.lib",
        "user32.lib",
      ]
-+    sources += [
++    sources = [
 +      "resources.rc"
 +    ]
    }
