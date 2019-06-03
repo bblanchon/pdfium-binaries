@@ -1,8 +1,8 @@
 diff --git a/public/cpp/fpdf_deleters.h b/public/cpp/fpdf_deleters.h
-index d9d95cda3..04d74a970 100644
+index 9a700e3b3..55a9f8341 100644
 --- a/public/cpp/fpdf_deleters.h
 +++ b/public/cpp/fpdf_deleters.h
-@@ -5,13 +5,13 @@
+@@ -5,14 +5,14 @@
  #ifndef PUBLIC_CPP_FPDF_DELETERS_H_
  #define PUBLIC_CPP_FPDF_DELETERS_H_
  
@@ -12,6 +12,7 @@ index d9d95cda3..04d74a970 100644
 -#include "public/fpdf_formfill.h"
 -#include "public/fpdf_structtree.h"
 -#include "public/fpdf_text.h"
+-#include "public/fpdf_transformpage.h"
 -#include "public/fpdfview.h"
 +#include "../fpdf_annot.h"
 +#include "../fpdf_dataavail.h"
@@ -19,12 +20,13 @@ index d9d95cda3..04d74a970 100644
 +#include "../fpdf_formfill.h"
 +#include "../fpdf_structtree.h"
 +#include "../fpdf_text.h"
++#include "../fpdf_transformpage.h"
 +#include "../fpdfview.h"
  
  // Custom deleters for using FPDF_* types with std::unique_ptr<>.
  
 diff --git a/public/cpp/fpdf_scopers.h b/public/cpp/fpdf_scopers.h
-index 3601f4734..de413cbd5 100644
+index ebae1073f..cbbe3cc64 100644
 --- a/public/cpp/fpdf_scopers.h
 +++ b/public/cpp/fpdf_scopers.h
 @@ -8,14 +8,14 @@
