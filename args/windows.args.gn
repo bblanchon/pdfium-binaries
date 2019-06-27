@@ -11,4 +11,4 @@ pdf_enable_v8 = false
 pdf_enable_xfa = false
 
 # Enable experimental win32 GDI APIs.
-pdf_use_win32_gdi_override = true
+pdf_use_win32_gdi = true
