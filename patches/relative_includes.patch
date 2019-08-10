@@ -1,8 +1,8 @@
 diff --git a/public/cpp/fpdf_deleters.h b/public/cpp/fpdf_deleters.h
-index 9a700e3b3..55a9f8341 100644
+index 633ddf5e3..3ecd19e0b 100644
 --- a/public/cpp/fpdf_deleters.h
 +++ b/public/cpp/fpdf_deleters.h
-@@ -5,14 +5,14 @@
+@@ -5,15 +5,15 @@
  #ifndef PUBLIC_CPP_FPDF_DELETERS_H_
  #define PUBLIC_CPP_FPDF_DELETERS_H_
  
@@ -10,6 +10,7 @@ index 9a700e3b3..55a9f8341 100644
 -#include "public/fpdf_dataavail.h"
 -#include "public/fpdf_edit.h"
 -#include "public/fpdf_formfill.h"
+-#include "public/fpdf_javascript.h"
 -#include "public/fpdf_structtree.h"
 -#include "public/fpdf_text.h"
 -#include "public/fpdf_transformpage.h"
@@ -18,6 +19,7 @@ index 9a700e3b3..55a9f8341 100644
 +#include "../fpdf_dataavail.h"
 +#include "../fpdf_edit.h"
 +#include "../fpdf_formfill.h"
++#include "../fpdf_javascript.h"
 +#include "../fpdf_structtree.h"
 +#include "../fpdf_text.h"
 +#include "../fpdf_transformpage.h"
@@ -26,29 +28,15 @@ index 9a700e3b3..55a9f8341 100644
  // Custom deleters for using FPDF_* types with std::unique_ptr<>.
  
 diff --git a/public/cpp/fpdf_scopers.h b/public/cpp/fpdf_scopers.h
-index ebae1073f..cbbe3cc64 100644
+index ff57c1b48..2ed295d88 100644
 --- a/public/cpp/fpdf_scopers.h
 +++ b/public/cpp/fpdf_scopers.h
-@@ -8,14 +8,14 @@
+@@ -8,7 +8,7 @@
  #include <memory>
  #include <type_traits>
  
 -#include "public/cpp/fpdf_deleters.h"
--#include "public/fpdf_annot.h"
--#include "public/fpdf_dataavail.h"
--#include "public/fpdf_edit.h"
--#include "public/fpdf_formfill.h"
--#include "public/fpdf_structtree.h"
--#include "public/fpdf_text.h"
--#include "public/fpdfview.h"
 +#include "fpdf_deleters.h"
-+#include "../fpdf_annot.h"
-+#include "../fpdf_dataavail.h"
-+#include "../fpdf_edit.h"
-+#include "../fpdf_formfill.h"
-+#include "../fpdf_structtree.h"
-+#include "../fpdf_text.h"
-+#include "../fpdfview.h"
  
  // Versions of FPDF types that clean up the object at scope exit.
  
