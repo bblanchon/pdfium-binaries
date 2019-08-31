@@ -8,10 +8,10 @@ matrix:
     - os: linux
       env: PDFium_BRANCH=$TRAVIS_BRANCH CONFIGURATION=Debug
     - os: osx
-      osx_image: xcode9
+      osx_image: xcode10.3
       env: PDFium_BRANCH=$TRAVIS_BRANCH CONFIGURATION=Release
     - os: osx
-      osx_image: xcode9
+      osx_image: xcode10.3
       env: PDFium_BRANCH=$TRAVIS_BRANCH CONFIGURATION=Debug
 
 script:
