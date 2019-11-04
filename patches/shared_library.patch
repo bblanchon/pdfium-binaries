@@ -1,17 +1,17 @@
 diff --git a/BUILD.gn b/BUILD.gn
-index 3ce1e0863..1cf685285 100644
+index 27ac7192f..b5dfe809e 100644
 --- a/BUILD.gn
 +++ b/BUILD.gn
-@@ -143,7 +143,7 @@ group("pdfium_public_headers") {
+@@ -142,7 +142,7 @@ group("pdfium_public_headers") {
    ]
  }
  
--jumbo_component("pdfium") {
+-component("pdfium") {
 +shared_library("pdfium") {
    libs = []
    configs += [ ":pdfium_core_config" ]
    public_configs = [ ":pdfium_public_config" ]
-@@ -182,6 +182,9 @@ jumbo_component("pdfium") {
+@@ -181,6 +181,9 @@ component("pdfium") {
        "gdi32.lib",
        "user32.lib",
      ]
