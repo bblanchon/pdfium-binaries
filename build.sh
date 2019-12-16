@@ -3,6 +3,7 @@
 # Variables to provide:
 # CONFIGURATION = Debug | Release
 # PDFium_BRANCH = master | chromium/3211 | ...
+# PDFium_V8 = enabled
 
 set -ex
 
@@ -30,8 +31,11 @@ PDFium_ARGS="$PWD/args/$OS.args.gn"
 PDFium_STAGING_DIR="$PWD/staging"
 PDFium_INCLUDE_DIR="$PDFium_STAGING_DIR/include"
 PDFium_LIB_DIR="$PDFium_STAGING_DIR/lib"
-PDFium_ARTIFACT="$PWD/pdfium-$OS.tgz"
-[ "$CONFIGURATION" == "Debug" ] && PDFium_ARTIFACT="$PWD/pdfium-$OS-debug.tgz"
+PDFium_RES_DIR="$PDFium_STAGING_DIR/res"
+PDFium_ARTIFACT_BASE="$PWD/pdfium-$OS"
+[ "$PDFium_V8" == "enabled" ] && PDFium_ARTIFACT_BASE="$PDFium_ARTIFACT_BASE-v8"
+[ "$CONFIGURATION" == "Debug" ] && PDFium_ARTIFACT_BASE="$PDFium_ARTIFACT_BASE-debug"
+PDFium_ARTIFACT="$PDFium_ARTIFACT_BASE.tgz"
 
 # Prepare directories
 mkdir -p "$PDFium_BUILD_DIR"
@@ -62,10 +66,13 @@ cd "$PDFium_SOURCE_DIR"
 git apply -v "$PDFium_PATCH_DIR/shared_library.patch"
 git apply -v "$PDFium_PATCH_DIR/relative_includes.patch"
 #git apply -v "$PDFium_PATCH_DIR/static_libstdcxx.patch"
+[ "$PDFium_V8" == "enabled" ] && git apply -v "$PDFium_PATCH_DIR/v8_init.patch"
 
 # Configure
 cp "$PDFium_ARGS" "$PDFium_BUILD_DIR/args.gn"
 [ "$CONFIGURATION" == "Release" ] && echo 'is_debug=false' >> "$PDFium_BUILD_DIR/args.gn"
+[ "$PDFium_V8" == "enabled" ] && echo 'pdf_enable_v8=true' >> "$PDFium_BUILD_DIR/args.gn"
+[ "$PDFium_V8" == "enabled" ] && echo 'pdf_enable_xfa=true' >> "$PDFium_BUILD_DIR/args.gn"
 
 # Generate Ninja files
 gn gen "$PDFium_BUILD_DIR"
@@ -83,6 +90,11 @@ rm -f "$PDFium_INCLUDE_DIR/README"
 rm -f "$PDFium_INCLUDE_DIR/PRESUBMIT.py"
 [ "$OS" == "linux" ] && mv "$PDFium_BUILD_DIR/libpdfium.so" "$PDFium_LIB_DIR"
 [ "$OS" == "darwin" ] && mv "$PDFium_BUILD_DIR/libpdfium.dylib" "$PDFium_LIB_DIR"
+if [ "$PDFium_V8" == "enabled" ]; then
+  mkdir -p "$PDFium_RES_DIR"
+  mv "$PDFium_BUILD_DIR/icudtl.dat" "$PDFium_RES_DIR"
+  mv "$PDFium_BUILD_DIR/snapshot_blob.bin" "$PDFium_RES_DIR"
+fi
 
 # Pack
 cd "$PDFium_STAGING_DIR"

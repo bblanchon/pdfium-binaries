@@ -1,0 +1,71 @@
+diff --git a/fpdfsdk/BUILD.gn b/fpdfsdk/BUILD.gn
+index 3c1b39cba..7a6458796 100644
+--- a/fpdfsdk/BUILD.gn
++++ b/fpdfsdk/BUILD.gn
+@@ -67,6 +67,7 @@ source_set("fpdfsdk") {
+     "fpdf_transformpage.cpp",
+     "fpdf_view.cpp",
+     "ipdfsdk_annothandler.h",
++    "fpdf_libs.cpp",
+   ]
+ 
+   configs += [ "../:pdfium_core_config" ]
+diff --git a/fpdfsdk/fpdf_libs.cpp b/fpdfsdk/fpdf_libs.cpp
+new file mode 100644
+index 000000000..144781857
+--- /dev/null
++++ b/fpdfsdk/fpdf_libs.cpp
+@@ -0,0 +1,22 @@
++#include "public/fpdfview.h"
++
++#include "v8.h"
++
++extern "C"
++{
++
++FPDF_EXPORT void FPDF_CALLCONV FPDF_InitEmbeddedLibraries(const char* resourcePath)
++{
++    v8::V8::InitializeICU();
++
++    v8::V8::InitializeExternalStartupData(resourcePath);
++
++    v8::V8::Initialize();
++
++    // By enabling predictable mode, V8 won't post any background tasks.
++    const char predictable_flag[] = "--predictable";
++    v8::V8::SetFlagsFromString(predictable_flag,
++                                static_cast<int>(strlen(predictable_flag)));
++}
++
++} // extern "C"
+diff --git a/public/fpdf_libs.h b/public/fpdf_libs.h
+new file mode 100644
+index 000000000..5531aba1f
+--- /dev/null
++++ b/public/fpdf_libs.h
+@@ -0,0 +1,25 @@
++#ifndef FPDF_LIBS_H_
++#define FPDF_LIBS_H_
++
++#include "fpdfview.h"
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++// Function: FPDF_InitEmbeddedLibraries
++//          Initialize embedded libraries (v8, iuctl) included in pdfium
++// Parameters:
++//          resourcePath - a path to v8 resources (snapshot_blob.bin, icudtl.dat, ...)
++// Return value:
++//          None.
++// Comments:
++//          This function must be called before calling FPDF_InitLibrary()
++//          if v8 suppport is enabled
++FPDF_EXPORT void FPDF_CALLCONV FPDF_InitEmbeddedLibraries(const char* resourcePath);
++
++#ifdef __cplusplus
++}
++#endif
++
++#endif // FPDF_LIBS_H_
