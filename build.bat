@@ -7,7 +7,7 @@
 : Input
 set WindowsSDK_DIR=C:\Program Files (x86)\Windows Kits\10\bin\%PLATFORM%
 set DepotTools_URL=https://storage.googleapis.com/chrome-infra/depot_tools.zip
-set DepotTools_DIR=%CD%/depot_tools
+set DepotTools_DIR=%CD%\depot_tools
 set PDFium_URL=https://pdfium.googlesource.com/pdfium.git
 set PDFium_SOURCE_DIR=%CD%\pdfium
 set PDFium_BUILD_DIR=%PDFium_SOURCE_DIR%\out
@@ -48,6 +48,10 @@ call gclient sync || exit /b
 echo on
 cd %PDFium_SOURCE_DIR%
 git.exe checkout %PDFium_BRANCH% && call gclient sync
+
+: Install python packages
+where python
+call %DepotTools_DIR%\python.bat -m pip install pywin32 || exit /b
 
 : Patch
 cd %PDFium_SOURCE_DIR%
