@@ -1,8 +1,8 @@
 diff --git a/BUILD.gn b/BUILD.gn
-index 27ac7192f..b5dfe809e 100644
+index f27a2f4c1..95eff4106 100644
 --- a/BUILD.gn
 +++ b/BUILD.gn
-@@ -142,7 +142,7 @@ group("pdfium_public_headers") {
+@@ -140,7 +140,7 @@ group("pdfium_public_headers") {
    ]
  }
  
@@ -11,7 +11,7 @@ index 27ac7192f..b5dfe809e 100644
    libs = []
    configs += [ ":pdfium_core_config" ]
    public_configs = [ ":pdfium_public_config" ]
-@@ -181,6 +181,9 @@ component("pdfium") {
+@@ -179,6 +179,9 @@ component("pdfium") {
        "gdi32.lib",
        "user32.lib",
      ]
@@ -22,12 +22,12 @@ index 27ac7192f..b5dfe809e 100644
  
    if (is_mac) {
 diff --git a/public/fpdfview.h b/public/fpdfview.h
-index 84ba7896c..072960849 100644
+index 901d7db14..cb0a596f6 100644
 --- a/public/fpdfview.h
 +++ b/public/fpdfview.h
-@@ -168,9 +168,6 @@ typedef int FPDF_OBJECT_TYPE;
- // Text object enums.
- typedef int FPDF_TEXT_RENDERMODE;
+@@ -175,9 +175,6 @@ typedef int FPDF_ANNOT_APPEARANCEMODE;
+ // Dictionary value types.
+ typedef int FPDF_OBJECT_TYPE;
  
 -#if defined(COMPONENT_BUILD)
 -// FPDF_EXPORT should be consistent with |export| in the pdfium_fuzzer
@@ -35,7 +35,7 @@ index 84ba7896c..072960849 100644
  #if defined(WIN32)
  #if defined(FPDF_IMPLEMENTATION)
  #define FPDF_EXPORT __declspec(dllexport)
-@@ -184,9 +181,6 @@ typedef int FPDF_TEXT_RENDERMODE;
+@@ -191,9 +188,6 @@ typedef int FPDF_OBJECT_TYPE;
  #define FPDF_EXPORT
  #endif  // defined(FPDF_IMPLEMENTATION)
  #endif  // defined(WIN32)
