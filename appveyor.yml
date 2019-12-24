@@ -8,9 +8,11 @@ environment:
   APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
   GYP_MSVS_VERSION: 2017
   PDFium_BRANCH: $(APPVEYOR_REPO_TAG_NAME)
+  matrix:
+    - PDFium_V8: enabled
+    - PDFium_V8: disabled
 
 configuration:
-  - Debug
   - Release
 
 platform:
