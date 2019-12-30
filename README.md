@@ -15,40 +15,40 @@ Here are the download links for latest release:
 <table>
   <tr>
     <th>Platform</th>
-    <th>Release build</th>
-    <th>Debug build</th>
+    <th>PDFium</th>
+    <th>PDFium with <a href="https://en.wikipedia.org/wiki/V8_(JavaScript_engine)">V8</a> and <a href="https://en.wikipedia.org/wiki/XFA">XFA</a></th>
   </tr>
   <tr>
     <td>Windows 32-bit</td>
-    <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest">pdfium-windows-x86.zip</a></td>
-    <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest">pdfium-windows-x86-debug.zip</a></td>
+    <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-windows-x86.zip">pdfium-windows-x86.zip</a> (2 MB)</td>
+    <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-windows-x86-v8.zip">pdfium-windows-x86-v8.zip</a> (12 MB)</td>
   </tr>
   <tr>
     <td>Windows 64-bit</td>
-    <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest">pdfium-windows-x64.zip</a></td>
-    <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest">pdfium-windows-x64-debug.zip</a></td>
+    <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-windows-x64.zip">pdfium-windows-x64.zip</a> (2 MB)</td>
+    <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-windows-x64-v8.zip">pdfium-windows-x64-v8.zip</a> (12 MB)</td>
   </tr>
   <tr>
     <td>Linux</td>
-    <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest">pdfium-linux.zip</a></td>
-    <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest">pdfium-linux-debug.zip</a></td>
+    <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-linux.tgz">pdfium-linux.tgz</a> (6 MB)</td>
+    <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-linux-v8.tgz">pdfium-linux-v8.tgz</a> (37 MB)</td>
   </tr>
   <tr>
     <td>macOS</td>
-    <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest">pdfium-darwin.zip</a></td>
-    <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest">pdfium-darwin-debug.zip</a></td>
+    <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-darwin.tgz">pdfium-darwin.tgz</a> (6 MB)</td>
+    <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-darwin-v8.tgz">pdfium-darwin-v8.tgz</a> (42 MB)</td>
   </tr>
 </table>
 
-### How too use in a CMake project
+### How to use PDFium in a CMake project
 
 1. Unzip one of more variants in a folder (eg `C:\Libraries\pdfium`)
 2. Set the environment variable `PDFium_DIR` to this folder (eg `C:\Libraries\pdfium`)
-3. In your CMakeLists.txt, add
+3. In your `CMakeLists.txt`, add
 
         find_package(PDFium)
 
-4. Then link you excecutable with PDFium
+4. Then link you executable with PDFium:
 
         target_link_libraries(my_exe pdfium)
 
@@ -57,3 +57,5 @@ Here are the download links for latest release:
 ---
 
 This project isn't affilated with Google nor Foxit.
+
+We are very thankful to [AppVeyor](https://www.appveyor.com/) and [Travis CI](https://travis-ci.org/) for extending the build time limit, which allows us to build PDFium with V8.
