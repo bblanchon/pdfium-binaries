@@ -1,12 +1,12 @@
 : Variables to provide:
-: GYP_MSVS_VERSION = 2017 | 2015
+: GYP_MSVS_VERSION = 2019 | 2017 | 2015
 : CONFIGURATION = Debug | Release
 : PLATFORM = x86 | x64
 : PDFium_BRANCH = master | chromium/3211 | ...
 : PDFium_V8 = enabled
 
 : Input
-set WindowsSDK_DIR=C:\Program Files (x86)\Windows Kits\10\bin\%PLATFORM%
+set WindowsSDK_DIR=C:\Program Files (x86)\Windows Kits\10\bin\10.0.19041.0\%PLATFORM%
 set DepotTools_URL=https://storage.googleapis.com/chrome-infra/depot_tools.zip
 set DepotTools_DIR=%CD%\depot_tools
 set PDFium_URL=https://pdfium.googlesource.com/pdfium.git
