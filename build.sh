@@ -73,7 +73,6 @@ cp "$PDFium_ARGS" "$PDFium_BUILD_DIR/args.gn"
 [ "$CONFIGURATION" == "Release" ] && echo 'is_debug=false' >> "$PDFium_BUILD_DIR/args.gn"
 [ "$PDFium_V8" == "enabled" ] && echo 'pdf_enable_v8=true' >> "$PDFium_BUILD_DIR/args.gn"
 [ "$PDFium_V8" == "enabled" ] && echo 'pdf_enable_xfa=true' >> "$PDFium_BUILD_DIR/args.gn"
-[ "$OS" == "darwin" ] && echo 'mac_deployment_target = "10.9.0"' >> "$PDFium_BUILD_DIR/args.gn"
 
 # Generate Ninja files
 gn gen "$PDFium_BUILD_DIR"
