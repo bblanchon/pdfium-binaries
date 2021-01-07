@@ -21,12 +21,12 @@ Here are the download links for latest release:
   <tr>
     <td>Windows 32-bit</td>
     <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-windows-x86.zip">pdfium-windows-x86.zip</a> (2 MB)</td>
-    <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-windows-x86-v8.zip">pdfium-windows-x86-v8.zip</a> (12 MB)</td>
+    <td>Unavailable (buildtime > 2h)</td>
   </tr>
   <tr>
     <td>Windows 64-bit</td>
     <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-windows-x64.zip">pdfium-windows-x64.zip</a> (2 MB)</td>
-    <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-windows-x64-v8.zip">pdfium-windows-x64-v8.zip</a> (12 MB)</td>
+    <td>Unavailable (buildtime > 2h)</td>
   </tr>
   <tr>
     <td>Linux</td>

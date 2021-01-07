@@ -9,7 +9,6 @@ environment:
   GYP_MSVS_VERSION: 2019
   PDFium_BRANCH: $(APPVEYOR_REPO_TAG_NAME)
   matrix:
-    - PDFium_V8: enabled
     - PDFium_V8: disabled
 
 configuration:
