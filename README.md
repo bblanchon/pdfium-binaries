@@ -41,7 +41,7 @@ Here are the download links for latest release:
   <tr>
     <td>macOS (ARM)</td>
     <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-darwin-arm64.tgz">pdfium-darwin-arm64.tgz</a> (6 MB)</td>
-    <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-darwin-arm64-v8.tgz">pdfium-darwin-arm64-v8.tgz</a> (42 MB)</td>
+    <td>-</td>
   </tr>
 </table>
 
