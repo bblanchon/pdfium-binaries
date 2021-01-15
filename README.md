@@ -34,9 +34,14 @@ Here are the download links for latest release:
     <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-linux-v8.tgz">pdfium-linux-v8.tgz</a> (37 MB)</td>
   </tr>
   <tr>
-    <td>macOS</td>
-    <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-darwin.tgz">pdfium-darwin.tgz</a> (6 MB)</td>
-    <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-darwin-v8.tgz">pdfium-darwin-v8.tgz</a> (42 MB)</td>
+    <td>macOS (Intel)</td>
+    <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-darwin-x64.tgz">pdfium-darwin-x64.tgz</a> (6 MB)</td>
+    <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-darwin-x64-v8.tgz">pdfium-darwin-x64-v8.tgz</a> (42 MB)</td>
+  </tr>
+  <tr>
+    <td>macOS (ARM)</td>
+    <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-darwin-arm64.tgz">pdfium-darwin-arm64.tgz</a> (6 MB)</td>
+    <td>-</td>
   </tr>
 </table>
 
@@ -81,6 +86,11 @@ See the following example for usage:
         FPDF_InitLibrary();
         FPDF_DestroyLibrary();
 
+### How to create macOS universal binary
+
+To  create a universial macOS binary containing both Intel and ARM code download
+both CPU versions and use the `mac_create_universal.sh` script to create a
+universal archive.
 
 
 ---
