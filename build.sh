@@ -51,6 +51,7 @@ mkdir -p "$PDFium_LIB_DIR"
 git clone --depth 1 "$DepotTools_URL" "$DepotTools_DIR"
 cd "$DepotTools_DIR"
 git apply -v "$PDFium_PATCH_DIR/depot_tools.patch"
+cd ..
 
 export PATH="$DepotTools_DIR:$PATH"
 
