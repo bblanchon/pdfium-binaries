@@ -1,5 +1,5 @@
 diff --git a/fpdfsdk/BUILD.gn b/fpdfsdk/BUILD.gn
-index dc8012a..12f8226 100644
+index dc8012ad3..12f82268c 100644
 --- a/fpdfsdk/BUILD.gn
 +++ b/fpdfsdk/BUILD.gn
 @@ -70,6 +70,7 @@ source_set("fpdfsdk") {
@@ -12,7 +12,7 @@ index dc8012a..12f8226 100644
    configs += [ "../:pdfium_strict_config" ]
 diff --git a/fpdfsdk/fpdf_libs.cpp b/fpdfsdk/fpdf_libs.cpp
 new file mode 100644
-index 000000000..144781857
+index 000000000..18fb89dd2
 --- /dev/null
 +++ b/fpdfsdk/fpdf_libs.cpp
 @@ -0,0 +1,22 @@
@@ -40,7 +40,7 @@ index 000000000..144781857
 +} // extern "C"
 diff --git a/public/fpdf_libs.h b/public/fpdf_libs.h
 new file mode 100644
-index 000000000..5531aba1f
+index 000000000..aa58f9ede
 --- /dev/null
 +++ b/public/fpdf_libs.h
 @@ -0,0 +1,25 @@
