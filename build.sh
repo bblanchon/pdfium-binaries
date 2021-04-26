@@ -49,6 +49,7 @@ mkdir -p "$PDFium_LIB_DIR"
 
 # Download depot_tools if not exists in this location or update utherwise
 git clone --depth 1 "$DepotTools_URL" "$DepotTools_DIR"
+git apply -v "$PDFium_PATCH_DIR/depot_tools.patch"
 
 export PATH="$DepotTools_DIR:$PATH"
 
