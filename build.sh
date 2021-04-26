@@ -56,13 +56,13 @@ cd ..
 export PATH="$DepotTools_DIR:$PATH"
 
 # Clone
-gclient config --verbose --unmanaged "$PDFium_URL"
-gclient sync --jobs=16 --verbose --no-history --shallow
+gclient config --unmanaged "$PDFium_URL"
+gclient sync --no-history --shallow
 
 # Checkout
 cd "$PDFium_SOURCE_DIR"
 git checkout "${PDFium_BRANCH:-master}"
-gclient sync --jobs=16 --verbose --no-history --shallow
+gclient sync --no-history --shallow
 
 # Patch
 cd "$PDFium_SOURCE_DIR"

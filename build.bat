@@ -46,12 +46,12 @@ where rc.exe || exit /b
 
 : Clone
 call gclient config --unmanaged %PDFium_URL% || exit /b
-call gclient sync --jobs=16 --no-history --shallow || exit /b
+call gclient sync --no-history --shallow || exit /b
 
 : Checkout branch (or ignore if it doesn't exist)
 echo on
 cd %PDFium_SOURCE_DIR%
-git.exe checkout %PDFium_BRANCH% && call gclient sync --jobs=16 --no-history --shallow
+git.exe checkout %PDFium_BRANCH% && call gclient sync --no-history --shallow
 cd %DepotTools_DIR%
 git.exe apply -v "%PDFium_PATCH_DIR%\depot_tools.patch" || exit /b
 cd ..
