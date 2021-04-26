@@ -46,12 +46,12 @@ where rc.exe || exit /b
 
 : Clone
 call gclient config --unmanaged %PDFium_URL% || exit /b
-call gclient sync || exit /b
+call gclient sync --no-history --shallow || exit /b
 
 : Checkout branch (or ignore if it doesn't exist)
 echo on
 cd %PDFium_SOURCE_DIR%
-git.exe checkout %PDFium_BRANCH% && call gclient sync
+git.exe checkout %PDFium_BRANCH% && call gclient sync --no-history --shallow
 
 : Install python packages
 where python
