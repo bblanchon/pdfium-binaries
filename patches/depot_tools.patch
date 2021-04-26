@@ -1,7 +1,7 @@
-diff --git a/depot_tools/gclient_scm.py b/depot_tools/gclient_scm.py
+diff --git a/gclient_scm.py b/gclient_scm.py
 index ea8f7734..d03b9da8 100644
---- a/depot_tools/gclient_scm.py
-+++ b/depot_tools/gclient_scm.py
+--- a/gclient_scm.py
++++ b/gclient_scm.py
 @@ -1005,7 +1005,7 @@ class GitWrapper(SCMWrapper):
        # to stdout
        self.Print('')

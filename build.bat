@@ -52,6 +52,7 @@ call gclient sync --no-history --shallow || exit /b
 echo on
 cd %PDFium_SOURCE_DIR%
 git.exe checkout %PDFium_BRANCH% && call gclient sync --no-history --shallow
+cd %DepotTools_DIR%
 git.exe apply -v "%PDFium_PATCH_DIR%\depot_tools.patch" || exit /b
 
 : Install python packages
