@@ -1,0 +1,13 @@
+diff --git a/gclient_scm.py b/gclient_scm.py
+index ea8f7734..d03b9da8 100644
+--- a/gclient_scm.py
++++ b/gclient_scm.py
+@@ -1005,7 +1005,7 @@ class GitWrapper(SCMWrapper):
+       # to stdout
+       self.Print('')
+     cfg = gclient_utils.DefaultIndexPackConfig(url)
+-    clone_cmd = cfg + ['clone', '--no-checkout', '--progress']
++    clone_cmd = cfg + ['clone', '--no-checkout', '--progress', '--depth=1']
+     if self.cache_dir:
+       clone_cmd.append('--shared')
+     if options.verbose:
