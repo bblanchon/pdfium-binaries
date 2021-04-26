@@ -1,0 +1,4 @@
+staging
+.cipd
+.gclient
+.gclient_entries
