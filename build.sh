@@ -40,29 +40,29 @@ PDFium_ARTIFACT_BASE="$PWD/pdfium-$OS"
 [ "$CONFIGURATION" == "Debug" ] && PDFium_ARTIFACT_BASE="$PDFium_ARTIFACT_BASE-debug"
 PDFium_ARTIFACT="$PDFium_ARTIFACT_BASE.tgz"
 
+rm -fr "$DepotTools_DIR"
+
 # Prepare directories
 mkdir -p "$PDFium_BUILD_DIR"
 mkdir -p "$PDFium_STAGING_DIR"
 mkdir -p "$PDFium_LIB_DIR"
 
 # Download depot_tools if not exists in this location or update utherwise
-if [ ! -d "$DepotTools_DIR" ]; then
-  git clone "$DepotTools_URL" "$DepotTools_DIR"
-else 
-  cd "$DepotTools_DIR"
-  git pull
-  cd ..
-fi
+git clone --depth 1 "$DepotTools_URL" "$DepotTools_DIR"
+cd "$DepotTools_DIR"
+git apply -v "$PDFium_PATCH_DIR/depot_tools.patch"
+cd ..
+
 export PATH="$DepotTools_DIR:$PATH"
 
 # Clone
 gclient config --unmanaged "$PDFium_URL"
-gclient sync
+gclient sync --no-history --shallow
 
 # Checkout
 cd "$PDFium_SOURCE_DIR"
 git checkout "${PDFium_BRANCH:-master}"
-gclient sync
+gclient sync --no-history --shallow
 
 # Patch
 cd "$PDFium_SOURCE_DIR"
