@@ -7,6 +7,11 @@ matrix:
       env: PDFium_BRANCH=$TRAVIS_BRANCH PDFium_V8=disabled CONFIGURATION=Release
     - os: linux
       env: PDFium_BRANCH=$TRAVIS_BRANCH PDFium_V8=enabled CONFIGURATION=Release
+    - os: linux
+        env: PDFium_BRANCH=$TRAVIS_BRANCH PDFium_V8=disabled CONFIGURATION=Release TARGET_CPU=arm _CC=arm-linux-gnueabihf-gcc _CXX=arm-linux-gnueabihf-g++
+        addons:
+          apt:
+            packages: ['g++-arm-linux-gnueabihf']
     - os: osx
       osx_image: xcode11.3
       env: PDFium_BRANCH=$TRAVIS_BRANCH PDFium_V8=disabled CONFIGURATION=Release
