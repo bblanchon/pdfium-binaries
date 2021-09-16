@@ -14,32 +14,41 @@ Here are the download links for latest release:
 
 <table>
   <tr>
-    <th>Platform</th>
+    <th>OS</th>
+    <th>Arch</th>
     <th>PDFium</th>
     <th>PDFium with <a href="https://en.wikipedia.org/wiki/V8_(JavaScript_engine)">V8</a> and <a href="https://en.wikipedia.org/wiki/XFA">XFA</a></th>
   </tr>
   <tr>
-    <td>Windows 32-bit</td>
+    <td rowspan="2">Windows</td>
+    <td>x86</td>
     <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-windows-x86.zip">pdfium-windows-x86.zip</a> (2 MB)</td>
     <td>Unavailable (buildtime > 2h)</td>
   </tr>
   <tr>
-    <td>Windows 64-bit</td>
+    <td>x64</td>
     <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-windows-x64.zip">pdfium-windows-x64.zip</a> (2 MB)</td>
     <td>Unavailable (buildtime > 2h)</td>
   </tr>
   <tr>
-    <td>Linux</td>
+    <td rowspan="2">Linux</td>
+    <td>x64</td>
     <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-linux.tgz">pdfium-linux.tgz</a> (6 MB)</td>
     <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-linux-v8.tgz">pdfium-linux-v8.tgz</a> (37 MB)</td>
   </tr>
   <tr>
-    <td>macOS (Intel)</td>
+    <td>ARM</td>
+    <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-linux-arm.tgz">pdfium-linux-arm.tgz</a> (5 MB)</td>
+    <td>-</td>
+  </tr>
+  <tr>
+    <td rowspan="2">macOS</td>
+    <td>x64</td>
     <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-darwin-x64.tgz">pdfium-darwin-x64.tgz</a> (6 MB)</td>
     <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-darwin-x64-v8.tgz">pdfium-darwin-x64-v8.tgz</a> (42 MB)</td>
   </tr>
   <tr>
-    <td>macOS (ARM)</td>
+    <td>ARM64</td>
     <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-darwin-arm64.tgz">pdfium-darwin-arm64.tgz</a> (6 MB)</td>
     <td>-</td>
   </tr>

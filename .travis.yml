@@ -7,6 +7,11 @@ matrix:
       env: PDFium_V8=disabled CONFIGURATION=Release
     - os: linux
       env: PDFium_V8=enabled CONFIGURATION=Release
+    - os: linux
+      env: PDFium_V8=disabled CONFIGURATION=Release TARGET_CPU=arm
+      addons:
+        apt:
+          packages: ['g++-arm-linux-gnueabihf']
     - os: osx
       osx_image: xcode11.3
       env: PDFium_V8=disabled CONFIGURATION=Release
