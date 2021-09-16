@@ -17,9 +17,7 @@ matrix:
       osx_image: xcode12.2
       env: PDFium_BRANCH=$TRAVIS_BRANCH PDFium_V8=disabled CONFIGURATION=Release TARGET_CPU=arm64
 
-script:
-  - bash build.sh
-  - '[ -n "$TARGET_CPU" ] || bash test.sh'
+script: bash -ev travis.sh
 
 deploy:
   provider: releases
