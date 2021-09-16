@@ -4,18 +4,18 @@ language: cpp
 matrix:
   include:
     - os: linux
-      env: PDFium_BRANCH=$TRAVIS_BRANCH PDFium_V8=disabled CONFIGURATION=Release
+      env: PDFium_V8=disabled CONFIGURATION=Release
     - os: linux
-      env: PDFium_BRANCH=$TRAVIS_BRANCH PDFium_V8=enabled CONFIGURATION=Release
+      env: PDFium_V8=enabled CONFIGURATION=Release
     - os: osx
       osx_image: xcode11.3
-      env: PDFium_BRANCH=$TRAVIS_BRANCH PDFium_V8=disabled CONFIGURATION=Release
+      env: PDFium_V8=disabled CONFIGURATION=Release
     - os: osx
       osx_image: xcode11.3
-      env: PDFium_BRANCH=$TRAVIS_BRANCH PDFium_V8=enabled CONFIGURATION=Release
+      env: PDFium_V8=enabled CONFIGURATION=Release
     - os: osx
       osx_image: xcode12.2
-      env: PDFium_BRANCH=$TRAVIS_BRANCH PDFium_V8=disabled CONFIGURATION=Release TARGET_CPU=arm64
+      env: PDFium_V8=disabled CONFIGURATION=Release TARGET_CPU=arm64
 
 script: bash -ev travis.sh
 
