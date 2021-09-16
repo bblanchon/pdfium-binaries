@@ -19,7 +19,7 @@ matrix:
 
 script:
   - bash build.sh
-  - bash test.sh
+  - '[ -n "$TARGET_CPU" ] || bash test.sh'
 
 deploy:
   provider: releases
