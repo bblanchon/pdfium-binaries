@@ -1,0 +1,2 @@
+*.sh text=auto eol=lf
+*.patch text=auto eol=lf
