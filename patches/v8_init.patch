@@ -1,10 +1,10 @@
 diff --git a/fpdfsdk/BUILD.gn b/fpdfsdk/BUILD.gn
-index dc8012ad3..12f82268c 100644
+index 748f43f4f..82434ebb5 100644
 --- a/fpdfsdk/BUILD.gn
 +++ b/fpdfsdk/BUILD.gn
-@@ -70,6 +70,7 @@ source_set("fpdfsdk") {
-     "fpdf_transformpage.cpp",
+@@ -69,6 +69,7 @@ source_set("fpdfsdk") {
      "fpdf_view.cpp",
+     "ipdfsdk_annothandler.cpp",
      "ipdfsdk_annothandler.h",
 +    "fpdf_libs.cpp",
    ]
