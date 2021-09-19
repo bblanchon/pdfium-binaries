@@ -1,6 +1,7 @@
 [![Total number of downloads](https://img.shields.io/github/downloads/bblanchon/pdfium-binaries/total.svg)](https://github.com/bblanchon/pdfium-binaries/releases)
 [![Windows Build status](https://ci.appveyor.com/api/projects/status/85rqdhpyxt589700?svg=true)](https://ci.appveyor.com/project/bblanchon/pdfium-binaries)
 [![Linux/macOS Build Status](https://travis-ci.org/bblanchon/pdfium-binaries.svg?branch=master)](https://travis-ci.org/bblanchon/pdfium-binaries)
+[![Build](https://github.com/bblanchon/pdfium-binaries/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/bblanchon/pdfium-binaries/actions/workflows/build.yml)
 
 # Pre-compiled binaries of PDFium
 
