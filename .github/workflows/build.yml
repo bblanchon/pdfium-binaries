@@ -1,0 +1,97 @@
+name: Build
+
+on: [push]
+
+jobs:
+  unix:
+    name: Build (Unix)
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-20.04
+            v8: disabled
+            cfg: Release
+            artifact: pdfium-linux-x64
+          - runner: ubuntu-20.04
+            v8: disabled
+            cfg: Release
+            cpu: arm
+            artifact: pdfium-linux-arm
+            install: g++-arm-linux-gnueabihf
+          - runner: macos-10.15
+            v8: disabled
+            cfg: Release
+            artifact: pdfium-darwin-x64
+          - runner: macos-10.15
+            v8: disabled
+            cfg: Release
+            cpu: arm64
+            artifact: pdfium-darwin-arm64
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - name: Install
+        if: ${{ matrix.install }}
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ${{ matrix.install }}
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Set PDFium branch
+        if: ${{ startsWith(github.ref, 'refs/tags/chromium/') }}
+        run: echo "PDFium_BRANCH=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+      - name: Build
+        run: ./build.sh
+        env:
+          PDFium_V8: ${{ matrix.v8 }}
+          CONFIGURATION: ${{ matrix.cfg }}
+          TARGET_CPU: ${{ matrix.cpu }}
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ matrix.artifact }}
+          path: staging/
+      - name: Test
+        run: ./test.sh
+        if: ${{ !matrix.cpu }}
+        env:
+          TARGET_CPU: ${{ matrix.cpu }}
+
+  windows:
+    name: Build (Windows)
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: windows-2019
+            v8: disabled
+            cfg: Release
+            cpu: x86
+            artifact: pdfium-windows-x86
+          - runner: windows-2019
+            v8: disabled
+            cfg: Release
+            cpu: x64
+            artifact: pdfium-windows-x64
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Set PDFium branch
+        if: ${{ startsWith(github.ref, 'refs/tags/chromium/') }}
+        run: echo "PDFium_BRANCH=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+      - name: Build
+        run: build.bat
+        shell: cmd
+        env:
+          PDFium_V8: ${{ matrix.v8 }}
+          CONFIGURATION: ${{ matrix.cfg }}
+          PLATFORM: ${{ matrix.cpu }}
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ matrix.artifact }}
+          path: staging/
+      - name: Test
+        run: test.bat
+        shell: cmd
