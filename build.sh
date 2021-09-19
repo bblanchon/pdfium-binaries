@@ -108,4 +108,4 @@ fi
 
 # Pack
 cd "$PDFium_STAGING_DIR"
-tar cvf "$PDFium_ARTIFACT" -- *
+tar cvzf "$PDFium_ARTIFACT" -- *
