@@ -26,7 +26,6 @@ PDFium_SOURCE_DIR="$PWD/pdfium"
 PDFium_BUILD_DIR="$PDFium_SOURCE_DIR/out"
 PDFium_PATCH_DIR="$PWD/patches"
 PDFium_CMAKE_CONFIG="$PWD/PDFiumConfig.cmake"
-PDFium_ARGS="$PWD/args/$OS.args.gn"
 
 # Output
 PDFium_STAGING_DIR="$PWD/staging"
@@ -72,12 +71,38 @@ git apply -v "$PDFium_PATCH_DIR/relative_includes.patch"
 [ "$PDFium_V8" == "enabled" ] && git apply -v "$PDFium_PATCH_DIR/v8_init.patch"
 
 # Configure
-cp "$PDFium_ARGS" "$PDFium_BUILD_DIR/args.gn"
-[ "$CONFIGURATION" == "Release" ] && echo 'is_debug=false' >> "$PDFium_BUILD_DIR/args.gn"
-[ "$PDFium_V8" == "enabled" ] && echo 'pdf_enable_v8=true' >> "$PDFium_BUILD_DIR/args.gn"
-[ "$PDFium_V8" == "enabled" ] && echo 'pdf_enable_xfa=true' >> "$PDFium_BUILD_DIR/args.gn"
-[ "$OS" == "darwin" ] && echo 'mac_deployment_target = "10.11.0"' >> "$PDFium_BUILD_DIR/args.gn"
-[ "$TARGET_CPU" != "" ] && echo "target_cpu=\"$TARGET_CPU\"" >> "$PDFium_BUILD_DIR/args.gn"
+(
+  echo "is_component_build = false"
+  echo "pdf_is_standalone = true"
+  [ "$TARGET_CPU" != "" ] && echo "target_cpu = \"$TARGET_CPU\""
+
+  if [ "$PDFium_V8" == "enabled" ]; then
+    echo 'pdf_enable_v8 = true'
+    echo 'pdf_enable_xfa = true'
+  else
+    echo 'pdf_enable_v8 = false'
+    echo 'pdf_enable_xfa = false'
+  fi
+
+  case "$OS" in
+    darwin)
+      echo 'mac_deployment_target = "10.11.0"'
+      ;;
+    linux)
+      echo 'use_custom_libcxx = true'
+      echo 'libcpp_is_static = true'
+      ;;
+  esac
+
+  case "$CONFIGURATION" in
+    Debug)
+      echo 'is_debug = true'
+      ;;
+    Release)
+      echo 'is_debug = false'
+      ;;
+  esac
+) > "$PDFium_BUILD_DIR/args.gn"
 
 # Install additional images if needed
 if [ "$TARGET_CPU" == "arm" ] && [ "$OS" == "linux" ]; then

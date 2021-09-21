@@ -14,7 +14,6 @@ set PDFium_SOURCE_DIR=%CD%\pdfium
 set PDFium_BUILD_DIR=%PDFium_SOURCE_DIR%\out
 set PDFium_PATCH_DIR=%CD%\patches
 set PDFium_CMAKE_CONFIG=%CD%\PDFiumConfig.cmake
-set PDFium_ARGS=%CD%\args\windows.args.gn
 
 : Output
 set PDFium_STAGING_DIR=%CD%\staging
@@ -67,11 +66,18 @@ if "%PDFium_V8%"=="enabled" git.exe apply -v "%PDFium_PATCH_DIR%\v8_init.patch" 
 git.exe -C build apply -v "%PDFium_PATCH_DIR%\rc_compiler.patch" || exit /b
 
 : Configure
-copy %PDFium_ARGS% %PDFium_BUILD_DIR%\args.gn
+echo pdf_use_win32_gdi=true > %PDFium_BUILD_DIR%\args.gn
+echo is_component_build=false >> %PDFium_BUILD_DIR%\args.gn
+echo pdf_is_standalone=true >> %PDFium_BUILD_DIR%\args.gn
 if "%CONFIGURATION%"=="Release" echo is_debug=false >> %PDFium_BUILD_DIR%\args.gn
 if "%PLATFORM%"=="x86" echo target_cpu="x86" >> %PDFium_BUILD_DIR%\args.gn
-if "%PDFium_V8%"=="enabled" echo pdf_enable_v8=true >> %PDFium_BUILD_DIR%\args.gn
-if "%PDFium_V8%"=="enabled" echo pdf_enable_xfa=true >> %PDFium_BUILD_DIR%\args.gn
+if "%PDFium_V8%"=="enabled" (
+    echo pdf_enable_v8=true >> %PDFium_BUILD_DIR%\args.gn
+    echo pdf_enable_xfa=true >> %PDFium_BUILD_DIR%\args.gn
+) else (
+    echo pdf_enable_v8=false >> %PDFium_BUILD_DIR%\args.gn
+    echo pdf_enable_xfa=false >> %PDFium_BUILD_DIR%\args.gn
+)
 
 : Generate Ninja files
 call gn gen %PDFium_BUILD_DIR% || exit /b
