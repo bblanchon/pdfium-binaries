@@ -26,15 +26,20 @@ PDFium_SOURCE_DIR="$PWD/pdfium"
 PDFium_BUILD_DIR="$PDFium_SOURCE_DIR/out"
 PDFium_PATCH_DIR="$PWD/patches"
 PDFium_CMAKE_CONFIG="$PWD/PDFiumConfig.cmake"
+WindowsSDK_DIR="/c/Program Files (x86)/Windows Kits/10/bin/10.0.19041.0"
 
 # Output
 PDFium_STAGING_DIR="$PWD/staging"
 PDFium_INCLUDE_DIR="$PDFium_STAGING_DIR/include"
-PDFium_LIB_DIR="$PDFium_STAGING_DIR/lib"
-PDFium_RES_DIR="$PDFium_STAGING_DIR/res"
-PDFium_ARTIFACT_BASE="$PWD/pdfium-$OS"
-[ "$OS" == "darwin" ] && [ "$TARGET_CPU" == "" ] && TARGET_CPU=x64
-[ "$TARGET_CPU" != "" ] && PDFium_ARTIFACT_BASE="$PDFium_ARTIFACT_BASE-$TARGET_CPU"
+if [ "$OS" == "windows" ]; then
+  PDFium_BIN_DIR="$PDFium_STAGING_DIR/$TARGET_CPU/bin"
+  PDFium_LIB_DIR="$PDFium_STAGING_DIR/$TARGET_CPU/lib"
+  PDFium_RES_DIR="$PDFium_STAGING_DIR/$TARGET_CPU/res"
+else
+  PDFium_LIB_DIR="$PDFium_STAGING_DIR/lib"
+  PDFium_RES_DIR="$PDFium_STAGING_DIR/res"
+fi
+PDFium_ARTIFACT_BASE="$PWD/pdfium-$OS-$TARGET_CPU"
 [ "$PDFium_V8" == "enabled" ] && PDFium_ARTIFACT_BASE="$PDFium_ARTIFACT_BASE-v8"
 [ "$CONFIGURATION" == "Debug" ] && PDFium_ARTIFACT_BASE="$PDFium_ARTIFACT_BASE-debug"
 PDFium_ARTIFACT="$PDFium_ARTIFACT_BASE.tgz"
@@ -54,6 +59,12 @@ else
 fi
 export PATH="$DepotTools_DIR:$PATH"
 
+# Extra config for Windows
+if [ "$OS" == "windows" ]; then
+  export PATH="$WindowsSDK_DIR/$TARGET_CPU:$PATH"
+  export DEPOT_TOOLS_WIN_TOOLCHAIN=0
+fi
+
 # Clone
 gclient config --unmanaged "$PDFium_URL"
 gclient sync
@@ -69,12 +80,17 @@ git apply -v "$PDFium_PATCH_DIR/shared_library.patch"
 git apply -v "$PDFium_PATCH_DIR/relative_includes.patch"
 #git apply -v "$PDFium_PATCH_DIR/static_libstdcxx.patch"
 [ "$PDFium_V8" == "enabled" ] && git apply -v "$PDFium_PATCH_DIR/v8_init.patch"
+if [ "$OS" == "windows" ]; then
+  git apply -v "$PDFium_PATCH_DIR/widestring.patch"
+  git -C build apply -v "$PDFium_PATCH_DIR/rc_compiler.patch"
+  cp "$PDFium_PATCH_DIR/resources.rc" .
+fi
 
 # Configure
 (
   echo "is_component_build = false"
   echo "pdf_is_standalone = true"
-  [ "$TARGET_CPU" != "" ] && echo "target_cpu = \"$TARGET_CPU\""
+  echo "target_cpu = \"$TARGET_CPU\""
 
   if [ "$PDFium_V8" == "enabled" ]; then
     echo 'pdf_enable_v8 = true'
@@ -91,6 +107,9 @@ git apply -v "$PDFium_PATCH_DIR/relative_includes.patch"
     linux)
       echo 'use_custom_libcxx = true'
       echo 'libcpp_is_static = true'
+      ;;
+    windows)
+      echo 'pdf_use_win32_gdi = true'
       ;;
   esac
 
@@ -124,8 +143,20 @@ cp -R "$PDFium_SOURCE_DIR/public" "$PDFium_INCLUDE_DIR"
 rm -f "$PDFium_INCLUDE_DIR/DEPS"
 rm -f "$PDFium_INCLUDE_DIR/README"
 rm -f "$PDFium_INCLUDE_DIR/PRESUBMIT.py"
-[ "$OS" == "linux" ] && mv "$PDFium_BUILD_DIR/libpdfium.so" "$PDFium_LIB_DIR"
-[ "$OS" == "darwin" ] && mv "$PDFium_BUILD_DIR/libpdfium.dylib" "$PDFium_LIB_DIR"
+case "$OS" in
+  darwin)
+    mv "$PDFium_BUILD_DIR/libpdfium.dylib" "$PDFium_LIB_DIR"
+    ;;
+  linux)
+    mv "$PDFium_BUILD_DIR/libpdfium.so" "$PDFium_LIB_DIR"
+    ;;
+  windows)
+    mkdir -p "$PDFium_BIN_DIR"
+    mv "$PDFium_BUILD_DIR/pdfium.dll.lib" "$PDFium_LIB_DIR"
+    mv "$PDFium_BUILD_DIR/pdfium.dll" "$PDFium_BIN_DIR"
+    [ "$CONFIGURATION" == "Debug" ] &&  mv "$PDFium_BUILD_DIR/pdfium.dll.pdb" "$PDFium_BIN_DIR"
+    ;;
+esac
 if [ "$PDFium_V8" == "enabled" ]; then
   mkdir -p "$PDFium_RES_DIR"
   mv "$PDFium_BUILD_DIR/icudtl.dat" "$PDFium_RES_DIR"
