@@ -3,7 +3,7 @@
 # Variables to provide:
 # CONFIGURATION = Debug | Release
 # TARGET_CPU = ...
-# PDFium_BRANCH = master | chromium/3211 | ...
+# PDFium_BRANCH = main | chromium/3211 | ...
 # PDFium_V8 = enabled
 
 set -ex
@@ -60,7 +60,7 @@ gclient sync
 
 # Checkout
 cd "$PDFium_SOURCE_DIR"
-git checkout "${PDFium_BRANCH:-master}"
+git checkout "${PDFium_BRANCH:-main}"
 gclient sync
 
 # Patch
