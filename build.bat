@@ -83,6 +83,7 @@ call ninja -C %PDFium_BUILD_DIR% pdfium || exit /b
 echo on
 copy %PDFium_CMAKE_CONFIG% %PDFium_STAGING_DIR% || exit /b
 copy %PDFium_SOURCE_DIR%\LICENSE %PDFium_STAGING_DIR% || exit /b
+copy %PDFium_BUILD_DIR%\args.gn %PDFium_STAGING_DIR% || exit /b
 xcopy /S /Y %PDFium_SOURCE_DIR%\public %PDFium_INCLUDE_DIR%\ || exit /b
 del %PDFium_INCLUDE_DIR%\DEPS
 del %PDFium_INCLUDE_DIR%\README

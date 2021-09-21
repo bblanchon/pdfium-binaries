@@ -94,6 +94,7 @@ ls -l "$PDFium_BUILD_DIR"
 # Install
 cp "$PDFium_CMAKE_CONFIG" "$PDFium_STAGING_DIR"
 cp "$PDFium_SOURCE_DIR/LICENSE" "$PDFium_STAGING_DIR"
+cp "$PDFium_BUILD_DIR/args.gn" "$PDFium_STAGING_DIR"
 cp -R "$PDFium_SOURCE_DIR/public" "$PDFium_INCLUDE_DIR"
 rm -f "$PDFium_INCLUDE_DIR/DEPS"
 rm -f "$PDFium_INCLUDE_DIR/README"
