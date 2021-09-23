@@ -8,161 +8,19 @@
 
 set -ex
 
-OS=$(uname)
-case $OS in
-MINGW*)
-  OS="windows"
-  ;;
-*)
-  OS=$(echo $OS | tr '[:upper:]' '[:lower:]')
-  ;;
-esac
+ENV_FILE=${GITHUB_ENV:-.env}
+PATH_FILE=${GITHUB_PATH:-.path}
 
-# Input
-DepotTools_URL='https://chromium.googlesource.com/chromium/tools/depot_tools.git'
-DepotTools_DIR="$PWD/depot_tools"
-PDFium_URL='https://pdfium.googlesource.com/pdfium.git'
-PDFium_SOURCE_DIR="$PWD/pdfium"
-PDFium_BUILD_DIR="$PDFium_SOURCE_DIR/out"
-PDFium_PATCH_DIR="$PWD/patches"
-PDFium_CMAKE_CONFIG="$PWD/PDFiumConfig.cmake"
-WindowsSDK_DIR="/c/Program Files (x86)/Windows Kits/10/bin/10.0.19041.0"
+. steps/00-environment.sh
+source "$ENV_FILE"
 
-# Output
-PDFium_STAGING_DIR="$PWD/staging"
-PDFium_INCLUDE_DIR="$PDFium_STAGING_DIR/include"
-if [ "$OS" == "windows" ]; then
-  PDFium_BIN_DIR="$PDFium_STAGING_DIR/$TARGET_CPU/bin"
-  PDFium_LIB_DIR="$PDFium_STAGING_DIR/$TARGET_CPU/lib"
-  PDFium_RES_DIR="$PDFium_STAGING_DIR/$TARGET_CPU/res"
-else
-  PDFium_LIB_DIR="$PDFium_STAGING_DIR/lib"
-  PDFium_RES_DIR="$PDFium_STAGING_DIR/res"
-fi
-PDFium_ARTIFACT_BASE="$PWD/pdfium-$OS-$TARGET_CPU"
-[ "$PDFium_V8" == "enabled" ] && PDFium_ARTIFACT_BASE="$PDFium_ARTIFACT_BASE-v8"
-[ "$CONFIGURATION" == "Debug" ] && PDFium_ARTIFACT_BASE="$PDFium_ARTIFACT_BASE-debug"
-PDFium_ARTIFACT="$PDFium_ARTIFACT_BASE.tgz"
+. steps/01-install.sh
+PATH="$(tr '\n' ':' < "$PATH_FILE")$PATH"
+export PATH
 
-# Prepare directories
-mkdir -p "$PDFium_BUILD_DIR"
-mkdir -p "$PDFium_STAGING_DIR"
-mkdir -p "$PDFium_LIB_DIR"
-
-# Download depot_tools if not exists in this location or update utherwise
-if [ ! -d "$DepotTools_DIR" ]; then
-  git clone "$DepotTools_URL" "$DepotTools_DIR"
-else 
-  cd "$DepotTools_DIR"
-  git pull
-  cd ..
-fi
-export PATH="$DepotTools_DIR:$PATH"
-
-# Extra config for Windows
-if [ "$OS" == "windows" ]; then
-  export PATH="$WindowsSDK_DIR/$TARGET_CPU:$PATH"
-  export DEPOT_TOOLS_WIN_TOOLCHAIN=0
-fi
-
-# Clone
-gclient config --unmanaged "$PDFium_URL"
-gclient sync
-
-# Checkout
-cd "$PDFium_SOURCE_DIR"
-git checkout "${PDFium_BRANCH:-main}"
-gclient sync
-
-# Patch
-cd "$PDFium_SOURCE_DIR"
-git apply -v "$PDFium_PATCH_DIR/shared_library.patch"
-git apply -v "$PDFium_PATCH_DIR/relative_includes.patch"
-#git apply -v "$PDFium_PATCH_DIR/static_libstdcxx.patch"
-[ "$PDFium_V8" == "enabled" ] && git apply -v "$PDFium_PATCH_DIR/v8_init.patch"
-if [ "$OS" == "windows" ]; then
-  git apply -v "$PDFium_PATCH_DIR/widestring.patch"
-  git -C build apply -v "$PDFium_PATCH_DIR/rc_compiler.patch"
-  cp "$PDFium_PATCH_DIR/resources.rc" .
-fi
-
-# Configure
-(
-  echo "is_component_build = false"
-  echo "pdf_is_standalone = true"
-  echo "target_cpu = \"$TARGET_CPU\""
-
-  if [ "$PDFium_V8" == "enabled" ]; then
-    echo 'pdf_enable_v8 = true'
-    echo 'pdf_enable_xfa = true'
-  else
-    echo 'pdf_enable_v8 = false'
-    echo 'pdf_enable_xfa = false'
-  fi
-
-  case "$OS" in
-    darwin)
-      echo 'mac_deployment_target = "10.11.0"'
-      ;;
-    linux)
-      echo 'use_custom_libcxx = true'
-      echo 'libcpp_is_static = true'
-      ;;
-    windows)
-      echo 'pdf_use_win32_gdi = true'
-      ;;
-  esac
-
-  case "$CONFIGURATION" in
-    Debug)
-      echo 'is_debug = true'
-      ;;
-    Release)
-      echo 'is_debug = false'
-      ;;
-  esac
-) > "$PDFium_BUILD_DIR/args.gn"
-
-# Install additional images if needed
-if [ "$TARGET_CPU" == "arm" ] && [ "$OS" == "linux" ]; then
-  build/linux/sysroot_scripts/install-sysroot.py --arch=arm
-fi
-
-# Generate Ninja files
-gn gen "$PDFium_BUILD_DIR"
-
-# Build
-ninja -C "$PDFium_BUILD_DIR" pdfium
-ls -l "$PDFium_BUILD_DIR"
-
-# Install
-cp "$PDFium_CMAKE_CONFIG" "$PDFium_STAGING_DIR"
-cp "$PDFium_SOURCE_DIR/LICENSE" "$PDFium_STAGING_DIR"
-cp "$PDFium_BUILD_DIR/args.gn" "$PDFium_STAGING_DIR"
-cp -R "$PDFium_SOURCE_DIR/public" "$PDFium_INCLUDE_DIR"
-rm -f "$PDFium_INCLUDE_DIR/DEPS"
-rm -f "$PDFium_INCLUDE_DIR/README"
-rm -f "$PDFium_INCLUDE_DIR/PRESUBMIT.py"
-case "$OS" in
-  darwin)
-    mv "$PDFium_BUILD_DIR/libpdfium.dylib" "$PDFium_LIB_DIR"
-    ;;
-  linux)
-    mv "$PDFium_BUILD_DIR/libpdfium.so" "$PDFium_LIB_DIR"
-    ;;
-  windows)
-    mkdir -p "$PDFium_BIN_DIR"
-    mv "$PDFium_BUILD_DIR/pdfium.dll.lib" "$PDFium_LIB_DIR"
-    mv "$PDFium_BUILD_DIR/pdfium.dll" "$PDFium_BIN_DIR"
-    [ "$CONFIGURATION" == "Debug" ] &&  mv "$PDFium_BUILD_DIR/pdfium.dll.pdb" "$PDFium_BIN_DIR"
-    ;;
-esac
-if [ "$PDFium_V8" == "enabled" ]; then
-  mkdir -p "$PDFium_RES_DIR"
-  mv "$PDFium_BUILD_DIR/icudtl.dat" "$PDFium_RES_DIR"
-  mv "$PDFium_BUILD_DIR/snapshot_blob.bin" "$PDFium_RES_DIR"
-fi
-
-# Pack
-cd "$PDFium_STAGING_DIR"
-tar cvzf "$PDFium_ARTIFACT" -- *
+. steps/02-checkout.sh
+. steps/03-patch.sh
+. steps/04-install-extras.sh
+. steps/05-configure.sh
+. steps/06-build.sh
+. steps/07-pack.sh

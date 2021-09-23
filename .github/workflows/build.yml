@@ -24,7 +24,6 @@ jobs:
             cfg: Release
             cpu: arm
             artifact: pdfium-linux-arm
-            install: g++-arm-linux-gnueabihf
             skip_test: true
           - runner: macos-10.15
             v8: disabled
@@ -49,23 +48,42 @@ jobs:
             artifact: pdfium-windows-x64
     runs-on: ${{ matrix.runner }}
     steps:
-      - name: Install
-        if: ${{ matrix.install }}
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y ${{ matrix.install }}
-      - name: Checkout
-        uses: actions/checkout@v2
       - name: Set PDFium branch
         if: ${{ startsWith(github.ref, 'refs/tags/chromium/') }}
         run: echo "PDFium_BRANCH=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
-      - name: Build
-        run: ./build.sh
         shell: bash
-        env:
-          PDFium_V8: ${{ matrix.v8 }}
-          CONFIGURATION: ${{ matrix.cfg }}
-          TARGET_CPU: ${{ matrix.cpu }}
+      - name: Checkout this repo
+        uses: actions/checkout@v2
+      - name: Set environment variables
+        run: |
+          cat >>$GITHUB_ENV <<END
+          PDFium_V8=${{ matrix.v8 }}
+          PDFium_CONFIGURATION=${{ matrix.cfg }}
+          PDFium_TARGET_CPU=${{ matrix.cpu }}
+          END
+          steps/00-environment.sh
+        shell: bash
+      - name: Install (1/2)
+        run: steps/01-install.sh
+        shell: bash
+      - name: Checkout PDFium
+        run: steps/02-checkout.sh
+        shell: bash
+      - name: Apply patches
+        run: steps/03-patch.sh
+        shell: bash
+      - name: Install (2/2)
+        run: steps/04-install-extras.sh
+        shell: bash
+      - name: Configure build
+        run: steps/05-configure.sh
+        shell: bash
+      - name: Build
+        run: steps/06-build.sh
+        shell: bash
+      - name: Pack
+        run: steps/07-pack.sh
+        shell: bash
       - name: Upload artifact
         uses: actions/upload-artifact@v2
         with:
