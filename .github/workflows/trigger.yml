@@ -1,0 +1,25 @@
+name: Weekly schedule
+
+on:
+  schedule:
+    - cron:  '0 6 * * 1'
+  workflow_dispatch:
+
+jobs:
+  trigger:
+    name: Trigger build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Get Chromium branch
+      id: chromium
+      shell: bash
+      run: echo "::set-output name=branch::$(git ls-remote --heads https://pdfium.googlesource.com/pdfium.git | grep -ohP 'chromium/\d+' | tail -n1)"
+    - name: Trigger build
+      uses: benc-uk/workflow-dispatch@v1
+      with:
+        workflow: Build
+        token: "${{ secrets.PERSONAL_ACCESS_TOKEN }}"
+        inputs: |
+          {
+            "branch": "${{ steps.chromium.outputs.branch }}"
+          }
