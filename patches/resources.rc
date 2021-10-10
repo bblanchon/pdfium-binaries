@@ -1,4 +1,6 @@
 1 VERSIONINFO
+FILEVERSION    	$VERSION_CSV
+PRODUCTVERSION 	$VERSION_CSV
 BEGIN
     BLOCK "StringFileInfo"
     BEGIN
@@ -6,10 +8,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName",      "Google Inc."
             VALUE "FileDescription",  "PDFium (compiled by github.com/bblanchon)"
+            VALUE "FileVersion",      "$VERSION"
             VALUE "InternalName",     "pdfium"
             VALUE "OriginalFilename", "pdfium.dll"
             VALUE "ProductName",      "pdfium"
-            VALUE "LegalCopyright",   "Copyright 2018 PDFium Authors. All rights reserved."
+            VALUE "ProductVersion",   "$VERSION"
+            VALUE "LegalCopyright",   "Copyright $YEAR PDFium Authors. All rights reserved."
         END
     END
 

@@ -15,7 +15,12 @@ git apply -v "$PATCHES/relative_includes.patch"
 if [ "$OS" == "windows" ]; then
   git apply -v "$PATCHES/widestring.patch"
   git -C build apply -v "$PATCHES/rc_compiler.patch"
-  cp "$PATCHES/resources.rc" .
+
+  VERSION=${PDFium_VERSION:-0.0.0.0}
+  YEAR=$(date +%Y)
+  VERSION_CSV=${VERSION//./,}
+  export YEAR VERSION VERSION_CSV
+  envsubst < "$PATCHES/resources.rc" > "resources.rc"
 fi
 
 popd

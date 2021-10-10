@@ -7,6 +7,10 @@ on:
         description: PDFium branch
         required: false
         default: main
+      version:
+        description: PDFium version
+        required: false
+        default: ''
 
 jobs:
   build:
@@ -58,6 +62,7 @@ jobs:
           PDFium_CONFIGURATION=${{ matrix.cfg }}
           PDFium_TARGET_CPU=${{ matrix.cpu }}
           PDFium_BRANCH=${{ github.event.inputs.branch }}
+          PDFium_VERSION=${{ github.event.inputs.version }}
           END
           steps/00-environment.sh
         shell: bash
@@ -118,4 +123,5 @@ jobs:
         bodyFile: RELEASE.md
         draft: false
         token: ${{ secrets.GITHUB_TOKEN }}
+        name: PDFium ${{ github.event.inputs.version }}
         tag: ${{ github.event.inputs.branch }}

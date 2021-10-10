@@ -4,6 +4,7 @@ CFG=${CONFIGURATION:-Release}
 V8=${V8:-disabled}
 OS=${PDFium_OS:?}
 CPU=${PDFium_TARGET_CPU:?}
+VERSION=${PDFium_VERSION:-}
 
 STAGING="$PWD/staging"
 SOURCE=${PDFium_SOURCE_DIR:-pdfium}
@@ -48,6 +49,13 @@ if [ "$V8" == "enabled" ]; then
   mv "$BUILD/icudtl.dat" "$STAGING_RES"
   mv "$BUILD/snapshot_blob.bin" "$STAGING_RES"
 fi
+
+[ -n "$VERSION" ] && cat >"$STAGING/VERSION" <<END
+MAJOR=$(echo "$VERSION" | cut -d. -f1)
+MINOR=$(echo "$VERSION" | cut -d. -f2)
+BUILD=$(echo "$VERSION" | cut -d. -f3)
+PATCH=$(echo "$VERSION" | cut -d. -f4)
+END
 
 ARTIFACT_BASE="$PWD/pdfium-$OS-$CPU"
 [ "$V8" == "enabled" ] && ARTIFACT_BASE="$ARTIFACT_BASE-v8"
