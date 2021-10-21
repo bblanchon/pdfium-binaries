@@ -1,6 +1,6 @@
 #!/bin/bash -eux
 
-OS=${PDFium_OS:?}
+OS=${PDFium_TARGET_OS:?}
 SOURCE=${PDFium_SOURCE_DIR:-pdfium}
 BUILD=${PDFium_BUILD_DIR:-pdfium/out}
 TARGET_CPU=${PDFium_TARGET_CPU:?}

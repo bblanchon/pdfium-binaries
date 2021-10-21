@@ -22,34 +22,40 @@ jobs:
           - runner: ubuntu-20.04
             v8: disabled
             cfg: Release
-            cpu: x64
+            target_cpu: x64
+            target_os: linux
             artifact: pdfium-linux-x64
           - runner: ubuntu-20.04
             v8: disabled
             cfg: Release
-            cpu: arm
+            target_cpu: arm
+            target_os: linux
             artifact: pdfium-linux-arm
             skip_test: true
           - runner: macos-10.15
             v8: disabled
             cfg: Release
-            cpu: x64
+            target_cpu: x64
+            target_os: darwin
             artifact: pdfium-darwin-x64
           - runner: macos-10.15
             v8: disabled
             cfg: Release
-            cpu: arm64
+            target_cpu: arm64
+            target_os: darwin
             artifact: pdfium-darwin-arm64
             skip_test: true
           - runner: windows-2019
             v8: disabled
             cfg: Release
-            cpu: x86
+            target_cpu: x86
+            target_os: windows
             artifact: pdfium-windows-x86
           - runner: windows-2019
             v8: disabled
             cfg: Release
-            cpu: x64
+            target_cpu: x64
+            target_os: windows
             artifact: pdfium-windows-x64
     runs-on: ${{ matrix.runner }}
     steps:
@@ -60,7 +66,8 @@ jobs:
           cat >>$GITHUB_ENV <<END
           PDFium_V8=${{ matrix.v8 }}
           PDFium_CONFIGURATION=${{ matrix.cfg }}
-          PDFium_TARGET_CPU=${{ matrix.cpu }}
+          PDFium_TARGET_CPU=${{ matrix.target_cpu }}
+          PDFium_TARGET_OS=${{ matrix.target_os }}
           PDFium_BRANCH=${{ github.event.inputs.branch }}
           PDFium_VERSION=${{ github.event.inputs.version }}
           END
@@ -97,7 +104,7 @@ jobs:
         shell: bash
         if: ${{ !matrix.skip_test }}
         env:
-          TARGET_CPU: ${{ matrix.cpu }}
+          TARGET_CPU: ${{ matrix.target_cpu }}
       - name: Upload tarball to GitHub Release
         uses: ncipollo/release-action@v1
         if: ${{ startsWith(github.event.inputs.branch, 'chromium/') }}

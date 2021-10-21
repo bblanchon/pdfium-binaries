@@ -2,7 +2,8 @@
 #
 # Variables to provide:
 # CONFIGURATION = Debug | Release
-# TARGET_CPU = ...
+# PDFium_TARGET_CPU = x86 | x64 | arm | arm64
+# PDFium_TARGET_OS = darwin | linux | windows
 # PDFium_BRANCH = main | chromium/3211 | ...
 # PDFium_V8 = enabled
 

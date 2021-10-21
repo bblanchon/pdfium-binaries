@@ -2,7 +2,7 @@
 
 PATCHES="$PWD/patches"
 SOURCE="${PDFium_SOURCE_DIR:-pdfium}"
-OS="${PDFium_OS:?}"
+OS="${PDFium_TARGET_OS:?}"
 
 pushd "${SOURCE}"
 

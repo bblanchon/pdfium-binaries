@@ -1,7 +1,7 @@
 #!/bin/bash -eux
 
 PATH_FILE=${GITHUB_PATH:-.path}
-OS=${PDFium_OS:?}
+OS=${PDFium_TARGET_OS:?}
 CPU="${PDFium_TARGET_CPU:?}"
 
 DepotTools_URL='https://chromium.googlesource.com/chromium/tools/depot_tools.git'
