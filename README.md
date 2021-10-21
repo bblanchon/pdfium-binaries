@@ -32,8 +32,8 @@ Here are the download links for latest release:
   <tr>
     <td rowspan="2">Linux</td>
     <td>x64</td>
-    <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-linux.tgz">pdfium-linux.tgz</a> (6 MB)</td>
-    <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-linux-v8.tgz">pdfium-linux-v8.tgz</a> (37 MB)</td>
+    <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-linux-x64.tgz">pdfium-linux.tgz</a> (6 MB)</td>
+    <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-linux-x64-v8.tgz">pdfium-linux-v8.tgz</a> (37 MB)</td>
   </tr>
   <tr>
     <td>ARM</td>
