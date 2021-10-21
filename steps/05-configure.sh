@@ -26,7 +26,7 @@ mkdir -p "$BUILD"
   echo "pdf_enable_xfa = $ENABLE_V8"
 
   case "$OS" in
-    darwin)
+    mac)
       echo 'mac_deployment_target = "10.11.0"'
       ;;
     linux)

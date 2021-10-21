@@ -36,14 +36,14 @@ jobs:
             v8: disabled
             cfg: Release
             target_cpu: x64
-            target_os: darwin
-            artifact: pdfium-darwin-x64
+            target_os: mac
+            artifact: pdfium-mac-x64
           - runner: macos-10.15
             v8: disabled
             cfg: Release
             target_cpu: arm64
-            target_os: darwin
-            artifact: pdfium-darwin-arm64
+            target_os: mac
+            artifact: pdfium-mac-arm64
             skip_test: true
           - runner: windows-2019
             v8: disabled

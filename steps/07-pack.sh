@@ -30,7 +30,7 @@ rm -f "$STAGING/include/DEPS"
 rm -f "$STAGING/include/README"
 rm -f "$STAGING/include/PRESUBMIT.py"
 case "$OS" in
-  darwin)
+  mac)
     mv "$BUILD/libpdfium.dylib" "$STAGING_LIB"
     ;;
   linux)
