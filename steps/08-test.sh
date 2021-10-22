@@ -20,6 +20,9 @@ case "$OS-$CPU" in
   linux-arm)
     export CC="arm-linux-gnueabihf-gcc" CXX="arm-linux-gnueabihf-g++"
     ;;
+  linux-arm64)
+    export CC="aarch64-linux-gnu-gcc" CXX="aarch64-linux-gnu-g++"
+    ;;
 esac
 
 mkdir build

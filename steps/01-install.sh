@@ -19,11 +19,18 @@ fi
 
 echo "$DepotTools_DIR" >> "$PATH_FILE"
 
-if [ "$OS" == "windows" ]; then
-  echo "$WindowsSDK_DIR/$CPU" >> "$PATH_FILE"
-fi
+case "$OS-$CPU" in
+  windows-*)
+    echo "$WindowsSDK_DIR/$CPU" >> "$PATH_FILE"
+    ;;
 
-if [ "$OS" == "linux" ] && [ "$CPU" == "arm" ]; then
-  sudo apt-get update
-  sudo apt-get install -y g++-arm-linux-gnueabihf
-fi
+  linux-arm)
+    sudo apt-get update
+    sudo apt-get install -y g++-arm-linux-gnueabihf
+    ;;
+
+  linux-arm64)
+    sudo apt-get update
+    sudo apt-get install -y g++-aarch64-linux-gnu
+    ;;
+esac
