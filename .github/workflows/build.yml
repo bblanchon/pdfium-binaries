@@ -31,7 +31,6 @@ jobs:
             target_cpu: arm
             target_os: linux
             artifact: pdfium-linux-arm
-            skip_test: true
           - runner: macos-10.15
             v8: disabled
             cfg: Release
@@ -44,7 +43,6 @@ jobs:
             target_cpu: arm64
             target_os: mac
             artifact: pdfium-mac-arm64
-            skip_test: true
           - runner: windows-2019
             v8: disabled
             cfg: Release
@@ -100,11 +98,8 @@ jobs:
           name: ${{ matrix.artifact }}
           path: staging/
       - name: Test
-        run: ./test.sh
+        run: steps/08-test.sh
         shell: bash
-        if: ${{ !matrix.skip_test }}
-        env:
-          TARGET_CPU: ${{ matrix.target_cpu }}
       - name: Upload tarball to GitHub Release
         uses: ncipollo/release-action@v1
         if: ${{ startsWith(github.event.inputs.branch, 'chromium/') }}
