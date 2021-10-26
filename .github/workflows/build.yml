@@ -53,14 +53,14 @@ jobs:
             v8: disabled
             cfg: Release
             target_cpu: x86
-            target_os: windows
-            artifact: pdfium-windows-x86
+            target_os: win
+            artifact: pdfium-win-x86
           - runner: windows-2019
             v8: disabled
             cfg: Release
             target_cpu: x64
-            target_os: windows
-            artifact: pdfium-windows-x64
+            target_os: win
+            artifact: pdfium-win-x64
           - runner: ubuntu-20.04
             v8: disabled
             cfg: Release

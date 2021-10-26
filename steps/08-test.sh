@@ -6,13 +6,13 @@ PDFIUM="${PDFium_SOURCE_DIR:?}"
 SOURCE_DIR="$PWD/example"
 
 export PDFium_DIR="$PWD/staging"
-[ "$OS" == "windows" ] && export CMAKE_GENERATOR="Visual Studio 16 2019"
+[ "$OS" == "win" ] && export CMAKE_GENERATOR="Visual Studio 16 2019"
 
 case "$OS-$CPU" in
-  windows-x86)    
+  win-x86)    
     export CMAKE_GENERATOR_PLATFORM="Win32"
     ;;
-  windows-x64)
+  win-x64)
     export CMAKE_GENERATOR_PLATFORM="x64"
     ;;
   mac-arm64)
@@ -47,7 +47,7 @@ cd build
 cmake "$SOURCE_DIR"
 cmake --build .
 
-if [ "$OS" == "windows" ]; then
+if [ "$OS" == "win" ]; then
   file Debug/example.exe
 else
   file example

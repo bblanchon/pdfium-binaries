@@ -16,7 +16,7 @@ fi
 echo "$DepotTools_DIR" >> "$PATH_FILE"
 
 case "$OS-$CPU" in
-  windows-*)
+  win-*)
     echo "$WindowsSDK_DIR/$CPU" >> "$PATH_FILE"
     ;;
 

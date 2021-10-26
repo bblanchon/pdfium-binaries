@@ -32,7 +32,7 @@ mkdir -p "$BUILD"
     linux)
       echo 'use_custom_libcxx = true'
       ;;
-    windows)
+    win)
       echo 'pdf_use_win32_gdi = true'
       ;;
     android)

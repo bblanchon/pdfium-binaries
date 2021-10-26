@@ -10,7 +10,7 @@ STAGING="$PWD/staging"
 SOURCE=${PDFium_SOURCE_DIR:-pdfium}
 BUILD=${PDFium_BUILD_DIR:-pdfium/out}
 
-if [ "$OS" == "windows" ]; then
+if [ "$OS" == "win" ]; then
   STAGING_BIN="$STAGING/$CPU/bin"
   STAGING_LIB="$STAGING/$CPU/lib"
   STAGING_RES="$STAGING/$CPU/res"
@@ -39,7 +39,7 @@ case "$OS" in
   android)
     mv "$BUILD/libpdfium.cr.so" "$STAGING_LIB/libpdfium.so"
     ;;
-  windows)
+  win)
     mv "$BUILD/pdfium.dll.lib" "$STAGING_LIB"
     mkdir -p "$STAGING_BIN"
     mv "$BUILD/pdfium.dll" "$STAGING_BIN"

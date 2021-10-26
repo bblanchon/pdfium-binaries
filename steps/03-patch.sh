@@ -11,7 +11,7 @@ git apply -v "$PATCHES/public_headers.patch"
 
 [ "${PDFium_V8:-}" == "enabled" ] && git apply -v "$PATCHES/v8_init.patch"
 
-if [ "$OS" == "windows" ]; then
+if [ "$OS" == "win" ]; then
   git apply -v "$PATCHES/widestring.patch"
   git -C build apply -v "$PATCHES/rc_compiler.patch"
 
