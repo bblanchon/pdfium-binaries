@@ -40,3 +40,27 @@ index ff57c1b48..2ed295d88 100644
  
  // Versions of FPDF types that clean up the object at scope exit.
  
+diff --git a/public/fpdfview.h b/public/fpdfview.h
+index e996d4a3b..b8c4b3dc2 100644
+--- a/public/fpdfview.h
++++ b/public/fpdfview.h
+@@ -176,9 +176,6 @@ typedef int FPDF_ANNOT_APPEARANCEMODE;
+ // Dictionary value types.
+ typedef int FPDF_OBJECT_TYPE;
+ 
+-#if defined(COMPONENT_BUILD)
+-// FPDF_EXPORT should be consistent with |export| in the pdfium_fuzzer
+-// template in testing/fuzzers/BUILD.gn.
+ #if defined(WIN32)
+ #if defined(FPDF_IMPLEMENTATION)
+ #define FPDF_EXPORT __declspec(dllexport)
+@@ -192,9 +189,6 @@ typedef int FPDF_OBJECT_TYPE;
+ #define FPDF_EXPORT
+ #endif  // defined(FPDF_IMPLEMENTATION)
+ #endif  // defined(WIN32)
+-#else
+-#define FPDF_EXPORT
+-#endif  // defined(COMPONENT_BUILD)
+ 
+ #if defined(WIN32) && defined(FPDFSDK_EXPORTS)
+ #define FPDF_CALLCONV __stdcall

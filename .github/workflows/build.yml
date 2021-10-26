@@ -61,6 +61,30 @@ jobs:
             target_cpu: x64
             target_os: windows
             artifact: pdfium-windows-x64
+          - runner: ubuntu-20.04
+            v8: disabled
+            cfg: Release
+            target_cpu: arm
+            target_os: android
+            artifact: pdfium-android-arm
+          - runner: ubuntu-20.04
+            v8: disabled
+            cfg: Release
+            target_cpu: arm64
+            target_os: android
+            artifact: pdfium-android-arm64
+          - runner: ubuntu-20.04
+            v8: disabled
+            cfg: Release
+            target_cpu: x86
+            target_os: android
+            artifact: pdfium-android-x86
+          - runner: ubuntu-20.04
+            v8: disabled
+            cfg: Release
+            target_cpu: x64
+            target_os: android
+            artifact: pdfium-android-x64
     runs-on: ${{ matrix.runner }}
     steps:
       - name: Checkout this repo

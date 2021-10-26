@@ -2,6 +2,7 @@
 
 OS=${PDFium_TARGET_OS:?}
 CPU="${PDFium_TARGET_CPU:?}"
+PDFIUM="${PDFium_SOURCE_DIR:?}"
 SOURCE_DIR="$PWD/example"
 
 export PDFium_DIR="$PWD/staging"
@@ -23,6 +24,22 @@ case "$OS-$CPU" in
   linux-arm64)
     export CC="aarch64-linux-gnu-gcc" CXX="aarch64-linux-gnu-g++"
     ;;
+  android-arm)
+    export PATH="$PDFIUM/third_party/android_ndk/toolchains/llvm/prebuilt/linux-x86_64/bin/:$PATH"
+    export CC="armv7a-linux-androideabi16-clang" CXX="armv7a-linux-androideabi16-clang++"
+    ;;
+  android-arm64)
+    export PATH="$PDFIUM/third_party/android_ndk/toolchains/llvm/prebuilt/linux-x86_64/bin/:$PATH"
+    export CC="aarch64-linux-android21-clang" CXX="aarch64-linux-android21-clang++"
+    ;;
+  android-x86)
+    export PATH="$PDFIUM/third_party/android_ndk/toolchains/llvm/prebuilt/linux-x86_64/bin/:$PATH"
+    export CC="i686-linux-android16-clang" CXX="i686-linux-android16-clang++"
+    ;;
+  android-x64)
+    export PATH="$PDFIUM/third_party/android_ndk/toolchains/llvm/prebuilt/linux-x86_64/bin/:$PATH"
+    export CC="x86_64-linux-android21-clang" CXX="x86_64-linux-android21-clang++"
+    ;;
 esac
 
 mkdir -p build
@@ -34,8 +51,4 @@ if [ "$OS" == "windows" ]; then
   file Debug/example.exe
 else
   file example
-fi
-
-if [ "$CPU" == "x86" ] || [ "$CPU" == "x64" ]; then
-  ctest --output-on-failure .
 fi

@@ -19,9 +19,9 @@ mkdir -p "$BUILD"
 
 (
   echo "is_debug = $IS_DEBUG"
-  echo "is_component_build = false"
   echo "pdf_is_standalone = true"
   echo "target_cpu = \"$TARGET_CPU\""
+  echo "target_os = \"$OS\""
   echo "pdf_enable_v8 = $ENABLE_V8"
   echo "pdf_enable_xfa = $ENABLE_V8"
 
@@ -34,6 +34,9 @@ mkdir -p "$BUILD"
       ;;
     windows)
       echo 'pdf_use_win32_gdi = true'
+      ;;
+    android)
+      echo "is_component_build = true"
       ;;
   esac
 

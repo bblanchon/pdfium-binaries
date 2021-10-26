@@ -36,6 +36,9 @@ case "$OS" in
   linux)
     mv "$BUILD/libpdfium.so" "$STAGING_LIB"
     ;;
+  android)
+    mv "$BUILD/libpdfium.cr.so" "$STAGING_LIB/libpdfium.so"
+    ;;
   windows)
     mv "$BUILD/pdfium.dll.lib" "$STAGING_LIB"
     mkdir -p "$STAGING_BIN"

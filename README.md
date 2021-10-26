@@ -56,6 +56,27 @@ Here are the download links for latest release:
     <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-mac-arm64.tgz">pdfium-mac-arm64.tgz</a> (6 MB)</td>
     <td>-</td>
   </tr>
+  <tr>
+    <td rowspan="4">Android</td>
+    <td>x86</td>
+    <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-android-x86.tgz">pdfium-android-x86.tgz</a></td>
+    <td>-</td>
+  </tr>
+  <tr>
+    <td>x64</td>
+    <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-android-x64.tgz">pdfium-android-x64.tgz</a></td>
+    <td>-</td>
+  </tr>
+  <tr>
+    <td>ARM</td>
+    <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-android-arm.tgz">pdfium-android-arm.tgz</a></td>
+    <td>-</td>
+  </tr>
+  <tr>
+    <td>ARM64</td>
+    <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-android-arm64.tgz">pdfium-android-arm64.tgz</a></td>
+    <td>-</td>
+  </tr>
 </table>
 
 ### How to use PDFium in a CMake project
