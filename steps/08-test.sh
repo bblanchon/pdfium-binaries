@@ -25,7 +25,7 @@ case "$OS-$CPU" in
     ;;
 esac
 
-mkdir build
+mkdir -p build
 cd build
 cmake "$SOURCE_DIR"
 cmake --build .
