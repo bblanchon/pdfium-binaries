@@ -10,7 +10,7 @@ on:
       version:
         description: PDFium version
         required: false
-        default: ''
+        default: ""
 
 jobs:
   build:
@@ -19,72 +19,83 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - runner: ubuntu-20.04
-            v8: disabled
-            cfg: Release
-            target_cpu: x64
+          - artifact: pdfium-linux-x64
             target_os: linux
-            artifact: pdfium-linux-x64
-          - runner: ubuntu-20.04
-            v8: disabled
+            target_cpu: x64
             cfg: Release
+            v8: disabled
+            runner: ubuntu-20.04
+
+          - artifact: pdfium-linux-arm
+            target_os: linux
             target_cpu: arm
-            target_os: linux
-            artifact: pdfium-linux-arm
-          - runner: ubuntu-20.04
-            v8: disabled
             cfg: Release
+            v8: disabled
+            runner: ubuntu-20.04
+
+          - artifact: pdfium-linux-arm64
+            target_os: linux
             target_cpu: arm64
-            target_os: linux
-            artifact: pdfium-linux-arm64
-          - runner: macos-10.15
-            v8: disabled
             cfg: Release
+            v8: disabled
+            runner: ubuntu-20.04
+
+          - artifact: pdfium-mac-x64
+            target_os: mac
             target_cpu: x64
-            target_os: mac
-            artifact: pdfium-mac-x64
-          - runner: macos-10.15
-            v8: disabled
             cfg: Release
-            target_cpu: arm64
+            v8: disabled
+            runner: macos-10.15
+
+          - artifact: pdfium-mac-arm64
             target_os: mac
-            artifact: pdfium-mac-arm64
-          - runner: windows-2019
+            target_cpu: arm64
+            cfg: Release
+            v8: disabled
+            runner: macos-10.15
+
+          - artifact: pdfium-win-x86
+            target_os: win
+            target_cpu: x86
+            cfg: Release
+            v8: disabled
+            runner: windows-2019
+
+          - artifact: pdfium-win-x64
+            target_os: win
+            target_cpu: x64
+            cfg: Release
+            v8: disabled
+            runner: windows-2019
+
+          - artifact: pdfium-android-arm
+            target_os: android
+            target_cpu: arm
+            cfg: Release
+            v8: disabled
+            runner: ubuntu-20.04
+
+          - artifact: pdfium-android-arm64
+            target_os: android
+            target_cpu: arm64
+            cfg: Release
+            v8: disabled
+            runner: ubuntu-20.04
+
+          - artifact: pdfium-android-x86
             v8: disabled
             cfg: Release
             target_cpu: x86
-            target_os: win
-            artifact: pdfium-win-x86
-          - runner: windows-2019
-            v8: disabled
-            cfg: Release
+            target_os: android
+            runner: ubuntu-20.04
+
+          - artifact: pdfium-android-x64
+            target_os: android
             target_cpu: x64
-            target_os: win
-            artifact: pdfium-win-x64
-          - runner: ubuntu-20.04
-            v8: disabled
             cfg: Release
-            target_cpu: arm
-            target_os: android
-            artifact: pdfium-android-arm
-          - runner: ubuntu-20.04
             v8: disabled
-            cfg: Release
-            target_cpu: arm64
-            target_os: android
-            artifact: pdfium-android-arm64
-          - runner: ubuntu-20.04
-            v8: disabled
-            cfg: Release
-            target_cpu: x86
-            target_os: android
-            artifact: pdfium-android-x86
-          - runner: ubuntu-20.04
-            v8: disabled
-            cfg: Release
-            target_cpu: x64
-            target_os: android
-            artifact: pdfium-android-x64
+            runner: ubuntu-20.04            
+
     runs-on: ${{ matrix.runner }}
     steps:
       - name: Checkout this repo
@@ -133,7 +144,7 @@ jobs:
       - name: Upload tarball to GitHub Release
         uses: ncipollo/release-action@v1
         if: ${{ startsWith(github.event.inputs.branch, 'chromium/') }}
-        with: 
+        with:
           tag: ${{ github.event.inputs.branch }}
           allowUpdates: true
           draft: true
@@ -146,14 +157,14 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     steps:
-    - name: Write release body
-      run: echo "This version was built with branch ${{ github.event.inputs.branch }} of PDFium" > RELEASE.md
-    - name: Publish Release
-      uses: ncipollo/release-action@v1
-      with:
-        allowUpdates: true
-        bodyFile: RELEASE.md
-        draft: false
-        token: ${{ secrets.GITHUB_TOKEN }}
-        name: PDFium ${{ github.event.inputs.version }}
-        tag: ${{ github.event.inputs.branch }}
+      - name: Write release body
+        run: echo "This version was built with branch ${{ github.event.inputs.branch }} of PDFium" > RELEASE.md
+      - name: Publish Release
+        uses: ncipollo/release-action@v1
+        with:
+          allowUpdates: true
+          bodyFile: RELEASE.md
+          draft: false
+          token: ${{ secrets.GITHUB_TOKEN }}
+          name: PDFium ${{ github.event.inputs.version }}
+          tag: ${{ github.event.inputs.branch }}
