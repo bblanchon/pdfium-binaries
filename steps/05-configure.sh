@@ -31,7 +31,6 @@ mkdir -p "$BUILD"
       ;;
     linux)
       echo 'use_custom_libcxx = true'
-      echo 'libcpp_is_static = true'
       ;;
     windows)
       echo 'pdf_use_win32_gdi = true'
