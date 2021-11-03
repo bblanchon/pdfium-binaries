@@ -8,13 +8,9 @@ DepotTools_URL='https://chromium.googlesource.com/chromium/tools/depot_tools.git
 DepotTools_DIR="$PWD/depot_tools"
 WindowsSDK_DIR="/c/Program Files (x86)/Windows Kits/10/bin/10.0.19041.0"
 
-# Download depot_tools if not exists in this location or update utherwise
+# Download depot_tools if not exists in this location
 if [ ! -d "$DepotTools_DIR" ]; then
   git clone "$DepotTools_URL" "$DepotTools_DIR"
-else 
-  pushd "$DepotTools_DIR"
-  git pull
-  popd
 fi
 
 echo "$DepotTools_DIR" >> "$PATH_FILE"
