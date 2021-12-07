@@ -33,15 +33,18 @@ rm -f "$STAGING/include/README"
 rm -f "$STAGING/include/PRESUBMIT.py"
 
 case "$OS" in
-  mac)
-    mv "$BUILD/libpdfium.dylib" "$STAGING_LIB"
-    ;;
-  linux)
-    mv "$BUILD/libpdfium.so" "$STAGING_LIB"
-    ;;
   android)
     mv "$BUILD/libpdfium.cr.so" "$STAGING_LIB/libpdfium.so"
     ;;
+
+  linux)
+    mv "$BUILD/libpdfium.so" "$STAGING_LIB"
+    ;;
+
+  mac)
+    mv "$BUILD/libpdfium.dylib" "$STAGING_LIB"
+    ;;
+
   win)
     mv "$BUILD/pdfium.dll.lib" "$STAGING_LIB"
     mkdir -p "$STAGING_BIN"
