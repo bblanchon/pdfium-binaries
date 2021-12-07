@@ -1,0 +1,56 @@
+diff --git a/core/fpdfapi/font/cpdf_type1font.cpp b/core/fpdfapi/font/cpdf_type1font.cpp
+index 51f0e889e..45dc1b272 100644
+--- a/core/fpdfapi/font/cpdf_type1font.cpp
++++ b/core/fpdfapi/font/cpdf_type1font.cpp
+@@ -19,7 +19,8 @@
+ #include "core/fxge/fx_freetype.h"
+ 
+ #if defined(OS_APPLE)
+-#include <Carbon/Carbon.h>
++#include <CoreFoundation/CFString.h>
++#include <CoreGraphics/CoreGraphics.h>
+ #endif  // defined(OS_APPLE)
+ 
+ namespace {
+diff --git a/core/fxge/BUILD.gn b/core/fxge/BUILD.gn
+index 8ccaf6808..f21bb8369 100644
+--- a/core/fxge/BUILD.gn
++++ b/core/fxge/BUILD.gn
+@@ -164,7 +164,7 @@ source_set("fxge") {
+     sources += [ "linux/fx_linux_impl.cpp" ]
+   }
+ 
+-  if (is_mac) {
++  if (is_mac || is_ios) {
+     sources += [
+       "apple/fx_apple_impl.cpp",
+       "apple/fx_apple_platform.cpp",
+diff --git a/core/fxge/apple/fx_quartz_device.h b/core/fxge/apple/fx_quartz_device.h
+index f39fee236..3294fdd82 100644
+--- a/core/fxge/apple/fx_quartz_device.h
++++ b/core/fxge/apple/fx_quartz_device.h
+@@ -7,7 +7,7 @@
+ #ifndef CORE_FXGE_APPLE_FX_QUARTZ_DEVICE_H_
+ #define CORE_FXGE_APPLE_FX_QUARTZ_DEVICE_H_
+ 
+-#include <Carbon/Carbon.h>
++#include <CoreGraphics/CoreGraphics.h>
+ #include <stdint.h>
+ 
+ #include "core/fxcrt/retain_ptr.h"
+diff --git a/testing/test.gni b/testing/test.gni
+index 515add54a..5472b88e5 100644
+--- a/testing/test.gni
++++ b/testing/test.gni
+@@ -206,11 +206,6 @@ template("test") {
+       }
+ 
+       _bundle_id_suffix = target_name
+-      if (ios_automatically_manage_certs) {
+-        # Use the same bundle identifier for all unit tests when managing
+-        # certificates automatically as the number of free certs is limited.
+-        _bundle_id_suffix = "generic-unit-test"
+-      }
+       if (!defined(extra_substitutions)) {
+         extra_substitutions = []
+       }

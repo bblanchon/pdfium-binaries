@@ -1,0 +1,12 @@
+diff --git a/config/ios/rules.gni b/config/ios/rules.gni
+index 2ab3cda0b..957ee6253 100644
+--- a/config/ios/rules.gni
++++ b/config/ios/rules.gni
+@@ -958,7 +958,6 @@ template("ios_app_bundle") {
+           if (!defined(data_deps)) {
+             data_deps = []
+           }
+-          data_deps += [ "//testing/iossim" ]
+         }
+       }
+     }

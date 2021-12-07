@@ -35,6 +35,22 @@ case "$OS-$CPU" in
       -D CMAKE_CXX_COMPILER="i686-linux-android16-clang++"
     )
     ;;
+  ios-arm64)
+    # WARNING: doesn't work, see following page
+    # https://discourse.cmake.org/t/find-package-stops-working-when-cmake-system-name-ios/4609
+    CMAKE_ARGS+=(
+      -D CMAKE_SYSTEM_NAME="iOS"
+      -D CMAKE_OSX_ARCHITECTURES="arm64"
+    )
+    ;;
+  ios-x64)
+    # WARNING: doesn't work, see following page
+    # https://discourse.cmake.org/t/find-package-stops-working-when-cmake-system-name-ios/4609
+    CMAKE_ARGS+=(
+      -D CMAKE_SYSTEM_NAME="iOS"
+      -D CMAKE_OSX_ARCHITECTURES="x86_64"
+    )
+    ;;
   linux-arm)
     CMAKE_ARGS+=(
       -D CMAKE_C_COMPILER="arm-linux-gnueabihf-gcc"

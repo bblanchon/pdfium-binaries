@@ -1,0 +1,13 @@
+diff --git a/BUILD.gn b/BUILD.gn
+index d566340..5a6e243 100644
+--- a/BUILD.gn
++++ b/BUILD.gn
+@@ -10,8 +10,6 @@ if (current_cpu == "arm" || current_cpu == "arm64") {
+   import("//build/config/arm.gni")
+ }
+ 
+-assert(!is_ios, "This is not used on iOS, don't drag it in unintentionally")
+-
+ source_set("libjpeg_headers") {
+   sources = [
+     "jconfig.h",

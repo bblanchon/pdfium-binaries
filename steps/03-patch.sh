@@ -11,6 +11,12 @@ git apply -v "$PATCHES/public_headers.patch"
 
 [ "${PDFium_V8:-}" == "enabled" ] && git apply -v "$PATCHES/v8_init.patch"
 
+if [ "$OS" == "ios" ]; then
+  git apply -v "$PATCHES/ios/pdfium.patch"
+  git -C build apply -v "$PATCHES/ios/build.patch"
+  git -C third_party/libjpeg_turbo apply -v "$PATCHES/ios/libjpeg_turbo.patch"
+fi
+
 if [ "$OS" == "win" ]; then
   git apply -v "$PATCHES/win/pdfium.patch"
   git -C build apply -v "$PATCHES/win/build.patch"
