@@ -124,7 +124,7 @@ jobs:
       - name: Install (2/2)
         run: steps/04-install-extras.sh
         shell: bash
-      - name: Configure build
+      - name: Configure
         run: steps/05-configure.sh
         shell: bash
       - name: Build
