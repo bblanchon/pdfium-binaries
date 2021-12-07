@@ -5,6 +5,7 @@ V8=${V8:-disabled}
 OS=${PDFium_TARGET_OS:?}
 CPU=${PDFium_TARGET_CPU:?}
 VERSION=${PDFium_VERSION:-}
+PATCHES="$PWD/patches"
 
 STAGING="$PWD/staging"
 SOURCE=${PDFium_SOURCE_DIR:-pdfium}
@@ -22,13 +23,15 @@ fi
 mkdir -p "$STAGING"
 mkdir -p "$STAGING_LIB"
 
-cp PDFiumConfig.cmake "$STAGING"
+sed "s/#VERSION#/${VERSION:-0.0.0.0}/" <"$PATCHES/PDFiumConfig.cmake" >"$STAGING/PDFiumConfig.cmake"
+
 cp "$SOURCE/LICENSE" "$STAGING"
 cp "$BUILD/args.gn" "$STAGING"
 cp -R "$SOURCE/public" "$STAGING/include"
 rm -f "$STAGING/include/DEPS"
 rm -f "$STAGING/include/README"
 rm -f "$STAGING/include/PRESUBMIT.py"
+
 case "$OS" in
   mac)
     mv "$BUILD/libpdfium.dylib" "$STAGING_LIB"

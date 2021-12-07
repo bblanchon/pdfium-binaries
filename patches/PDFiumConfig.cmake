@@ -16,6 +16,8 @@ find_path(PDFium_INCLUDE_DIR
     PATH_SUFFIXES "include"
 )
 
+set(PDFium_VERSION "#VERSION#")
+
 if(MSVC)
   if(CMAKE_CL_64)
     set(PDFium_ARCH x64)
@@ -43,6 +45,7 @@ if(MSVC)
 
   find_package_handle_standard_args(PDFium
     REQUIRED_VARS PDFium_LIBRARY PDFium_IMPLIB PDFium_INCLUDE_DIR
+    VERSION_VAR PDFium_VERSION
   )
 else()
   find_library(PDFium_LIBRARY
@@ -59,5 +62,6 @@ else()
 
   find_package_handle_standard_args(PDFium
     REQUIRED_VARS PDFium_LIBRARY PDFium_INCLUDE_DIR
+    VERSION_VAR PDFium_VERSION
   )
 endif()
