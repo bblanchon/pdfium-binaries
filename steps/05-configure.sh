@@ -40,7 +40,7 @@ mkdir -p "$BUILD"
       ;;
   esac
 
-) > "$BUILD/args.gn"
+) | sort > "$BUILD/args.gn"
 
 # Generate Ninja files
 pushd "$SOURCE"
