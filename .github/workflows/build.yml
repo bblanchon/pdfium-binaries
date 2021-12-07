@@ -22,78 +22,56 @@ jobs:
           - artifact: pdfium-linux-x64
             target_os: linux
             target_cpu: x64
-            cfg: Release
-            v8: disabled
             runner: ubuntu-20.04
 
           - artifact: pdfium-linux-arm
             target_os: linux
             target_cpu: arm
-            cfg: Release
-            v8: disabled
             runner: ubuntu-20.04
 
           - artifact: pdfium-linux-arm64
             target_os: linux
             target_cpu: arm64
-            cfg: Release
-            v8: disabled
             runner: ubuntu-20.04
 
           - artifact: pdfium-mac-x64
             target_os: mac
             target_cpu: x64
-            cfg: Release
-            v8: disabled
             runner: macos-10.15
 
           - artifact: pdfium-mac-arm64
             target_os: mac
             target_cpu: arm64
-            cfg: Release
-            v8: disabled
             runner: macos-10.15
 
           - artifact: pdfium-win-x86
             target_os: win
             target_cpu: x86
-            cfg: Release
-            v8: disabled
             runner: windows-2019
 
           - artifact: pdfium-win-x64
             target_os: win
             target_cpu: x64
-            cfg: Release
-            v8: disabled
             runner: windows-2019
 
           - artifact: pdfium-android-arm
             target_os: android
             target_cpu: arm
-            cfg: Release
-            v8: disabled
             runner: ubuntu-20.04
 
           - artifact: pdfium-android-arm64
             target_os: android
             target_cpu: arm64
-            cfg: Release
-            v8: disabled
             runner: ubuntu-20.04
 
           - artifact: pdfium-android-x86
             target_os: android
             target_cpu: x86
-            v8: disabled
-            cfg: Release
             runner: ubuntu-20.04
 
           - artifact: pdfium-android-x64
             target_os: android
             target_cpu: x64
-            cfg: Release
-            v8: disabled
             runner: ubuntu-20.04            
 
     runs-on: ${{ matrix.runner }}
@@ -103,11 +81,11 @@ jobs:
       - name: Set environment variables
         run: |
           cat >>$GITHUB_ENV <<END
-          PDFium_V8=${{ matrix.v8 }}
-          PDFium_CONFIGURATION=${{ matrix.cfg }}
+          PDFium_BRANCH=${{ github.event.inputs.branch }}
+          PDFium_CONFIGURATION=${{ matrix.cfg || 'Release' }}
           PDFium_TARGET_CPU=${{ matrix.target_cpu }}
           PDFium_TARGET_OS=${{ matrix.target_os }}
-          PDFium_BRANCH=${{ github.event.inputs.branch }}
+          PDFium_V8=${{ matrix.v8 || 'disabled' }}
           PDFium_VERSION=${{ github.event.inputs.version }}
           END
           steps/00-environment.sh
