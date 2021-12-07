@@ -26,17 +26,17 @@ mkdir -p "$BUILD"
   echo "pdf_enable_xfa = $ENABLE_V8"
 
   case "$OS" in
-    mac)
-      echo 'mac_deployment_target = "10.11.0"'
+    android)
+      echo "is_component_build = true"
       ;;
     linux)
       echo 'use_custom_libcxx = true'
       ;;
+    mac)
+      echo 'mac_deployment_target = "10.11.0"'
+      ;;
     win)
       echo 'pdf_use_win32_gdi = true'
-      ;;
-    android)
-      echo "is_component_build = true"
       ;;
   esac
 
