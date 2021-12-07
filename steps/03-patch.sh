@@ -12,14 +12,14 @@ git apply -v "$PATCHES/public_headers.patch"
 [ "${PDFium_V8:-}" == "enabled" ] && git apply -v "$PATCHES/v8_init.patch"
 
 if [ "$OS" == "win" ]; then
-  git apply -v "$PATCHES/widestring.patch"
-  git -C build apply -v "$PATCHES/rc_compiler.patch"
+  git apply -v "$PATCHES/win/pdfium.patch"
+  git -C build apply -v "$PATCHES/win/build.patch"
 
   VERSION=${PDFium_VERSION:-0.0.0.0}
   YEAR=$(date +%Y)
   VERSION_CSV=${VERSION//./,}
   export YEAR VERSION VERSION_CSV
-  envsubst < "$PATCHES/resources.rc" > "resources.rc"
+  envsubst < "$PATCHES/win/resources.rc" > "resources.rc"
 fi
 
 popd
