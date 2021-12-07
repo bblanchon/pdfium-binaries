@@ -29,6 +29,9 @@ mkdir -p "$BUILD"
     android)
       echo "is_component_build = true"
       ;;
+    ios)
+      echo "ios_enable_code_signing = false"
+      ;;
     linux)
       echo 'use_custom_libcxx = true'
       ;;

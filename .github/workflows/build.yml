@@ -38,6 +38,16 @@ jobs:
             target_os: android
             target_cpu: x86
             runner: ubuntu-20.04
+          
+          - artifact: pdfium-ios-arm64
+            target_os: ios
+            target_cpu: arm64
+            runner: macos-10.15
+
+          - artifact: pdfium-ios-x64
+            target_os: ios
+            target_cpu: x64
+            runner: macos-10.15
 
           - artifact: pdfium-linux-arm
             target_os: linux
@@ -119,6 +129,7 @@ jobs:
       - name: Test
         run: steps/08-test.sh
         shell: bash
+        if: matrix.target_os != 'ios' # https://discourse.cmake.org/t/find-package-stops-working-when-cmake-system-name-ios/4609
       - name: Upload tarball to GitHub Release
         uses: ncipollo/release-action@v1
         if: ${{ startsWith(github.event.inputs.branch, 'chromium/') }}
