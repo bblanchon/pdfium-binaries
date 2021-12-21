@@ -147,7 +147,7 @@ jobs:
     needs: build
     steps:
       - name: Write release body
-        run: echo "This version was built with branch ${{ github.event.inputs.branch }} of PDFium" > RELEASE.md
+        run: echo 'This version was built with branch `${{ github.event.inputs.branch }}` of PDFium' > RELEASE.md
       - name: Publish Release
         uses: ncipollo/release-action@v1
         with:
