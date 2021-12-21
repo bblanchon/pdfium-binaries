@@ -33,11 +33,7 @@ rm -f "$STAGING/include/README"
 rm -f "$STAGING/include/PRESUBMIT.py"
 
 case "$OS" in
-  android)
-    mv "$BUILD/libpdfium.cr.so" "$STAGING_LIB/libpdfium.so"
-    ;;
-
-  linux)
+  android|linux)
     mv "$BUILD/libpdfium.so" "$STAGING_LIB"
     ;;
 

@@ -26,9 +26,6 @@ mkdir -p "$BUILD"
   echo "pdf_enable_xfa = $ENABLE_V8"
 
   case "$OS" in
-    android)
-      echo "is_component_build = true"
-      ;;
     ios)
       echo "ios_enable_code_signing = false"
       ;;

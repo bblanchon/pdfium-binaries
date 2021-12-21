@@ -1,0 +1,14 @@
+diff --git a/config/BUILDCONFIG.gn b/config/BUILDCONFIG.gn
+index 034999175..eda58932a 100644
+--- a/config/BUILDCONFIG.gn
++++ b/config/BUILDCONFIG.gn
+@@ -456,6 +456,9 @@ if (is_android) {
+ }
+ set_defaults("shared_library") {
+   configs = default_shared_library_configs
++  if (is_android) {
++    configs -= [ "//build/config/android:hide_all_but_jni_onload" ]
++  }
+ }
+ set_defaults("loadable_module") {
+   configs = default_shared_library_configs
