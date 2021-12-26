@@ -19,11 +19,7 @@ find_path(PDFium_INCLUDE_DIR
 set(PDFium_VERSION "#VERSION#")
 
 if(MSVC)
-  if(CMAKE_CL_64)
-    set(PDFium_ARCH x64)
-  else()
-    set(PDFium_ARCH x86)
-  endif()
+  string(TOLOWER "${CMAKE_CXX_COMPILER_ARCHITECTURE_ID}" PDFium_ARCH)
 
   find_file(PDFium_LIBRARY
         NAMES "pdfium.dll"

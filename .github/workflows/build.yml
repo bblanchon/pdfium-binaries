@@ -74,6 +74,11 @@ jobs:
             target_cpu: x64
             runner: macos-10.15
 
+          - artifact: pdfium-win-arm64
+            target_os: win
+            target_cpu: arm64
+            runner: windows-2019
+
           - artifact: pdfium-win-x64
             target_os: win
             target_cpu: x64

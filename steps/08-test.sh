@@ -68,6 +68,12 @@ case "$OS-$CPU" in
       -D CMAKE_OSX_ARCHITECTURES="arm64"
     )
     ;;
+  win-arm64)
+    CMAKE_ARGS+=(
+      -G "Visual Studio 16 2019"
+      -A ARM64
+    )
+    ;;
   win-x86)
     CMAKE_ARGS+=(
       -G "Visual Studio 16 2019"
