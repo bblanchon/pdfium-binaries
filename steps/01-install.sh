@@ -1,8 +1,9 @@
 #!/bin/bash -eux
 
 PATH_FILE=${GITHUB_PATH:-.path}
-OS=${PDFium_TARGET_OS:?}
-CPU="${PDFium_TARGET_CPU:?}"
+TARGET_OS=${PDFium_TARGET_OS:?}
+TARGET_CPU=${PDFium_TARGET_CPU:?}
+CURRENT_CPU=${PDFium_CURRENT_CPU:-x64}
 
 DepotTools_URL='https://chromium.googlesource.com/chromium/tools/depot_tools.git'
 DepotTools_DIR="$PWD/depot_tools"
@@ -15,9 +16,9 @@ fi
 
 echo "$DepotTools_DIR" >> "$PATH_FILE"
 
-case "$OS-$CPU" in
+case "$TARGET_OS-$TARGET_CPU" in
   win-*)
-    echo "$WindowsSDK_DIR/$CPU" >> "$PATH_FILE"
+    echo "$WindowsSDK_DIR/$CURRENT_CPU" >> "$PATH_FILE"
     ;;
 
   linux-arm)
