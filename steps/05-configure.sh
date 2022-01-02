@@ -2,7 +2,7 @@
 
 OS=${PDFium_TARGET_OS:?}
 SOURCE=${PDFium_SOURCE_DIR:-pdfium}
-BUILD=${PDFium_BUILD_DIR:-pdfium/out}
+BUILD=${PDFium_BUILD_DIR:-$SOURCE/out}
 TARGET_CPU=${PDFium_TARGET_CPU:?}
 if [ "${PDFium_V8:-}" == "enabled" ]; then
   ENABLE_V8="true"
