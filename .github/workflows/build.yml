@@ -153,6 +153,17 @@ jobs:
     steps:
       - name: Write release body
         run: echo 'This version was built with branch `${{ github.event.inputs.branch }}` of PDFium' > RELEASE.md
+      - name: Get changes
+        continue-on-error: true
+        run: |
+          CURRENT_REV=${{ github.event.inputs.branch }}
+          PREVIOUS_REV=$(curl --silent "https://api.github.com/repos/${{ github.repository }}/releases/latest" | jq -r ".tag_name")
+          git clone -b "${{ github.event.inputs.branch }}" https://pdfium.googlesource.com/pdfium.git
+          cat <<END >> RELEASE.md
+          ### Changes
+          Commits between \`$PREVIOUS_REV\` and \`$CURRENT_REV\`:
+          END
+          git -C "pdfium" log origin/${PREVIOUS_REV}.. --pretty=format:'* [%s](https://pdfium.googlesource.com/pdfium/+/%H)' >> RELEASE.md
       - name: Publish Release
         uses: ncipollo/release-action@v1
         with:
