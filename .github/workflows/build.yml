@@ -134,7 +134,6 @@ jobs:
       - name: Test
         run: steps/08-test.sh
         shell: bash
-        if: matrix.target_os != 'ios' # https://discourse.cmake.org/t/find-package-stops-working-when-cmake-system-name-ios/4609
       - name: Upload tarball to GitHub Release
         uses: ncipollo/release-action@v1
         if: ${{ startsWith(github.event.inputs.branch, 'chromium/') }}

@@ -8,7 +8,19 @@ CMAKE_ARGS=()
 
 export PDFium_DIR="$PWD/staging"
 
-[ "$OS" == "android" ] && export PATH="$ANDROID_TOOLCHAIN:$PATH"
+case "$OS" in
+  android)
+    export PATH="$ANDROID_TOOLCHAIN:$PATH"
+    ;;
+  ios)
+    # https://discourse.cmake.org/t/find-package-stops-working-when-cmake-system-name-ios/4609/7
+    CMAKE_ARGS+=(
+      -D CMAKE_FIND_ROOT_PATH_MODE_PACKAGE="BOTH"
+      -D CMAKE_FIND_ROOT_PATH_MODE_INCLUDE="BOTH"
+      -D CMAKE_FIND_ROOT_PATH_MODE_LIBRARY="BOTH"
+    )
+    ;;
+esac
 
 case "$OS-$CPU" in
   android-arm)
@@ -36,18 +48,16 @@ case "$OS-$CPU" in
     )
     ;;
   ios-arm64)
-    # WARNING: doesn't work, see following page
-    # https://discourse.cmake.org/t/find-package-stops-working-when-cmake-system-name-ios/4609
     CMAKE_ARGS+=(
       -D CMAKE_SYSTEM_NAME="iOS"
+      -D CMAKE_OSX_SYSROOT="iphoneos"
       -D CMAKE_OSX_ARCHITECTURES="arm64"
     )
     ;;
   ios-x64)
-    # WARNING: doesn't work, see following page
-    # https://discourse.cmake.org/t/find-package-stops-working-when-cmake-system-name-ios/4609
     CMAKE_ARGS+=(
       -D CMAKE_SYSTEM_NAME="iOS"
+      -D CMAKE_OSX_SYSROOT="iphonesimulator"
       -D CMAKE_OSX_ARCHITECTURES="x86_64"
     )
     ;;
