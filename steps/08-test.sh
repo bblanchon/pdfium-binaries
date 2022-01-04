@@ -10,107 +10,94 @@ export PDFium_DIR="$PWD/staging"
 
 case "$OS" in
   android)
-    export PATH="$ANDROID_TOOLCHAIN:$PATH"
     case "$CPU" in
       arm)
-        CMAKE_ARGS+=(
-          -D CMAKE_C_COMPILER="armv7a-linux-androideabi16-clang"
-          -D CMAKE_CXX_COMPILER="armv7a-linux-androideabi16-clang++"
-        )
+        ARCH="armv7a-linux-androideabi16"
         ;;
       arm64)
-        CMAKE_ARGS+=(
-          -D CMAKE_C_COMPILER="aarch64-linux-android21-clang"
-          -D CMAKE_CXX_COMPILER="aarch64-linux-android21-clang++"
-        )
+        ARCH="aarch64-linux-android21"
         ;;
       x64)
-        CMAKE_ARGS+=(
-          -D CMAKE_C_COMPILER="x86_64-linux-android21-clang"
-          -D CMAKE_CXX_COMPILER="x86_64-linux-android21-clang++"
-        )
+        ARCH="x86_64-linux-android21"
         ;;
       x86)
-        CMAKE_ARGS+=(
-          -D CMAKE_C_COMPILER="i686-linux-android16-clang"
-          -D CMAKE_CXX_COMPILER="i686-linux-android16-clang++"
-        )
+        ARCH="i686-linux-android16"
         ;;
     esac
+    export PATH="$ANDROID_TOOLCHAIN:$PATH"
+    CMAKE_ARGS+=(
+      -D CMAKE_C_COMPILER="$ARCH-clang"
+      -D CMAKE_CXX_COMPILER="$ARCH-clang++"
+    )
     ;;
 
   ios)
+    case "$CPU" in
+      arm64)
+        ARCH="arm64"
+        SDK="iphoneos"
+        ;;
+      x64)
+        ARCH="x86_64"
+        SDK="iphonesimulator"
+        ;;
+    esac
     CMAKE_ARGS+=(
       -D CMAKE_SYSTEM_NAME="iOS"
+      -D CMAKE_OSX_SYSROOT="$SDK"
+      -D CMAKE_OSX_ARCHITECTURES="$ARCH"
       # https://discourse.cmake.org/t/find-package-stops-working-when-cmake-system-name-ios/4609/7
       -D CMAKE_FIND_ROOT_PATH_MODE_PACKAGE="BOTH"
       -D CMAKE_FIND_ROOT_PATH_MODE_INCLUDE="BOTH"
       -D CMAKE_FIND_ROOT_PATH_MODE_LIBRARY="BOTH"
     )
-    case "$CPU" in
-      arm64)
-        CMAKE_ARGS+=(
-          -D CMAKE_OSX_SYSROOT="iphoneos"
-          -D CMAKE_OSX_ARCHITECTURES="arm64"
-        )
-        ;;
-      x64)
-        CMAKE_ARGS+=(
-          -D CMAKE_OSX_SYSROOT="iphonesimulator"
-          -D CMAKE_OSX_ARCHITECTURES="x86_64"
-        )
-        ;;
-    esac
     ;;
 
   linux)
     case "$CPU" in
       arm)
-        CMAKE_ARGS+=(
-          -D CMAKE_C_COMPILER="arm-linux-gnueabihf-gcc"
-          -D CMAKE_CXX_COMPILER="arm-linux-gnueabihf-g++"
-        )
+        ARCH="arm-linux-gnueabihf"
         ;;
       arm64)
-        CMAKE_ARGS+=(
-          -D CMAKE_C_COMPILER="aarch64-linux-gnu-gcc"
-          -D CMAKE_CXX_COMPILER="aarch64-linux-gnu-g++"
-        )
+        ARCH="aarch64-linux-gnu"
         ;;
     esac
+    [ -n "${ARCH:-}" ] && CMAKE_ARGS+=(
+      -D CMAKE_C_COMPILER="$ARCH-gcc"
+      -D CMAKE_CXX_COMPILER="$ARCH-g++"
+    )
     ;;
 
   mac)
     case "$CPU" in
       arm64)
-        CMAKE_ARGS+=(
-          -D CMAKE_OSX_ARCHITECTURES="arm64"
-        )
-      ;;
+        ARCH="arm64"
+        ;;
+      x64)
+        ARCH="x86_64"
+        ;;
     esac
+    CMAKE_ARGS+=(
+      -D CMAKE_OSX_ARCHITECTURES="$ARCH"
+    )
     ;;
 
   win)
-    CMAKE_ARGS+=(
-      -G "Visual Studio 16 2019"
-    )
     case "$CPU" in
       arm64)
-        CMAKE_ARGS+=(
-          -A ARM64
-        )
+        ARCH="ARM64"
         ;;
       x86)
-        CMAKE_ARGS+=(
-          -A Win32
-        )
+        ARCH="Win32"
         ;;
       x64)
-        CMAKE_ARGS+=(
-          -A x64
-        )
+        ARCH="x64"
         ;;
     esac
+    CMAKE_ARGS+=(
+      -G "Visual Studio 16 2019"
+      -A "$ARCH"
+    )
     ;;
 esac
 
