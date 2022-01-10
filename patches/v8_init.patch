@@ -15,20 +15,22 @@ new file mode 100644
 index 000000000..18fb89dd2
 --- /dev/null
 +++ b/fpdfsdk/fpdf_libs.cpp
-@@ -0,0 +1,22 @@
+@@ -0,0 +1,24 @@
 +#include "public/fpdfview.h"
 +
 +#include "v8.h"
++#include "libplatform/libplatform.h"
 +
 +extern "C"
 +{
 +
 +FPDF_EXPORT void FPDF_CALLCONV FPDF_InitEmbeddedLibraries(const char* resourcePath)
 +{
-+    v8::V8::InitializeICU();
-+
++    v8::V8::InitializeICUDefaultLocation(resourcePath);
 +    v8::V8::InitializeExternalStartupData(resourcePath);
 +
++    std::unique_ptr<v8::Platform> platform = v8::platform::NewDefaultPlatform();
++    v8::V8::InitializePlatform(platform.get());
 +    v8::V8::Initialize();
 +
 +    // By enabling predictable mode, V8 won't post any background tasks.
