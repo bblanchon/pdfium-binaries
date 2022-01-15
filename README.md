@@ -1,13 +1,16 @@
-[![Total number of downloads](https://img.shields.io/github/downloads/bblanchon/pdfium-binaries/total.svg)](https://github.com/bblanchon/pdfium-binaries/releases)
-[![Build](https://github.com/bblanchon/pdfium-binaries/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/bblanchon/pdfium-binaries/actions/workflows/build.yml)
-
 # Pre-compiled binaries of PDFium
 
-This project hosts pre-compiled binaries of the [PDFium library](https://pdfium.googlesource.com/pdfium/).
+[![Build](https://github.com/bblanchon/pdfium-binaries/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/bblanchon/pdfium-binaries/actions/workflows/build.yml)
+[![Total downloads](https://img.shields.io/github/downloads/bblanchon/pdfium-binaries/total)](https://github.com/bblanchon/pdfium-binaries/releases/)
+[![Latest release](https://img.shields.io/github/v/release/bblanchon/pdfium-binaries?display_name=release&include_prereleases)](https://github.com/bblanchon/pdfium-binaries/releases/latest/)
 
-See [Releases page](https://github.com/bblanchon/pdfium-binaries/releases) to download binaries.
+This project hosts pre-compiled binaries of the [PDFium library](https://pdfium.googlesource.com/pdfium/), an open-source library for PDF manipulation and rendering.
 
-### Download links
+Builds are triggered automatically every Monday since 2017.
+
+**Disclaimer**: This project isn't affiliated with Google or Foxit.
+
+## Download
 
 Here are the download links for latest release:
 
@@ -85,54 +88,59 @@ Here are the download links for latest release:
   </tr>
 </table>
 
+See the [Releases page](https://github.com/bblanchon/pdfium-binaries/releases) to download older versions of PDFium.
+
+## Documentation
+
+### PDFium API documentation
+
+Please find the [documentation of the PDFium API on developers.foxit.com](https://developers.foxit.com/resources/pdf-sdk/c_api_reference_pdfium/index.html).
+
 ### How to use PDFium in a CMake project
 
-1. Unzip one of more variants in a folder (eg `C:\Libraries\pdfium`)
+1. Unzip the dpwnloaded package in a folder (e.g., `C:\Libraries\pdfium`)
 2. Set the environment variable `PDFium_DIR` to this folder (eg `C:\Libraries\pdfium`)
 3. In your `CMakeLists.txt`, add
 
         find_package(PDFium)
 
-4. Then link you executable with PDFium:
+4. Then link your executable with PDFium:
 
         target_link_libraries(my_exe pdfium)
 
-5. On Windows, make sure that `pdfium.dll` can be found by your executable.
+5. On Windows, make sure that `pdfium.dll` can be found by your executable (copy it on the same folder, or put in on the `PATH`).
 
 ### How to use JavaScript V8 enabled binaries
 
-If you are using the V8 enabled binaries additional initialization is required.
-In your code before using PDFium you have to call `FPDF_InitEmbeddedLibraries()`
-from the additional header `fpdf_libs.h` which is only available in V8 enabled
+If you are using the V8-enabled binaries, additional initialization is required.
+In your code, before using PDFium you have to call `FPDF_InitEmbeddedLibraries()`
+from the additional header `fpdf_libs.h`, which is only available in V8 enabled
 binaries.
 
 The archive will contain a `res` folder which you have to distribute with your
-application. On macOS you should include this in your application bundle for other
+application. On macOS, you should include this in your application bundle for other
 platforms place it where your application binary will find it.
 
 See the following example for usage:
 
-        #include "fpdf_libs.h"
+```c++
+#include "fpdf_libs.h"
 
-        ...
+...
 
-        // Determine the path to files in the res folder from the archive
-        const char* resPath = "<path to the res folder>";
+// Determine the path to files in the res folder from the archive
+const char* resPath = "<path to the res folder>";
 
-        // Initialize V8 and other embedded libraries
-        FPDF_InitEmbeddedLibraries(resPath);
+// Initialize V8 and other embedded libraries
+FPDF_InitEmbeddedLibraries(resPath);
 
-        // Make use of PDFium
-        FPDF_InitLibrary();
-        FPDF_DestroyLibrary();
+// Make use of PDFium
+FPDF_InitLibrary();
+FPDF_DestroyLibrary();
+```
 
 ### How to create macOS universal binary
 
-To  create a universial macOS binary containing both Intel and ARM code download
+To  create a universal macOS binary containing both Intel and ARM code, download
 both CPU versions and use the `mac_create_universal.sh` script to create a
 universal archive.
-
-
----
-
-This project isn't affilated with Google nor Foxit.
