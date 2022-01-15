@@ -144,3 +144,17 @@ FPDF_DestroyLibrary();
 To  create a universal macOS binary containing both Intel and ARM code, download
 both CPU versions and use the `mac_create_universal.sh` script to create a
 universal archive.
+
+
+## Related projects
+
+The following project use (or recommend using) our PDFium builds:
+
+* [dart_pdf](https://github.com/DavBfr/dart_pdf), PDF creation module for dart/flutter
+* [Flutter native_pdf_renderer](https://github.com/rbcprolabs/packages.flutter/tree/master/packages/native_pdf_renderer), Flutter Plugin to render PDF pages as images
+* [PDFium RS](https://github.com/asafigan/pdfium_rs), a Rust wrapper around PDFium
+* [PDFiumCore](https://github.com/Dtronix/PDFiumCore), .NET Standard P/Invoke bindings for PDFium
+* [PyPDFium2](https://github.com/pypdfium2-team/pypdfium2), Python bindings to PDFium
+* [wxPDFView](https://github.com/TcT2k/wxPDFView), wxWidgets components to display PDF content
+
+*Did we miss a project? Please open a PR!*  
