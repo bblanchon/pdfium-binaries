@@ -1,3 +1,5 @@
+![PDFium binaries](.github/images/header.png)
+
 # Pre-compiled binaries of PDFium
 
 [![Build](https://github.com/bblanchon/pdfium-binaries/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/bblanchon/pdfium-binaries/actions/workflows/build.yml)
