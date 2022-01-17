@@ -1,22 +1,22 @@
 diff --git a/core/fpdfapi/font/cpdf_type1font.cpp b/core/fpdfapi/font/cpdf_type1font.cpp
-index 51f0e889e..45dc1b272 100644
+index 0205b0255..13f5fb78b 100644
 --- a/core/fpdfapi/font/cpdf_type1font.cpp
 +++ b/core/fpdfapi/font/cpdf_type1font.cpp
 @@ -19,7 +19,8 @@
  #include "core/fxge/fx_freetype.h"
  
- #if defined(OS_APPLE)
+ #if BUILDFLAG(IS_APPLE)
 -#include <Carbon/Carbon.h>
 +#include <CoreFoundation/CFString.h>
 +#include <CoreGraphics/CoreGraphics.h>
- #endif  // defined(OS_APPLE)
+ #endif  // BUILDFLAG(IS_APPLE)
  
  namespace {
 diff --git a/core/fxge/BUILD.gn b/core/fxge/BUILD.gn
-index 8ccaf6808..f21bb8369 100644
+index 7dafd7d42..e44977204 100644
 --- a/core/fxge/BUILD.gn
 +++ b/core/fxge/BUILD.gn
-@@ -164,7 +164,7 @@ source_set("fxge") {
+@@ -166,7 +166,7 @@ source_set("fxge") {
      sources += [ "linux/fx_linux_impl.cpp" ]
    }
  
@@ -26,7 +26,7 @@ index 8ccaf6808..f21bb8369 100644
        "apple/fx_apple_impl.cpp",
        "apple/fx_apple_platform.cpp",
 diff --git a/core/fxge/apple/fx_quartz_device.h b/core/fxge/apple/fx_quartz_device.h
-index f39fee236..3294fdd82 100644
+index fa78f0643..b9d220e4d 100644
 --- a/core/fxge/apple/fx_quartz_device.h
 +++ b/core/fxge/apple/fx_quartz_device.h
 @@ -7,7 +7,7 @@
