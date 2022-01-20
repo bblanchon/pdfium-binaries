@@ -1,4 +1,6 @@
-![PDFium binaries](.github/images/header.png)
+<p align="center">
+  <img alt="PDFium binaries" src=".github/images/header.svg" />
+</p>
 
 # Pre-compiled binaries of PDFium
 
