@@ -7,18 +7,13 @@ CPU=${PDFium_TARGET_CPU:?}
 VERSION=${PDFium_VERSION:-}
 PATCHES="$PWD/patches"
 
-STAGING="$PWD/staging"
 SOURCE=${PDFium_SOURCE_DIR:-pdfium}
 BUILD=${PDFium_BUILD_DIR:-pdfium/out}
 
-if [ "$OS" == "win" ]; then
-  STAGING_BIN="$STAGING/$CPU/bin"
-  STAGING_LIB="$STAGING/$CPU/lib"
-  STAGING_RES="$STAGING/$CPU/res"
-else
-  STAGING_LIB="$STAGING/lib"
-  STAGING_RES="$STAGING/res"
-fi
+STAGING="$PWD/staging"
+STAGING_BIN="$STAGING/bin"
+STAGING_LIB="$STAGING/lib"
+STAGING_RES="$STAGING/res"
 
 mkdir -p "$STAGING"
 mkdir -p "$STAGING_LIB"
