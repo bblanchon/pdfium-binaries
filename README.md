@@ -158,6 +158,7 @@ The following project use (or recommend using) our PDFium builds:
 * [Flutter native_pdf_renderer](https://github.com/rbcprolabs/packages.flutter/tree/master/packages/native_pdf_renderer), Flutter Plugin to render PDF pages as images
 * [PDFium RS](https://github.com/asafigan/pdfium_rs), a Rust wrapper around PDFium
 * [PDFiumCore](https://github.com/Dtronix/PDFiumCore), .NET Standard P/Invoke bindings for PDFium
+* [PDFtoImage](https://github.com/sungaila/PDFtoImage), .NET library to render PDF content into images
 * [PyPDFium2](https://github.com/pypdfium2-team/pypdfium2), Python bindings to PDFium
 * [wxPDFView](https://github.com/TcT2k/wxPDFView), wxWidgets components to display PDF content
 
