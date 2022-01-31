@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- this forces .NET Framework targets to copy the native pdfium assemblies -->
+<!-- .NET (Core) supports the runtimes folder out of the box -->
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Condition="'$(TargetFramework)'=='net461' or '$(TargetFramework)'=='net462' or '$(TargetFramework)'=='net47' or '$(TargetFramework)'=='net471' or '$(TargetFramework)'=='net472' or '$(TargetFramework)'=='net48' or '$(TargetFrameworkVersion)'=='v4.6.1' or '$(TargetFrameworkVersion)'=='v4.6.2' or '$(TargetFrameworkVersion)'=='v4.7' or '$(TargetFrameworkVersion)'=='v4.7.1' or '$(TargetFrameworkVersion)'=='v4.7.2' or '$(TargetFrameworkVersion)'=='v4.8'">
+    <None Include="$(MSBuildThisFileDirectory)..\..\runtimes\win-x86\native\pdfium.dll" >
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>runtimes\win-x86\native\pdfium.dll</Link>
+      <Visible>false</Visible>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)..\..\runtimes\win-x64\native\pdfium.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>runtimes\win-x64\native\pdfium.dll</Link>
+      <Visible>false</Visible>
+    </None>
+  </ItemGroup>
+</Project>
