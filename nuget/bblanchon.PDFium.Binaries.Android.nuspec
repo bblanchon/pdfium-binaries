@@ -2,27 +2,27 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
   <metadata>
     <id>bblanchon.PDFium.Binaries.Android</id>
-	<version>$version$</version>
+    <version>$version$</version>
     <authors>Benoit Blanchon</authors>
-	<owners>Benoit Blanchon</owners>
-	<requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <owners>Benoit Blanchon</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <license type="expression">Apache-2.0</license>
     <licenseUrl>https://licenses.nuget.org/Apache-2.0</licenseUrl>
     <projectUrl>https://github.com/bblanchon/pdfium-binaries</projectUrl>
     <description>This package contains pre-compiled binaries of the PDFium library, an open-source library for PDF manipulation and rendering.</description>
-	<releaseNotes>$releaseNotes$</releaseNotes>
-	<copyright>Copyright © Benoit Blanchon 2017-2022</copyright>
+    <releaseNotes>$releaseNotes$</releaseNotes>
+    <copyright>Copyright Â© Benoit Blanchon 2017-2022</copyright>
     <tags>PDFium PDF binaries library native Chromium</tags>
     <repository type="git" url="https://github.com/bblanchon/pdfium-binaries.git" branch="$branch$" commit="$commit$" />
   </metadata>
-  
+
   <files>
-	<!-- the native PDFium binaries -->
-	<!-- see list of available runtime identifiers -->
-	<!-- https://docs.microsoft.com/en-us/dotnet/core/rid-catalog -->
-	<file src="pdfium-android-arm/lib/libpdfium.so" target="runtimes/android-arm/native/libpdfium.so" />
-	<file src="pdfium-android-arm64/lib/libpdfium.so" target="runtimes/android-arm64/native/libpdfium.so" />
-	<file src="pdfium-android-x64/lib/libpdfium.so" target="runtimes/android-x64/native/libpdfium.so" />
-	<file src="pdfium-android-x86/lib/libpdfium.so" target="runtimes/android-x86/native/libpdfium.so" />
+    <!-- the native PDFium binaries -->
+    <!-- see list of available runtime identifiers -->
+    <!-- https://docs.microsoft.com/en-us/dotnet/core/rid-catalog -->
+    <file src="pdfium-android-arm/lib/libpdfium.so" target="runtimes/android-arm/native/libpdfium.so" />
+    <file src="pdfium-android-arm64/lib/libpdfium.so" target="runtimes/android-arm64/native/libpdfium.so" />
+    <file src="pdfium-android-x64/lib/libpdfium.so" target="runtimes/android-x64/native/libpdfium.so" />
+    <file src="pdfium-android-x86/lib/libpdfium.so" target="runtimes/android-x86/native/libpdfium.so" />
   </files>
 </package>
