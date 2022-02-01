@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
   <metadata>
-    <id>bblanchon.PDFium.Binaries.macOS</id>
+    <id>bblanchon.PDFium</id>
     <version>$version$</version>
     <authors>Benoit Blanchon</authors>
     <owners>Benoit Blanchon</owners>
@@ -14,13 +14,17 @@
     <copyright>Copyright © Benoit Blanchon 2017-2022</copyright>
     <tags>PDFium PDF binaries library native Chromium</tags>
     <repository type="git" url="https://github.com/bblanchon/pdfium-binaries.git" branch="$branch$" commit="$commit$" />
+    <dependencies>
+      <group>
+        <dependency id="bblanchon.PDFium.Android" version="$version$" />
+        <dependency id="bblanchon.PDFium.iOS" version="$version$" />
+        <dependency id="bblanchon.PDFium.Linux" version="$version$" />
+        <dependency id="bblanchon.PDFium.macOS" version="$version$" />
+        <dependency id="bblanchon.PDFium.Win32" version="$version$" />
+      </group>
+    </dependencies>
   </metadata>
 
-  <files>
-    <!-- the native PDFium binaries -->
-    <!-- see list of available runtime identifiers -->
-    <!-- https://docs.microsoft.com/en-us/dotnet/core/rid-catalog -->
-    <file src="pdfium-mac-arm64/lib/GNUSparseFile.0/libpdfium.dylib" target="runtimes/osx-arm64/native/libpdfium.dylib" />
-    <file src="pdfium-mac-x64/lib/libpdfium.dylib" target="runtimes/osx-x64/native/libpdfium.dylib" />
-  </files>
+  <!-- just a meta package without content -->
+  <files />
 </package>

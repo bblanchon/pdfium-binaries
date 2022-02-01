@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
   <metadata>
-    <id>bblanchon.PDFium.Binaries.Win32</id>
+    <id>bblanchon.PDFium.iOS</id>
     <version>$version$</version>
     <authors>Benoit Blanchon</authors>
     <owners>Benoit Blanchon</owners>
@@ -14,25 +14,13 @@
     <copyright>Copyright © Benoit Blanchon 2017-2022</copyright>
     <tags>PDFium PDF binaries library native Chromium</tags>
     <repository type="git" url="https://github.com/bblanchon/pdfium-binaries.git" branch="$branch$" commit="$commit$" />
-
-    <dependencies>
-      <group targetFramework="netstandard2.0" />
-    </dependencies>
   </metadata>
 
   <files>
-    <!-- placeholder file because this package contains native binaries only -->
-    <file src="_._" target="lib/netstandard2.0/_._" />
-
-    <!-- special targets file copies native binaries for .NET Framework -->
-    <!-- .NET (Core) does not need this and handles the runtimes folder on its own -->
-    <file src="bblanchon.PDFium.Binaries.targets" target="build/net461/bblanchon.PDFium.Binaries.Win32.targets" />
-
     <!-- the native PDFium binaries -->
     <!-- see list of available runtime identifiers -->
     <!-- https://docs.microsoft.com/en-us/dotnet/core/rid-catalog -->
-    <file src="pdfium-win-arm64/bin/pdfium.dll" target="runtimes/win-arm64/native/pdfium.dll" />
-    <file src="pdfium-win-x64/bin/pdfium.dll" target="runtimes/win-x64/native/pdfium.dll" />
-    <file src="pdfium-win-x86/bin/pdfium.dll" target="runtimes/win-x86/native/pdfium.dll" />
+    <file src="pdfium-ios-arm64/lib/GNUSparseFile.0/libpdfium.dylib" target="runtimes/ios-arm64/native/libpdfium.dylib" />
+    <file src="pdfium-ios-x64/lib/libpdfium.dylib" target="runtimes/ios-x64/native/libpdfium.dylib" />
   </files>
 </package>
