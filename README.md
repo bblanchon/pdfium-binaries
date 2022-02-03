@@ -94,6 +94,9 @@ Here are the download links for latest release:
 
 See the [Releases page](https://github.com/bblanchon/pdfium-binaries/releases) to download older versions of PDFium.
 
+Thanks to [@sungaila](https://github.com/sungaila), NuGet packages are available in the build artifacts.
+We'll soon publish them to nuget.org.
+
 ## Documentation
 
 ### PDFium API documentation

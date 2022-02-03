@@ -144,6 +144,31 @@ jobs:
           artifacts: pdfium*.tgz
           token: ${{ secrets.GITHUB_TOKEN }}
 
+  nuget:
+    name: Build NuGet packages
+    runs-on: windows-latest
+    needs: build
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Download artifacts
+        uses: actions/download-artifact@v2
+        with:
+          path: nuget
+      - name: Pack
+        shell: bash
+        run: |
+          for NUSPEC in nuget/*.nuspec; do
+            echo "::group::$NUSPEC"
+            nuget pack "$NUSPEC" -properties "version=${{ github.event.inputs.version || '0.0.0.0' }};branch=${GITHUB_REF#refs/heads/};commit=${GITHUB_SHA}"
+            echo "::endgroup::"
+          done
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: NuGet packages
+          path: '*.nupkg'
+
   publish:
     name: Publish Release
     if: ${{ startsWith(github.event.inputs.branch, 'chromium/') }}
