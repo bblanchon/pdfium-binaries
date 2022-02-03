@@ -32,13 +32,13 @@ jobs:
           - artifact: pdfium-android-x64
             target_os: android
             target_cpu: x64
-            runner: ubuntu-20.04            
+            runner: ubuntu-20.04
 
           - artifact: pdfium-android-x86
             target_os: android
             target_cpu: x86
             runner: ubuntu-20.04
-          
+
           - artifact: pdfium-ios-arm64
             target_os: ios
             target_cpu: arm64
@@ -83,7 +83,7 @@ jobs:
             target_os: win
             target_cpu: x64
             runner: windows-2019
-            
+
           - artifact: pdfium-win-x86
             target_os: win
             target_cpu: x86
