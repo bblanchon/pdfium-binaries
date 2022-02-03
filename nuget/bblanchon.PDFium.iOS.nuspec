@@ -14,9 +14,13 @@
     <copyright>Copyright © Benoit Blanchon 2017-2022</copyright>
     <tags>PDFium PDF binaries library native Chromium</tags>
     <repository type="git" url="https://github.com/bblanchon/pdfium-binaries.git" branch="$branch$" commit="$commit$" />
+    <icon>icon.png</icon>
+    <iconUrl>https://raw.githubusercontent.com/bblanchon/pdfium-binaries/master/nuget/bblanchon.PDFium.iOS.png</iconUrl>
   </metadata>
 
   <files>
+    <file src="bblanchon.PDFium.iOS.png" target="icon.png" />
+    
     <!-- the native PDFium binaries -->
     <!-- see list of available runtime identifiers -->
     <!-- https://docs.microsoft.com/en-us/dotnet/core/rid-catalog -->

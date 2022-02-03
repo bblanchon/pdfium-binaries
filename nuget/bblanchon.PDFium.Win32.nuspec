@@ -14,6 +14,8 @@
     <copyright>Copyright © Benoit Blanchon 2017-2022</copyright>
     <tags>PDFium PDF binaries library native Chromium</tags>
     <repository type="git" url="https://github.com/bblanchon/pdfium-binaries.git" branch="$branch$" commit="$commit$" />
+    <icon>icon.png</icon>
+    <iconUrl>https://raw.githubusercontent.com/bblanchon/pdfium-binaries/master/nuget/bblanchon.PDFium.Win32.png</iconUrl>
 
     <dependencies>
       <group targetFramework="netstandard2.0" />
@@ -21,6 +23,8 @@
   </metadata>
 
   <files>
+    <file src="bblanchon.PDFium.Win32.png" target="icon.png" />
+
     <!-- placeholder file because this package contains native binaries only -->
     <!-- we want to fail on any platform not compatible with .NET Standard 2.0 (on Windows only) -->
     <!-- https://docs.microsoft.com/en-us/nuget/reference/errors-and-warnings/nu5127 -->
