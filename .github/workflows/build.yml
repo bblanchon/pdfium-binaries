@@ -168,6 +168,9 @@ jobs:
         with:
           name: NuGet packages
           path: '*.nupkg'
+      - name: Push to nuget.org
+        if: ${{ startsWith(github.event.inputs.branch, 'chromium/') }}
+        run: nuget push -Source nuget.org -ApiKey ${{ secrets.NUGET_API_KEY }} *.nupkg
 
   publish:
     name: Publish Release
