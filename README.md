@@ -94,7 +94,7 @@ Here are the download links for latest release:
 
 See the [Releases page](https://github.com/bblanchon/pdfium-binaries/releases) to download older versions of PDFium.
 
-Thanks to [@sungaila](https://github.com/sungaila), several [NuGet packages](https://www.nuget.org/packages/bblanchon.PDFium/) are also available.
+Several [NuGet packages](https://www.nuget.org/packages/bblanchon.PDFium/) are also available.
 
 ## Documentation
 
@@ -165,3 +165,19 @@ The following project use (or recommend using) our PDFium builds:
 * [wxPDFView](https://github.com/TcT2k/wxPDFView), wxWidgets components to display PDF content
 
 *Did we miss a project? Please open a PR!*  
+
+
+## Contributors
+
+David Sungaila, [@sungaila](https://github.com/sungaila):
+
+* NuGet packages
+
+Christoffer Green, [@ChristofferGreen](https://github.com/ChristofferGreen):
+
+* Linux ARM build
+
+Tobias Taschner, [@TcT2k](https://github.com/TcT2k):
+
+* macOS build
+* V8 build
