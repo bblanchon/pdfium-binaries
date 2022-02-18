@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- this forces .NET Framework targets to copy the native pdfium assemblies -->
-<!-- .NET (Core) supports the runtimes folder out of the box -->
+<!-- includes PDFium libraries for MonoAndroid projects -->
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Condition="'$(AndroidApplication)' == 'True'">
     <AndroidNativeLibrary Include="$(MSBuildThisFileDirectory)..\..\runtimes\android-x86\native\libpdfium.so" Abi="x86" />
