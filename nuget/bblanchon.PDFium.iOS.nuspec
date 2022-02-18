@@ -20,7 +20,7 @@
 
   <files>
     <file src="bblanchon.PDFium.iOS.png" target="icon.png" />
-    
+
     <!-- the native PDFium binaries -->
     <!-- see list of available runtime identifiers -->
     <!-- https://docs.microsoft.com/en-us/dotnet/core/rid-catalog -->

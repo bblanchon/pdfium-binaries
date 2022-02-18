@@ -32,7 +32,8 @@
 
     <!-- special targets file copies native binaries for .NET Framework -->
     <!-- .NET (Core) does not need this and handles the runtimes folder on its own -->
-    <file src="bblanchon.PDFium.targets" target="build/net461/bblanchon.PDFium.Win32.targets" />
+    <file src="bblanchon.PDFium.Win32.targets" target="build/net461/bblanchon.PDFium.Win32.targets" />
+    <file src="bblanchon.PDFium.Win32.targets" target="buildTransitive/net461/bblanchon.PDFium.Win32.targets" />
 
     <!-- the native PDFium binaries -->
     <!-- see list of available runtime identifiers -->
