@@ -26,8 +26,7 @@
   <files>
     <file src="bblanchon.PDFium.Android.png" target="icon.png" />
 
-    <!-- placeholder file because this package contains native binaries only -->
-    <!-- we want to fail on any platform not compatible with .NET Standard 2.0 (on Windows only) -->
+    <!-- placeholder files because this package contains native binaries only -->
     <!-- https://docs.microsoft.com/en-us/nuget/reference/errors-and-warnings/nu5127 -->
     <file src="_._" target="lib/monoandroid1.0/_._" />
     <file src="_._" target="lib/net6.0-android21.0/_._" />
