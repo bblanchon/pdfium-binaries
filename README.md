@@ -90,7 +90,14 @@ Here are the download links for latest release:
     <td>x86</td>
     <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-win-x86.tgz">pdfium-win-x86.tgz</a></td>
   </tr>
+
+  <tr>
+    <td colspan="2">WebAssembly<sup>1</sup></td>
+    <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-wasm.tgz">pdfium-wasm.tgz</a></td>
+  </tr>
 </table>
+
+<small>1: WebAssembly build is experimental; please [provide feedback](https://github.com/bblanchon/pdfium-binaries/issues/28).</small>
 
 See the [Releases page](https://github.com/bblanchon/pdfium-binaries/releases) to download older versions of PDFium.
 

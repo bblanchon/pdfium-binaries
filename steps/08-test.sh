@@ -99,6 +99,11 @@ case "$OS" in
       -A "$ARCH"
     )
     ;;
+
+  wasm)
+    # TODO: add test for Wasm
+    exit
+    ;;
 esac
 
 CMAKE_ARGS+=("$SOURCE_DIR")

@@ -39,6 +39,9 @@ mkdir -p "$BUILD"
     win)
       echo 'pdf_use_win32_gdi = true'
       ;;
+    wasm):
+      echo 'pdf_is_complete_lib = true'
+      ;;
   esac
 
 ) | sort > "$BUILD/args.gn"

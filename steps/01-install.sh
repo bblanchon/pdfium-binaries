@@ -1,6 +1,6 @@
 #!/bin/bash -eux
 
-PATH_FILE=${GITHUB_PATH:-.path}
+PATH_FILE=${GITHUB_PATH:-$PWD/.path}
 TARGET_OS=${PDFium_TARGET_OS:?}
 TARGET_CPU=${PDFium_TARGET_CPU:?}
 CURRENT_CPU=${PDFium_CURRENT_CPU:-x64}
@@ -30,4 +30,15 @@ case "$TARGET_OS-$TARGET_CPU" in
     sudo apt-get update
     sudo apt-get install -y g++-aarch64-linux-gnu
     ;;
+
+  wasm-wasm)
+    git clone https://github.com/emscripten-core/emsdk.git
+    pushd emsdk
+    ./emsdk install latest
+    ./emsdk activate latest
+    echo "$PWD/upstream/emscripten" >> "$PATH_FILE"
+    echo "$PWD/upstream/bin" >> "$PATH_FILE"
+    popd
+    ;;
+
 esac

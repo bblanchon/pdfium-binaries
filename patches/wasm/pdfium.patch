@@ -1,0 +1,26 @@
+diff --git a/core/fxcrt/BUILD.gn b/core/fxcrt/BUILD.gn
+index ffa1b60..92224c5 100644
+--- a/core/fxcrt/BUILD.gn
++++ b/core/fxcrt/BUILD.gn
+@@ -125,7 +125,7 @@ source_set("fxcrt") {
+     "//third_party/icu:icuuc",
+   ]
+ 
+-  if (is_posix || is_fuchsia) {
++  if (is_posix || is_fuchsia || is_wasm) {
+     sources += [
+       "cfx_fileaccess_posix.cpp",
+       "cfx_fileaccess_posix.h",
+diff --git a/core/fxge/BUILD.gn b/core/fxge/BUILD.gn
+index 7dafd7d..6d1fff9 100644
+--- a/core/fxge/BUILD.gn
++++ b/core/fxge/BUILD.gn
+@@ -162,7 +162,7 @@ source_set("fxge") {
+     ]
+   }
+ 
+-  if (is_linux || is_chromeos) {
++  if (is_linux || is_chromeos || is_wasm) {
+     sources += [ "linux/fx_linux_impl.cpp" ]
+   }
+ 

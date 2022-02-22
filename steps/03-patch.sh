@@ -6,7 +6,7 @@ OS="${PDFium_TARGET_OS:?}"
 
 pushd "${SOURCE}"
 
-git apply -v "$PATCHES/shared_library.patch"
+[ "$OS" != "wasm" ] && git apply -v "$PATCHES/shared_library.patch"
 git apply -v "$PATCHES/public_headers.patch"
 
 [ "${PDFium_V8:-}" == "enabled" ] && git apply -v "$PATCHES/v8_init.patch"
@@ -20,6 +20,15 @@ case "$OS" in
     git apply -v "$PATCHES/ios/pdfium.patch"
     git -C build apply -v "$PATCHES/ios/build.patch"
     git -C third_party/libjpeg_turbo apply -v "$PATCHES/ios/libjpeg_turbo.patch"
+    ;;
+
+  wasm)
+    git apply -v "$PATCHES/wasm/pdfium.patch"
+    git -C build apply -v "$PATCHES/wasm/build.patch"
+    mkdir -p "build/toolchain/wasm"
+    cp "$PATCHES/wasm/toolchain.gn" "build/toolchain/wasm/BUILD.gn"
+    mkdir -p "build/config/wasm"
+    cp "$PATCHES/wasm/config.gn" "build/config/wasm/BUILD.gn"
     ;;
 
   win)

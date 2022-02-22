@@ -36,6 +36,14 @@ case "$OS" in
     mv "$BUILD/libpdfium.dylib" "$STAGING_LIB"
     ;;
 
+  wasm)
+    mv "$BUILD/pdfium.html" "$STAGING_LIB"
+    mv "$BUILD/pdfium.js" "$STAGING_LIB"
+    mv "$BUILD/pdfium.wasm" "$STAGING_LIB"
+    rm -rf "$STAGING/include/cpp"
+    rm "$STAGING/PDFiumConfig.cmake"
+    ;;
+
   win)
     mv "$BUILD/pdfium.dll.lib" "$STAGING_LIB"
     mkdir -p "$STAGING_BIN"
@@ -57,7 +65,11 @@ BUILD=$(echo "$VERSION" | cut -d. -f3)
 PATCH=$(echo "$VERSION" | cut -d. -f4)
 END
 
-ARTIFACT_BASE="$PWD/pdfium-$OS-$CPU"
+if [ "$OS" != "$CPU" ]; then
+  ARTIFACT_BASE="$PWD/pdfium-$OS-$CPU"
+else
+  ARTIFACT_BASE="$PWD/pdfium-$OS"
+fi
 [ "$V8" == "enabled" ] && ARTIFACT_BASE="$ARTIFACT_BASE-v8"
 [ "$CFG" == "Debug" ] && ARTIFACT_BASE="$ARTIFACT_BASE-debug"
 ARTIFACT="$ARTIFACT_BASE.tgz"

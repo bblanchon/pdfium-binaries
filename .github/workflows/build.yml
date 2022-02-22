@@ -89,6 +89,11 @@ jobs:
             target_cpu: x86
             runner: windows-2019
 
+          - artifact: pdfium-wasm
+            target_os: wasm
+            target_cpu: wasm
+            runner: ubuntu-20.04
+
     runs-on: ${{ matrix.runner }}
     steps:
       - name: Checkout this repo

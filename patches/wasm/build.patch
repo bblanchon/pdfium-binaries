@@ -1,0 +1,72 @@
+diff --git a/config/BUILDCONFIG.gn b/config/BUILDCONFIG.gn
+index fcc7e1283..a6e65682d 100644
+--- a/config/BUILDCONFIG.gn
++++ b/config/BUILDCONFIG.gn
+@@ -262,6 +262,8 @@ if (target_os == "android") {
+   _default_toolchain = "//build/toolchain/aix:$target_cpu"
+ } else if (target_os == "zos") {
+   _default_toolchain = "//build/toolchain/zos:$target_cpu"
++} else if (target_cpu == "wasm") {
++  _default_toolchain = "//build/toolchain/wasm:emscripten"
+ } else {
+   assert(false, "Unsupported target_os: $target_os")
+ }
+@@ -300,9 +302,10 @@ is_linux = current_os == "linux"
+ is_mac = current_os == "mac"
+ is_nacl = current_os == "nacl"
+ is_win = current_os == "win" || current_os == "winuwp"
++is_wasm = current_os == "wasm"
+ 
+ is_apple = is_ios || is_mac
+-is_posix = !is_win && !is_fuchsia
++is_posix = !is_win && !is_fuchsia && !is_wasm
+ 
+ # =============================================================================
+ # TARGET DEFAULTS
+@@ -377,7 +380,6 @@ if (is_android) {
+ 
+ if (is_clang && !is_nacl) {
+   default_compiler_configs += [
+-    "//build/config/clang:find_bad_constructs",
+     "//build/config/clang:extra_warnings",
+   ]
+ }
+diff --git a/config/compiler/BUILD.gn b/config/compiler/BUILD.gn
+index 10937225b..5fed442e4 100644
+--- a/config/compiler/BUILD.gn
++++ b/config/compiler/BUILD.gn
+@@ -287,6 +287,8 @@ config("compiler") {
+     configs += [ "//build/config/aix:compiler" ]
+   } else if (current_os == "zos") {
+     configs += [ "//build/config/zos:compiler" ]
++  } else if (current_os == "wasm") {
++    configs += [ "//build/config/wasm:compiler" ]
+   }
+ 
+   configs += [
+diff --git a/config/compiler/compiler.gni b/config/compiler/compiler.gni
+index 8e7bdd8f0..124dbd963 100644
+--- a/config/compiler/compiler.gni
++++ b/config/compiler/compiler.gni
+@@ -221,7 +221,7 @@ declare_args() {
+   # (which lld doesn't support either).
+   # The default linker everywhere else.
+   use_lld = is_clang && !(is_mac && is_gpu_fyi_bot) && current_os != "zos" &&
+-            !(is_ios && (is_cronet_build || target_environment == "catalyst"))
++            !(is_ios && (is_cronet_build || target_environment == "catalyst")) && !is_wasm
+ }
+ 
+ declare_args() {
+diff --git a/toolchain/toolchain.gni b/toolchain/toolchain.gni
+index 9874c7a12..59f84c36f 100644
+--- a/toolchain/toolchain.gni
++++ b/toolchain/toolchain.gni
+@@ -52,6 +52,8 @@ if (is_apple) {
+   shlib_extension = ".so"
+ } else if (is_win) {
+   shlib_extension = ".dll"
++} if (is_wasm) {
++  shlib_extension = ".so"
+ } else {
+   assert(false, "Platform not supported")
+ }
