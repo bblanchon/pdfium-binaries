@@ -8,7 +8,7 @@ ninja -C "$BUILD_DIR" pdfium
 
 if [ "$TARGET_CPU" == "wasm" ]; then
   LIBPDFIUMA="$BUILD_DIR/obj/libpdfium.a"
-  EXPORTED_FUNCTIONS=$(emnm $LIBPDFIUMA --format=just-symbols | grep "^FPDF" | sed 's/^/_/' | paste -sd "," -)
+  EXPORTED_FUNCTIONS=$(llvm-nm $LIBPDFIUMA --format=just-symbols | grep "^FPDF" | sed 's/^/_/' | paste -sd "," -)
   em++ \
     -s EXPORTED_FUNCTIONS="$EXPORTED_FUNCTIONS" \
     -s LLD_REPORT_UNDEFINED \

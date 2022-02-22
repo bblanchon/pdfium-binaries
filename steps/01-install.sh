@@ -34,8 +34,8 @@ case "$TARGET_OS-$TARGET_CPU" in
   wasm-wasm)
     git clone https://github.com/emscripten-core/emsdk.git
     pushd emsdk
-    ./emsdk install latest
-    ./emsdk activate latest
+    ./emsdk install 2.0.24
+    ./emsdk activate 2.0.24
     echo "$PWD/upstream/emscripten" >> "$PATH_FILE"
     echo "$PWD/upstream/bin" >> "$PATH_FILE"
     popd
