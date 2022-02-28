@@ -102,7 +102,49 @@ Here are the download links for latest release:
 
 See the [Releases page](https://github.com/bblanchon/pdfium-binaries/releases) to download older versions of PDFium.
 
-Several [NuGet packages](https://www.nuget.org/packages/bblanchon.PDFium/) are also available.
+### NuGet Packages
+
+The following NuGet packages are available:
+
+<table>
+  <tr>
+    <th>OS</th>
+    <th>NuGet package</th>
+  </tr>
+
+  <tr>
+    <td>All (meta package)</td>
+    <td><a href="https://www.nuget.org/packages/bblanchon.PDFium/">bblanchon.PDFium</a></td>
+  </tr>
+
+  <tr>
+    <td>Android</td>
+    <td><a href="https://www.nuget.org/packages/bblanchon.PDFium.Android/">bblanchon.PDFium.Android</a></td>
+  </tr>
+
+  <tr>
+    <td>iOS</td>
+    <td><a href="https://www.nuget.org/packages/bblanchon.PDFium.iOS/">bblanchon.PDFium.iOS</a></td>
+  </tr>
+
+  <tr>
+    <td>Linux</td>
+    <td><a href="https://www.nuget.org/packages/bblanchon.PDFium.Linux/">bblanchon.PDFium.Linux</a></td>
+  </tr>
+
+  <tr>
+    <td>macOS</td>
+    <td><a href="https://www.nuget.org/packages/bblanchon.PDFium.macOS/">bblanchon.PDFium.macOS</a></td>
+  </tr>
+
+  <tr>
+    <td>Windows</td>
+    <td><a href="https://www.nuget.org/packages/bblanchon.PDFium.Windows/">bblanchon.PDFium.Windows</a></td>
+  </tr>
+</table>
+
+**HELP WANTED!**  
+I can provide packages for your favorite package manager, but I need help from someone who knows the format. Contact me via the [GitHub issues](https://github.com/bblanchon/pdfium-binaries/issues) if you wanna help.
 
 ## Documentation
 
