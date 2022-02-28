@@ -22,7 +22,7 @@ sed "s/#VERSION#/${VERSION:-0.0.0.0}/" <"$PATCHES/PDFiumConfig.cmake" >"$STAGING
 
 cp "$SOURCE/LICENSE" "$STAGING"
 cp "$BUILD/args.gn" "$STAGING"
-cp -R "$SOURCE/public" -T "$STAGING/include"
+cp -R "$SOURCE/public" "$STAGING/include"
 rm -f "$STAGING/include/DEPS"
 rm -f "$STAGING/include/README"
 rm -f "$STAGING/include/PRESUBMIT.py"
