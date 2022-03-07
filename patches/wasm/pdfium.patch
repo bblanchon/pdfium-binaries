@@ -12,11 +12,11 @@ index b92e1d667..b67b57ca9 100644
        "cfx_fileaccess_posix.cpp",
        "cfx_fileaccess_posix.h",
 diff --git a/core/fxge/BUILD.gn b/core/fxge/BUILD.gn
-index 23437a10e..7ade03c43 100644
+index 18b15b70a..cd42a8eaf 100644
 --- a/core/fxge/BUILD.gn
 +++ b/core/fxge/BUILD.gn
-@@ -166,7 +166,7 @@ source_set("fxge") {
-     configs -= [ "../../:pdfium_noshorten_config" ]
+@@ -163,7 +163,7 @@ source_set("fxge") {
+     ]
    }
  
 -  if (is_linux || is_chromeos || is_fuchsia) {
