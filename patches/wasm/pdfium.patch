@@ -1,8 +1,8 @@
 diff --git a/core/fxcrt/BUILD.gn b/core/fxcrt/BUILD.gn
-index ffa1b60..92224c5 100644
+index b92e1d667..b67b57ca9 100644
 --- a/core/fxcrt/BUILD.gn
 +++ b/core/fxcrt/BUILD.gn
-@@ -125,7 +125,7 @@ source_set("fxcrt") {
+@@ -126,7 +126,7 @@ source_set("fxcrt") {
      "//third_party/icu:icuuc",
    ]
  
@@ -12,15 +12,15 @@ index ffa1b60..92224c5 100644
        "cfx_fileaccess_posix.cpp",
        "cfx_fileaccess_posix.h",
 diff --git a/core/fxge/BUILD.gn b/core/fxge/BUILD.gn
-index 7dafd7d..6d1fff9 100644
+index 23437a10e..7ade03c43 100644
 --- a/core/fxge/BUILD.gn
 +++ b/core/fxge/BUILD.gn
-@@ -162,7 +162,7 @@ source_set("fxge") {
-     ]
+@@ -166,7 +166,7 @@ source_set("fxge") {
+     configs -= [ "../../:pdfium_noshorten_config" ]
    }
  
--  if (is_linux || is_chromeos) {
-+  if (is_linux || is_chromeos || is_wasm) {
+-  if (is_linux || is_chromeos || is_fuchsia) {
++  if (is_linux || is_chromeos || is_fuchsia || is_wasm) {
      sources += [ "linux/fx_linux_impl.cpp" ]
    }
  
