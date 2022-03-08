@@ -28,11 +28,11 @@ Here are the download links for latest release:
 
   <tr>
     <td rowspan="4">Android</td>
-    <td>ARM</td>
+    <td>arm</td>
     <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-android-arm.tgz">pdfium-android-arm.tgz</a></td>
   </tr>
   <tr>
-    <td>ARM64</td>
+    <td>arm64</td>
     <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-android-arm64.tgz">pdfium-android-arm64.tgz</a></td>
   </tr>
   <tr>
@@ -46,7 +46,7 @@ Here are the download links for latest release:
 
   <tr>
     <td rowspan="2">iOS</td>
-    <td>ARM64</td>
+    <td>arm64</td>
     <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-ios-arm64.tgz">pdfium-ios-arm64.tgz</a></td>
   </tr>
   <tr>
@@ -56,11 +56,11 @@ Here are the download links for latest release:
 
   <tr>
     <td rowspan="4">Linux</td>
-    <td>ARM</td>
+    <td>arm</td>
     <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-linux-arm.tgz">pdfium-linux-arm.tgz</a></td>
   </tr>
   <tr>
-    <td>ARM64</td>
+    <td>arm64</td>
     <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-linux-arm64.tgz">pdfium-linux-arm64.tgz</a></td>
   </tr>
   <tr>
@@ -74,7 +74,7 @@ Here are the download links for latest release:
 
   <tr>
     <td rowspan="2">macOS</td>
-    <td>ARM64</td>
+    <td>arm64</td>
     <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-mac-arm64.tgz">pdfium-mac-arm64.tgz</a></td>
   </tr>
   <tr>
@@ -84,7 +84,7 @@ Here are the download links for latest release:
 
   <tr>
     <td rowspan="3">Windows</td>
-    <td>ARM64</td>
+    <td>arm64</td>
     <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-win-arm64.tgz">pdfium-win-arm64.tgz</a></td>
   </tr>
   <tr>
