@@ -8,3 +8,5 @@
 /emsdk/
 /pdfium/
 /staging/
+/build/
+*.tgz
