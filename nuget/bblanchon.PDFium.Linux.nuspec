@@ -27,5 +27,6 @@
     <file src="pdfium-linux-arm/lib/libpdfium.so" target="runtimes/linux-arm/native/libpdfium.so" />
     <file src="pdfium-linux-arm64/lib/libpdfium.so" target="runtimes/linux-arm64/native/libpdfium.so" />
     <file src="pdfium-linux-x64/lib/libpdfium.so" target="runtimes/linux-x64/native/libpdfium.so" />
+    <file src="pdfium-linux-x86/lib/libpdfium.so" target="runtimes/linux-x86/native/libpdfium.so" />
   </files>
 </package>

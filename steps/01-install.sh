@@ -31,6 +31,11 @@ case "$TARGET_OS-$TARGET_CPU" in
     sudo apt-get install -y g++-aarch64-linux-gnu
     ;;
 
+  linux-x86)
+    sudo apt-get update
+    sudo apt-get install -y g++-multilib
+    ;;
+
   wasm-wasm)
     git clone https://github.com/emscripten-core/emsdk.git
     pushd emsdk

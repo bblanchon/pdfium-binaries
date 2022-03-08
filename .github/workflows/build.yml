@@ -64,6 +64,11 @@ jobs:
             target_cpu: x64
             runner: ubuntu-20.04
 
+          - artifact: pdfium-linux-x86
+            target_os: linux
+            target_cpu: x86
+            runner: ubuntu-20.04
+
           - artifact: pdfium-mac-arm64
             target_os: mac
             target_cpu: arm64

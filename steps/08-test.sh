@@ -61,6 +61,12 @@ case "$OS" in
       arm64)
         ARCH="aarch64-linux-gnu"
         ;;
+      x86)
+        CMAKE_ARGS+=(
+          -D CMAKE_CXX_FLAGS="-m32"
+          -D CMAKE_C_FLAGS="-m32"
+        )
+        ;;
     esac
     [ -n "${ARCH:-}" ] && CMAKE_ARGS+=(
       -D CMAKE_C_COMPILER="$ARCH-gcc"
