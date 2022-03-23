@@ -143,7 +143,7 @@ The following NuGet packages are available:
 
   <tr>
     <td>Windows</td>
-    <td><a href="https://www.nuget.org/packages/bblanchon.PDFium.Windows/">bblanchon.PDFium.Windows</a></td>
+    <td><a href="https://www.nuget.org/packages/bblanchon.PDFium.Win32/">bblanchon.PDFium.Win32</a></td>
   </tr>
 </table>
 
