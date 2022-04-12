@@ -13,39 +13,60 @@ jobs:
     steps:
     - name: Checkout this repo
       uses: actions/checkout@v2
+
     - name: Install depot_tools
       run: |
         git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
         echo "$PWD/depot_tools" >> $GITHUB_PATH
+
     - name: Checkout PDFium
       timeout-minutes: 15
       run: |
         gclient config --unmanaged "https://pdfium.googlesource.com/pdfium.git"
         gclient sync --no-history --shallow
+
     - name: Create patch script
       run: |
         cat >patch.sh <<END
         set -eux
         git -C pdfium reset --hard
         gclient sync -R
-        PDFium_TARGET_OS=\$1 steps/03-patch.sh
+        steps/03-patch.sh
         END
         chmod +x patch.sh
+
     - name: Apply patches for Android
-      run: ./patch.sh android
+      run: ./patch.sh
       if: always()
+      env:
+        PDFium_TARGET_OS: android
+
     - name: Apply patches for iOS
-      run: ./patch.sh ios
+      run: ./patch.sh
       if: always()
+      env:
+        PDFium_TARGET_OS: ios
+
     - name: Apply patches for Linux
-      run: ./patch.sh linux
+      run: ./patch.sh
       if: always()
+      env:
+        PDFium_TARGET_OS: linux
+
     - name: Apply patches for macOS
-      run: ./patch.sh mac
+      run: ./patch.sh
       if: always()
+      env:
+        PDFium_TARGET_OS: macos
+
     - name: Apply patches for WASM
-      run: ./patch.sh wasm
+      run: ./patch.sh
       if: always()
+      env:
+        PDFium_TARGET_OS: wasm
+
     - name: Apply patches for Windows
-      run: ./patch.sh win
+      run: ./patch.sh
       if: always()
+      env:
+        PDFium_TARGET_OS: win
