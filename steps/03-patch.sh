@@ -9,13 +9,13 @@ pushd "${SOURCE}"
 [ "$OS" != "wasm" ] && git apply -v "$PATCHES/shared_library.patch"
 git apply -v "$PATCHES/public_headers.patch"
 
-[ "${PDFium_V8:-}" == "enabled" ] && git apply -v "$PATCHES/v8_init.patch"
+[ "${PDFium_ENABLE_V8:-}" == "true" ] && git apply -v "$PATCHES/v8_init.patch"
 
 case "$OS" in
   android)
     git -C build apply -v "$PATCHES/android/build.patch"
     ;;
-  
+
   ios)
     git apply -v "$PATCHES/ios/pdfium.patch"
     git -C build apply -v "$PATCHES/ios/build.patch"

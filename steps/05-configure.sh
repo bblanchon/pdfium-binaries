@@ -4,11 +4,8 @@ OS=${PDFium_TARGET_OS:?}
 SOURCE=${PDFium_SOURCE_DIR:-pdfium}
 BUILD=${PDFium_BUILD_DIR:-$SOURCE/out}
 TARGET_CPU=${PDFium_TARGET_CPU:?}
-if [ "${PDFium_V8:-}" == "enabled" ]; then
-  ENABLE_V8="true"
-else
-  ENABLE_V8="false"
-fi
+ENABLE_V8=${PDFium_ENABLE_V8:-false}
+
 if [ "${PDFium_CONFIGURATION:-}" == "Debug" ]; then
   IS_DEBUG="true"
 else

@@ -1,7 +1,7 @@
 #!/bin/bash -eux
 
 CFG=${CONFIGURATION:-Release}
-V8=${PDFium_V8:-disabled}
+ENABLE_V8=${PDFium_ENABLE_V8:-false}
 OS=${PDFium_TARGET_OS:?}
 CPU=${PDFium_TARGET_CPU:?}
 VERSION=${PDFium_VERSION:-}
@@ -52,7 +52,7 @@ case "$OS" in
     ;;
 esac
 
-if [ "$V8" == "enabled" ]; then
+if [ "$PDFium_ENABLE_V8" == "true" ]; then
   mkdir -p "$STAGING_RES"
   mv "$BUILD/icudtl.dat" "$STAGING_RES"
   mv "$BUILD/snapshot_blob.bin" "$STAGING_RES"
