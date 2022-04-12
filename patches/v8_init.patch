@@ -1,18 +1,18 @@
 diff --git a/fpdfsdk/BUILD.gn b/fpdfsdk/BUILD.gn
-index 748f43f4f..82434ebb5 100644
+index 1f75bef05..bd88350a8 100644
 --- a/fpdfsdk/BUILD.gn
 +++ b/fpdfsdk/BUILD.gn
-@@ -69,6 +69,7 @@ source_set("fpdfsdk") {
+@@ -59,6 +59,7 @@ source_set("fpdfsdk") {
+     "fpdf_thumbnail.cpp",
+     "fpdf_transformpage.cpp",
      "fpdf_view.cpp",
-     "ipdfsdk_annothandler.cpp",
-     "ipdfsdk_annothandler.h",
 +    "fpdf_libs.cpp",
    ]
  
-   configs += [ "../:pdfium_strict_config" ]
+   configs += [
 diff --git a/fpdfsdk/fpdf_libs.cpp b/fpdfsdk/fpdf_libs.cpp
 new file mode 100644
-index 000000000..18fb89dd2
+index 000000000..620588f76
 --- /dev/null
 +++ b/fpdfsdk/fpdf_libs.cpp
 @@ -0,0 +1,24 @@
