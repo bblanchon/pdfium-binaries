@@ -70,3 +70,10 @@ jobs:
       if: always()
       env:
         PDFium_TARGET_OS: win
+
+    - name: Apply patches for V8
+      run: ./patch.sh
+      if: always()
+      env:
+        PDFium_TARGET_OS: dummy
+        PDFium_ENABLE_V8: true
