@@ -52,7 +52,7 @@ case "$OS" in
     ;;
 esac
 
-if [ "$PDFium_ENABLE_V8" == "true" ]; then
+if [ "$ENABLE_V8" == "true" ]; then
   mkdir -p "$STAGING_RES"
   mv "$BUILD/icudtl.dat" "$STAGING_RES"
   mv "$BUILD/snapshot_blob.bin" "$STAGING_RES"
@@ -70,7 +70,7 @@ if [ "$OS" != "$CPU" ]; then
 else
   ARTIFACT_BASE="$PWD/pdfium-$OS"
 fi
-[ "$V8" == "enabled" ] && ARTIFACT_BASE="$ARTIFACT_BASE-v8"
+[ "$ENABLE_V8" == "true" ] && ARTIFACT_BASE="$ARTIFACT_BASE-v8"
 [ "$CFG" == "Debug" ] && ARTIFACT_BASE="$ARTIFACT_BASE-debug"
 ARTIFACT="$ARTIFACT_BASE.tgz"
 
