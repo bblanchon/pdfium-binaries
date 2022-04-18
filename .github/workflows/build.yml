@@ -107,7 +107,7 @@ jobs:
         run: |
           cat >>$GITHUB_ENV <<END
           PDFium_BRANCH=${{ github.event.inputs.branch }}
-          PDFium_CONFIGURATION=${{ matrix.cfg || 'Release' }}
+          PDFium_IS_DEBUG=${{ matrix.is_debug }}
           PDFium_TARGET_CPU=${{ matrix.target_cpu }}
           PDFium_TARGET_OS=${{ matrix.target_os }}
           PDFium_ENABLE_V8=${{ matrix.enable_v8 }}

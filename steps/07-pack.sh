@@ -1,6 +1,6 @@
 #!/bin/bash -eux
 
-CFG=${CONFIGURATION:-Release}
+IS_DEBUG=${PDFium_IS_DEBUG:-false}
 ENABLE_V8=${PDFium_ENABLE_V8:-false}
 OS=${PDFium_TARGET_OS:?}
 CPU=${PDFium_TARGET_CPU:?}
@@ -48,7 +48,7 @@ case "$OS" in
     mv "$BUILD/pdfium.dll.lib" "$STAGING_LIB"
     mkdir -p "$STAGING_BIN"
     mv "$BUILD/pdfium.dll" "$STAGING_BIN"
-    [ "$CFG" == "Debug" ] && mv "$BUILD/pdfium.dll.pdb" "$STAGING_BIN"
+    [ "$IS_DEBUG" == "true" ] && mv "$BUILD/pdfium.dll.pdb" "$STAGING_BIN"
     ;;
 esac
 
@@ -71,7 +71,7 @@ else
   ARTIFACT_BASE="$PWD/pdfium-$OS"
 fi
 [ "$ENABLE_V8" == "true" ] && ARTIFACT_BASE="$ARTIFACT_BASE-v8"
-[ "$CFG" == "Debug" ] && ARTIFACT_BASE="$ARTIFACT_BASE-debug"
+[ "$IS_DEBUG" == "true" ] && ARTIFACT_BASE="$ARTIFACT_BASE-debug"
 ARTIFACT="$ARTIFACT_BASE.tgz"
 
 pushd "$STAGING"

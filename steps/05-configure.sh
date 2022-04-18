@@ -5,12 +5,7 @@ SOURCE=${PDFium_SOURCE_DIR:-pdfium}
 BUILD=${PDFium_BUILD_DIR:-$SOURCE/out}
 TARGET_CPU=${PDFium_TARGET_CPU:?}
 ENABLE_V8=${PDFium_ENABLE_V8:-false}
-
-if [ "${PDFium_CONFIGURATION:-}" == "Debug" ]; then
-  IS_DEBUG="true"
-else
-  IS_DEBUG="false"
-fi
+IS_DEBUG=${PDFium_IS_DEBUG:-false}
 
 mkdir -p "$BUILD"
 
