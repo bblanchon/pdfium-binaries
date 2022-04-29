@@ -4,6 +4,7 @@ OS=${PDFium_TARGET_OS:?}
 SOURCE=${PDFium_SOURCE_DIR:-pdfium}
 BUILD=${PDFium_BUILD_DIR:-$SOURCE/out}
 TARGET_CPU=${PDFium_TARGET_CPU:?}
+TARGET_LIBC=${PDFium_TARGET_LIBC:-default}
 ENABLE_V8=${PDFium_ENABLE_V8:-false}
 IS_DEBUG=${PDFium_IS_DEBUG:-false}
 
@@ -33,6 +34,13 @@ mkdir -p "$BUILD"
       ;;
     wasm):
       echo 'pdf_is_complete_lib = true'
+      ;;
+  esac
+
+  case "$TARGET_LIBC" in
+    musl)
+      echo 'is_musl = true'
+      echo 'is_clang = false'
       ;;
   esac
 

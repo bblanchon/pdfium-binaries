@@ -10,3 +10,4 @@
 /staging/
 /build/
 *.tgz
+/*-musl-cross/

@@ -1,7 +1,9 @@
 #!/bin/bash -eux
 
 PATH_FILE=${GITHUB_PATH:-$PWD/.path}
+ENV_FILE=${GITHUB_ENV:-.env}
 TARGET_OS=${PDFium_TARGET_OS:?}
+TARGET_LIBC=${PDFium_TARGET_LIBC:-default}
 TARGET_CPU=${PDFium_TARGET_CPU:?}
 CURRENT_CPU=${PDFium_CURRENT_CPU:-x64}
 
@@ -16,27 +18,37 @@ fi
 
 echo "$DepotTools_DIR" >> "$PATH_FILE"
 
-case "$TARGET_OS-$TARGET_CPU" in
+case "$TARGET_OS-$TARGET_LIBC-$TARGET_CPU" in
   win-*)
     echo "$WindowsSDK_DIR/$CURRENT_CPU" >> "$PATH_FILE"
     ;;
 
-  linux-arm)
+  linux-default-arm)
     sudo apt-get update
     sudo apt-get install -y g++-arm-linux-gnueabihf
     ;;
 
-  linux-arm64)
+  linux-default-arm64)
     sudo apt-get update
     sudo apt-get install -y g++-aarch64-linux-gnu
     ;;
 
-  linux-x86)
+  linux-default-x86)
     sudo apt-get update
     sudo apt-get install -y g++-multilib
     ;;
 
-  wasm-wasm)
+  linux-musl-x86)
+    curl -L https://musl.cc/i686-linux-musl-cross.tgz | tar xz
+    echo "$PWD/i686-linux-musl-cross/bin" >> "$PATH_FILE"
+    ;;
+
+  linux-musl-x64)
+    curl -L https://musl.cc/x86_64-linux-musl-cross.tgz | tar xz
+    echo "$PWD/x86_64-linux-musl-cross/bin" >> "$PATH_FILE"
+    ;;
+
+  wasm-*)
     git clone https://github.com/emscripten-core/emsdk.git
     pushd emsdk
     ./emsdk install 2.0.24
@@ -47,3 +59,8 @@ case "$TARGET_OS-$TARGET_CPU" in
     ;;
 
 esac
+
+if [ "$TARGET_LIBC" == "musl" ]; then
+  sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 10
+  sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-10 10
+fi

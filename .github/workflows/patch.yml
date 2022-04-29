@@ -77,3 +77,10 @@ jobs:
       env:
         PDFium_TARGET_OS: dummy
         PDFium_ENABLE_V8: true
+
+    - name: Apply patches for musl
+      run: ./patch.sh
+      if: always()
+      env:
+        PDFium_TARGET_OS: linux
+        PDFium_TARGET_LIBC: musl

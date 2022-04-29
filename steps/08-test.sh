@@ -2,6 +2,7 @@
 
 OS=${PDFium_TARGET_OS:?}
 CPU="${PDFium_TARGET_CPU:?}"
+TARGET_LIBC="${PDFium_TARGET_LIBC:-default}"
 SOURCE_DIR="$PWD/example"
 ANDROID_TOOLCHAIN="${PDFium_SOURCE_DIR:?}/third_party/android_ndk/toolchains/llvm/prebuilt/linux-x86_64/bin/"
 CMAKE_ARGS=()
@@ -12,22 +13,22 @@ case "$OS" in
   android)
     case "$CPU" in
       arm)
-        ARCH="armv7a-linux-androideabi16"
+        PREFIX="armv7a-linux-androideabi16-"
         ;;
       arm64)
-        ARCH="aarch64-linux-android21"
+        PREFIX="aarch64-linux-android21-"
         ;;
       x64)
-        ARCH="x86_64-linux-android21"
+        PREFIX="x86_64-linux-android21-"
         ;;
       x86)
-        ARCH="i686-linux-android16"
+        PREFIX="i686-linux-android16-"
         ;;
     esac
     export PATH="$ANDROID_TOOLCHAIN:$PATH"
     CMAKE_ARGS+=(
-      -D CMAKE_C_COMPILER="$ARCH-clang"
-      -D CMAKE_CXX_COMPILER="$ARCH-clang++"
+      -D CMAKE_C_COMPILER="${PREFIX:-}clang"
+      -D CMAKE_CXX_COMPILER="${PREFIX:-}clang++"
     )
     ;;
 
@@ -56,21 +57,25 @@ case "$OS" in
   linux)
     case "$CPU" in
       arm)
-        ARCH="arm-linux-gnueabihf"
+        PREFIX="arm-linux-gnueabihf-"
         ;;
       arm64)
-        ARCH="aarch64-linux-gnu"
+        PREFIX="aarch64-linux-gnu-"
         ;;
       x86)
+        [ "$TARGET_LIBC" == "musl" ] && PREFIX="i686-linux-musl-"
         CMAKE_ARGS+=(
           -D CMAKE_CXX_FLAGS="-m32"
           -D CMAKE_C_FLAGS="-m32"
         )
         ;;
+      x64)
+        [ "$TARGET_LIBC" == "musl" ] && PREFIX="x86_64-linux-musl-"
+        ;;
     esac
-    [ -n "${ARCH:-}" ] && CMAKE_ARGS+=(
-      -D CMAKE_C_COMPILER="$ARCH-gcc"
-      -D CMAKE_CXX_COMPILER="$ARCH-g++"
+    CMAKE_ARGS+=(
+      -D CMAKE_C_COMPILER="${PREFIX:-}gcc"
+      -D CMAKE_CXX_COMPILER="${PREFIX:-}g++"
     )
     ;;
 

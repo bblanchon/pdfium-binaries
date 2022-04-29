@@ -69,6 +69,18 @@ jobs:
             target_cpu: x86
             runner: ubuntu-20.04
 
+          - artifact: pdfium-linux-musl-x64
+            target_os: linux
+            target_libc: musl
+            target_cpu: x64
+            runner: ubuntu-20.04
+
+          - artifact: pdfium-linux-musl-x86
+            target_os: linux
+            target_libc: musl
+            target_cpu: x86
+            runner: ubuntu-20.04
+
           - artifact: pdfium-mac-arm64
             target_os: mac
             target_cpu: arm64
@@ -110,6 +122,7 @@ jobs:
           PDFium_IS_DEBUG=${{ matrix.is_debug }}
           PDFium_TARGET_CPU=${{ matrix.target_cpu }}
           PDFium_TARGET_OS=${{ matrix.target_os }}
+          PDFium_TARGET_LIBC=${{ matrix.target_libc }}
           PDFium_ENABLE_V8=${{ matrix.enable_v8 }}
           PDFium_VERSION=${{ github.event.inputs.version }}
           END

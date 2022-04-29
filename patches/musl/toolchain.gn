@@ -1,0 +1,45 @@
+import("//build/toolchain/gcc_toolchain.gni")
+
+gcc_toolchain("x86") {
+  toolprefix = "i686-linux-musl-"
+
+  cc = "${toolprefix}gcc"
+  cxx = "${toolprefix}g++"
+
+  readelf = "${toolprefix}readelf"
+  nm = "${toolprefix}nm"
+  ar = "${toolprefix}ar"
+  ld = cxx
+
+  extra_cxxflags = "-D_LIBCPP_HAS_MUSL_LIBC"
+
+  toolchain_args = {
+    current_cpu = "x86"
+    current_os = "linux"
+
+    use_remoteexec = false
+    is_clang = false
+  }
+}
+
+gcc_toolchain("x64") {
+  toolprefix = "x86_64-linux-musl-"
+
+  cc = "${toolprefix}gcc"
+  cxx = "${toolprefix}g++"
+
+  readelf = "${toolprefix}readelf"
+  nm = "${toolprefix}nm"
+  ar = "${toolprefix}ar"
+  ld = cxx
+
+  extra_cxxflags = "-D_LIBCPP_HAS_MUSL_LIBC"
+
+  toolchain_args = {
+    current_cpu = "x64"
+    current_os = "linux"
+
+    use_remoteexec = false
+    is_clang = false
+  }
+}
