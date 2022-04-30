@@ -23,9 +23,6 @@ mkdir -p "$BUILD"
     ios)
       echo "ios_enable_code_signing = false"
       ;;
-    linux)
-      echo 'use_custom_libcxx = true'
-      ;;
     mac)
       echo 'mac_deployment_target = "10.11.0"'
       ;;
