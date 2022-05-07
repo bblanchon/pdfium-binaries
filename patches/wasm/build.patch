@@ -1,8 +1,8 @@
 diff --git a/config/BUILDCONFIG.gn b/config/BUILDCONFIG.gn
-index fcc7e1283..a6e65682d 100644
+index d96064894..4df27883b 100644
 --- a/config/BUILDCONFIG.gn
 +++ b/config/BUILDCONFIG.gn
-@@ -262,6 +262,8 @@ if (target_os == "android") {
+@@ -264,6 +264,8 @@ if (target_os == "android") {
    _default_toolchain = "//build/toolchain/aix:$target_cpu"
  } else if (target_os == "zos") {
    _default_toolchain = "//build/toolchain/zos:$target_cpu"
@@ -11,7 +11,7 @@ index fcc7e1283..a6e65682d 100644
  } else {
    assert(false, "Unsupported target_os: $target_os")
  }
-@@ -300,9 +302,10 @@ is_linux = current_os == "linux"
+@@ -302,9 +304,10 @@ is_linux = current_os == "linux"
  is_mac = current_os == "mac"
  is_nacl = current_os == "nacl"
  is_win = current_os == "win" || current_os == "winuwp"
@@ -23,7 +23,7 @@ index fcc7e1283..a6e65682d 100644
  
  # =============================================================================
  # TARGET DEFAULTS
-@@ -377,7 +380,6 @@ if (is_android) {
+@@ -380,7 +383,6 @@ if (is_android) {
  
  if (is_clang && !is_nacl) {
    default_compiler_configs += [
@@ -32,10 +32,10 @@ index fcc7e1283..a6e65682d 100644
    ]
  }
 diff --git a/config/compiler/BUILD.gn b/config/compiler/BUILD.gn
-index 10937225b..5fed442e4 100644
+index f378b9560..1b23288b0 100644
 --- a/config/compiler/BUILD.gn
 +++ b/config/compiler/BUILD.gn
-@@ -287,6 +287,8 @@ config("compiler") {
+@@ -282,6 +282,8 @@ config("compiler") {
      configs += [ "//build/config/aix:compiler" ]
    } else if (current_os == "zos") {
      configs += [ "//build/config/zos:compiler" ]
@@ -45,23 +45,23 @@ index 10937225b..5fed442e4 100644
  
    configs += [
 diff --git a/config/compiler/compiler.gni b/config/compiler/compiler.gni
-index 8e7bdd8f0..124dbd963 100644
+index 056759834..0b5a430a1 100644
 --- a/config/compiler/compiler.gni
 +++ b/config/compiler/compiler.gni
-@@ -221,7 +221,7 @@ declare_args() {
-   # (which lld doesn't support either).
+@@ -39,7 +39,7 @@ declare_args() {
+   # Tentatively used on iOS, except in cronet builds (cronet still supports
+   # 32-bit builds, which lld doesn't support).
    # The default linker everywhere else.
-   use_lld = is_clang && !(is_mac && is_gpu_fyi_bot) && current_os != "zos" &&
--            !(is_ios && (is_cronet_build || target_environment == "catalyst"))
-+            !(is_ios && (is_cronet_build || target_environment == "catalyst")) && !is_wasm
+-  use_lld = is_clang && current_os != "zos" && !(is_ios && is_cronet_build)
++  use_lld = is_clang && current_os != "zos" && !(is_ios && is_cronet_build) && !is_wasm
  }
  
  declare_args() {
 diff --git a/toolchain/toolchain.gni b/toolchain/toolchain.gni
-index 9874c7a12..59f84c36f 100644
+index 86d9ff778..c915ca743 100644
 --- a/toolchain/toolchain.gni
 +++ b/toolchain/toolchain.gni
-@@ -52,6 +52,8 @@ if (is_apple) {
+@@ -47,6 +47,8 @@ if (is_apple) {
    shlib_extension = ".so"
  } else if (is_win) {
    shlib_extension = ".dll"
