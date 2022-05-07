@@ -1,12 +1,12 @@
-diff --git a/toolchain/win/BUILD.gn b/toolchain/win/BUILD.gn
-index adec621f8..01990e2fa 100644
---- a/toolchain/win/BUILD.gn
-+++ b/toolchain/win/BUILD.gn
-@@ -212,7 +212,7 @@ template("msvc_toolchain") {
+diff --git a/toolchain/win/toolchain.gni b/toolchain/win/toolchain.gni
+index e7fd62098..b5b034765 100644
+--- a/toolchain/win/toolchain.gni
++++ b/toolchain/win/toolchain.gni
+@@ -230,7 +230,7 @@ template("msvc_toolchain") {
      }
  
      tool("rc") {
--      command = "$python_path $tool_wrapper_path rc-wrapper $env rc.exe /nologo $sys_include_flags{{defines}} {{include_dirs}} /fo{{output}} {{source}}"
+-      command = "$python_path $_tool_wrapper_path rc-wrapper $env rc.exe /nologo $sys_include_flags{{defines}} {{include_dirs}} /fo{{output}} {{source}}"
 +      command = "rc.exe /nologo $sys_include_flags{{defines}} {{include_dirs}} /fo{{output}} {{source}}"
        depsformat = "msvc"
        outputs = [ "$object_subdir/{{source_name_part}}.res" ]
