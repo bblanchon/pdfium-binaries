@@ -115,6 +115,12 @@ jobs:
     steps:
       - name: Checkout this repo
         uses: actions/checkout@v2
+      - name: Workaround for libpcre2 i386 # https://github.com/actions/virtual-environments/issues/4589#issuecomment-1100899313
+        if: matrix.target_os == 'android'
+        run: |
+          sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
+          sudo apt-get update -qq
+          sudo apt-get install -yqq --allow-downgrades libpcre2-8-0/focal libpcre2-16-0/focal libpcre2-32-0/focal libpcre2-posix2/focal
       - name: Set environment variables
         run: |
           cat >>$GITHUB_ENV <<END
