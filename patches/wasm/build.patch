@@ -1,5 +1,5 @@
 diff --git a/config/BUILDCONFIG.gn b/config/BUILDCONFIG.gn
-index d96064894..4df27883b 100644
+index d96064894..1766fdc02 100644
 --- a/config/BUILDCONFIG.gn
 +++ b/config/BUILDCONFIG.gn
 @@ -264,6 +264,8 @@ if (target_os == "android") {
@@ -23,14 +23,6 @@ index d96064894..4df27883b 100644
  
  # =============================================================================
  # TARGET DEFAULTS
-@@ -380,7 +383,6 @@ if (is_android) {
- 
- if (is_clang && !is_nacl) {
-   default_compiler_configs += [
--    "//build/config/clang:find_bad_constructs",
-     "//build/config/clang:extra_warnings",
-   ]
- }
 diff --git a/config/compiler/BUILD.gn b/config/compiler/BUILD.gn
 index f378b9560..1b23288b0 100644
 --- a/config/compiler/BUILD.gn
@@ -44,19 +36,6 @@ index f378b9560..1b23288b0 100644
    }
  
    configs += [
-diff --git a/config/compiler/compiler.gni b/config/compiler/compiler.gni
-index 056759834..0b5a430a1 100644
---- a/config/compiler/compiler.gni
-+++ b/config/compiler/compiler.gni
-@@ -39,7 +39,7 @@ declare_args() {
-   # Tentatively used on iOS, except in cronet builds (cronet still supports
-   # 32-bit builds, which lld doesn't support).
-   # The default linker everywhere else.
--  use_lld = is_clang && current_os != "zos" && !(is_ios && is_cronet_build)
-+  use_lld = is_clang && current_os != "zos" && !(is_ios && is_cronet_build) && !is_wasm
- }
- 
- declare_args() {
 diff --git a/toolchain/toolchain.gni b/toolchain/toolchain.gni
 index 86d9ff778..c915ca743 100644
 --- a/toolchain/toolchain.gni
