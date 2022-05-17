@@ -228,6 +228,7 @@ The following project use (or recommend using) our PDFium builds:
 * [PDFtoImage](https://github.com/sungaila/PDFtoImage), .NET library to render PDF content into images
 * [PyPDFium2](https://github.com/pypdfium2-team/pypdfium2), Python bindings to PDFium
 * [wxPDFView](https://github.com/TcT2k/wxPDFView), wxWidgets components to display PDF content
+* [libvips](https://github.com/libvips/libvips), a performant image processing library
 
 *Did we miss a project? Please open a PR!*  
 
