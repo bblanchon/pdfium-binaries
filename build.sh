@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 #
 # Variables to provide:
-# PDFium_TARGET_CPU = x86 | x64 | arm | arm64
-# PDFium_TARGET_OS = mac | linux | win
+# PDFium_TARGET_CPU = x86 | x64 | arm | arm64 | wasm
+# PDFium_TARGET_OS = mac | linux | win | wasm
 # PDFium_TARGET_LIBC = musl | default
 # PDFium_BRANCH = main | chromium/3211 | ...
 # PDFium_ENABLE_V8 = true | false
