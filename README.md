@@ -11,7 +11,7 @@
 
 This project hosts pre-compiled binaries of the [PDFium library](https://pdfium.googlesource.com/pdfium/), an open-source library for PDF manipulation and rendering.
 
-Builds are triggered automatically every Monday since 2017.
+Builds have been triggered automatically every Monday since 2017.
 
 **Disclaimer**: This project isn't affiliated with Google or Foxit.
 
@@ -158,7 +158,7 @@ The following NuGet packages are available:
 </table>
 
 **HELP WANTED!**  
-I can provide packages for your favorite package manager, but I need help from someone who knows the format. Contact me via the [GitHub issues](https://github.com/bblanchon/pdfium-binaries/issues) if you wanna help.
+I can provide packages for your favorite package manager, but I need help from someone who knows the format. Contact me via [GitHub issues](https://github.com/bblanchon/pdfium-binaries/issues) if you want to help.
 
 ## Documentation
 
@@ -168,8 +168,8 @@ Please find the [documentation of the PDFium API on developers.foxit.com](https:
 
 ### How to use PDFium in a CMake project
 
-1. Unzip the dpwnloaded package in a folder (e.g., `C:\Libraries\pdfium`)
-2. Set the environment variable `PDFium_DIR` to this folder (eg `C:\Libraries\pdfium`)
+1. Unzip the downloaded package in a folder (e.g., `C:\Libraries\pdfium`)
+2. Set the environment variable `PDFium_DIR` to this folder (e.g., `C:\Libraries\pdfium`)
 3. In your `CMakeLists.txt`, add
 
         find_package(PDFium)
@@ -178,7 +178,7 @@ Please find the [documentation of the PDFium API on developers.foxit.com](https:
 
         target_link_libraries(my_exe pdfium)
 
-5. On Windows, make sure that `pdfium.dll` can be found by your executable (copy it on the same folder, or put in on the `PATH`).
+5. On Windows, make sure that `pdfium.dll` can be found by your executable (copy it on the same folder, or put it on the `PATH`).
 
 ### How to use JavaScript V8 enabled binaries
 
@@ -188,8 +188,8 @@ from the additional header `fpdf_libs.h`, which is only available in V8 enabled
 binaries.
 
 The archive will contain a `res` folder which you have to distribute with your
-application. On macOS, you should include this in your application bundle for other
-platforms place it where your application binary will find it.
+application. On macOS, you should include this in your application bundle; for other
+platforms, place it where your application binary will find it.
 
 See the following example for usage:
 
@@ -218,7 +218,7 @@ universal archive.
 
 ## Related projects
 
-The following project use (or recommend using) our PDFium builds:
+The following projects use (or recommend using) our PDFium builds:
 
 * [dart_pdf](https://github.com/DavBfr/dart_pdf), PDF creation module for dart/flutter
 * [Flutter native_pdf_renderer](https://github.com/rbcprolabs/packages.flutter/tree/master/packages/native_pdf_renderer), Flutter Plugin to render PDF pages as images
