@@ -39,6 +39,7 @@ mkdir -p "$BUILD"
     musl)
       echo 'is_musl = true'
       echo 'is_clang = false'
+      echo 'use_custom_libcxx = false'
       ;;
   esac
 

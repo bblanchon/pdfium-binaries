@@ -13,17 +13,17 @@ set -ex
 ENV_FILE=${GITHUB_ENV:-.env}
 PATH_FILE=${GITHUB_PATH:-.path}
 
-. steps/00-environment.sh
+# . steps/00-environment.sh
 source "$ENV_FILE"
 
-. steps/01-install.sh
+# . steps/01-install.sh
 PATH="$(tr '\n' ':' < "$PATH_FILE")$PATH"
 export PATH
 
-. steps/02-checkout.sh
-. steps/03-patch.sh
-. steps/04-install-extras.sh
-. steps/05-configure.sh
-. steps/06-build.sh
-. steps/07-pack.sh
+# . steps/02-checkout.sh
+# . steps/03-patch.sh
+# . steps/04-install-extras.sh
+# . steps/05-configure.sh
+# . steps/06-build.sh
+# . steps/07-pack.sh
 . steps/08-test.sh
