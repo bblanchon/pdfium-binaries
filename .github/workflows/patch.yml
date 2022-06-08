@@ -1,4 +1,4 @@
-name: Verify patches
+name: Patches
 
 on:
   schedule:
@@ -20,6 +20,7 @@ jobs:
         echo "$PWD/depot_tools" >> $GITHUB_PATH
 
     - name: Checkout PDFium
+      id: checkout
       timeout-minutes: 15
       run: |
         gclient config --unmanaged "https://pdfium.googlesource.com/pdfium.git"
@@ -37,50 +38,50 @@ jobs:
 
     - name: Apply patches for Android
       run: ./patch.sh
-      if: always()
+      if: always() && steps.checkout.outcome == 'success'
       env:
         PDFium_TARGET_OS: android
 
     - name: Apply patches for iOS
       run: ./patch.sh
-      if: always()
+      if: always() && steps.checkout.outcome == 'success'
       env:
         PDFium_TARGET_OS: ios
 
     - name: Apply patches for Linux
       run: ./patch.sh
-      if: always()
+      if: always() && steps.checkout.outcome == 'success'
       env:
         PDFium_TARGET_OS: linux
 
     - name: Apply patches for macOS
       run: ./patch.sh
-      if: always()
+      if: always() && steps.checkout.outcome == 'success'
       env:
         PDFium_TARGET_OS: macos
 
     - name: Apply patches for WASM
       run: ./patch.sh
-      if: always()
+      if: always() && steps.checkout.outcome == 'success'
       env:
         PDFium_TARGET_OS: wasm
 
     - name: Apply patches for Windows
       run: ./patch.sh
-      if: always()
+      if: always() && steps.checkout.outcome == 'success'
       env:
         PDFium_TARGET_OS: win
 
     - name: Apply patches for V8
       run: ./patch.sh
-      if: always()
+      if: always() && steps.checkout.outcome == 'success'
       env:
         PDFium_TARGET_OS: dummy
         PDFium_ENABLE_V8: true
 
     - name: Apply patches for musl
       run: ./patch.sh
-      if: always()
+      if: always() && steps.checkout.outcome == 'success'
       env:
         PDFium_TARGET_OS: linux
         PDFium_TARGET_LIBC: musl
