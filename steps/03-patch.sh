@@ -52,4 +52,6 @@ case "$TARGET_LIBC" in
     ;;
 esac
 
+"$PATCHES/aggregate_licenses.sh"
+
 popd
