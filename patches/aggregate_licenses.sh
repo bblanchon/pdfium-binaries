@@ -1,4 +1,6 @@
-#!/bin/env bash
+#!/usr/bin/env bash
+
+set -eu
 
 cat >LICENSES <<END
 # BEGIN PDFium license
