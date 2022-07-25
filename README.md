@@ -229,6 +229,7 @@ The following projects use (or recommend using) our PDFium builds:
 * [PyPDFium2](https://github.com/pypdfium2-team/pypdfium2), Python bindings to PDFium
 * [wxPDFView](https://github.com/TcT2k/wxPDFView), wxWidgets components to display PDF content
 * [libvips](https://github.com/libvips/libvips), a performant image processing library
+* [PdfiumLib](https://github.com/ahausladen/PdfiumLib), an interface to libpdfium for Delphi
 
 *Did we miss a project? Please open a PR!*  
 
