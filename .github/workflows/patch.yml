@@ -23,7 +23,7 @@ jobs:
       id: checkout
       timeout-minutes: 15
       run: |
-        gclient config --unmanaged "https://pdfium.googlesource.com/pdfium.git"
+        gclient config --unmanaged "https://pdfium.googlesource.com/pdfium.git" --custom-var "checkout_configuration=minimal"
         gclient sync --no-history --shallow
 
     - name: Create patch script

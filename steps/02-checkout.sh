@@ -4,7 +4,7 @@ PDFium_URL='https://pdfium.googlesource.com/pdfium.git'
 OS=${PDFium_TARGET_OS:?}
 
 # Clone
-gclient config --unmanaged "$PDFium_URL"
+gclient config --unmanaged "$PDFium_URL" --custom-var "checkout_configuration=minimal"
 echo "target_os = [ '$OS' ]" >> .gclient
 
 gclient sync -r "origin/${PDFium_BRANCH:-main}" --no-history --shallow
