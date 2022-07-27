@@ -42,12 +42,12 @@ jobs:
           - artifact: pdfium-ios-arm64
             target_os: ios
             target_cpu: arm64
-            runner: macos-10.15
+            runner: macos-latest
 
           - artifact: pdfium-ios-x64
             target_os: ios
             target_cpu: x64
-            runner: macos-10.15
+            runner: macos-latest
 
           - artifact: pdfium-linux-arm
             target_os: linux
@@ -84,12 +84,12 @@ jobs:
           - artifact: pdfium-mac-arm64
             target_os: mac
             target_cpu: arm64
-            runner: macos-10.15
+            runner: macos-latest
 
           - artifact: pdfium-mac-x64
             target_os: mac
             target_cpu: x64
-            runner: macos-10.15
+            runner: macos-latest
 
           - artifact: pdfium-win-arm64
             target_os: win
