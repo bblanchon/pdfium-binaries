@@ -12,6 +12,7 @@ jobs:
     steps:
     - name: Get Chrome version
       id: chromium
+      timeout-minutes: 5
       shell: bash
       run: |
         VERSION=$(git ls-remote --sort version:refname --tags https://chromium.googlesource.com/chromium/src '*.*.*.0' | grep -oE '[0-9]+\.[0-9]+\.[0-9]+.0' | tail -n1)
