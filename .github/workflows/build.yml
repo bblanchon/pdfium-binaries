@@ -131,6 +131,7 @@ jobs:
           PDFium_TARGET_LIBC=${{ matrix.target_libc }}
           PDFium_ENABLE_V8=${{ matrix.enable_v8 }}
           PDFium_VERSION=${{ github.event.inputs.version }}
+          MUSL_URL=${{ secrets.MUSL_URL }}
           END
           steps/00-environment.sh
         shell: bash

@@ -6,6 +6,7 @@ TARGET_OS=${PDFium_TARGET_OS:?}
 TARGET_LIBC=${PDFium_TARGET_LIBC:-default}
 TARGET_CPU=${PDFium_TARGET_CPU:?}
 CURRENT_CPU=${PDFium_CURRENT_CPU:-x64}
+MUSL_URL=${MUSL_URL:-https://musl.cc}
 
 DepotTools_URL='https://chromium.googlesource.com/chromium/tools/depot_tools.git'
 DepotTools_DIR="$PWD/depot_tools"
@@ -39,12 +40,12 @@ case "$TARGET_OS-$TARGET_LIBC-$TARGET_CPU" in
     ;;
 
   linux-musl-x86)
-    curl -L https://musl.cc/i686-linux-musl-cross.tgz | tar xz
+    curl -L "$MUSL_URL/i686-linux-musl-cross.tgz" | tar xz
     echo "$PWD/i686-linux-musl-cross/bin" >> "$PATH_FILE"
     ;;
 
   linux-musl-x64)
-    curl -L https://musl.cc/x86_64-linux-musl-cross.tgz | tar xz
+    curl -L "$MUSL_URL/x86_64-linux-musl-cross.tgz" | tar xz
     echo "$PWD/x86_64-linux-musl-cross/bin" >> "$PATH_FILE"
     ;;
 
