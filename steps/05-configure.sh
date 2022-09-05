@@ -24,7 +24,7 @@ mkdir -p "$BUILD"
       echo "ios_enable_code_signing = false"
       ;;
     mac)
-      echo 'mac_deployment_target = "10.11.0"'
+      echo 'mac_deployment_target = "10.13.0"'
       ;;
     win)
       echo 'pdf_use_win32_gdi = true'
