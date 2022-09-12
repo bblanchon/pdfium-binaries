@@ -29,4 +29,5 @@ jobs:
             "branch": "${{ steps.chromium.outputs.branch }}",
             "version": "${{ steps.chromium.outputs.version }}",
             "repository": "pdfium-binaries",
+            "push_nuget": true
           }
