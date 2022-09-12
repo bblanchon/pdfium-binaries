@@ -11,6 +11,16 @@ on:
         description: PDFium version
         required: false
         default: ""
+      enable_v8:
+        description: Enable V8
+        type: boolean
+        required: false
+        default: false
+      is_debug:
+        description: Is debug
+        type: boolean
+        required: false
+        default: false
 
 jobs:
   build:
@@ -125,11 +135,11 @@ jobs:
         run: |
           cat >>$GITHUB_ENV <<END
           PDFium_BRANCH=${{ github.event.inputs.branch }}
-          PDFium_IS_DEBUG=${{ matrix.is_debug }}
+          PDFium_IS_DEBUG=${{ github.event.inputs.is_debug }}
           PDFium_TARGET_CPU=${{ matrix.target_cpu }}
           PDFium_TARGET_OS=${{ matrix.target_os }}
           PDFium_TARGET_LIBC=${{ matrix.target_libc }}
-          PDFium_ENABLE_V8=${{ matrix.enable_v8 }}
+          PDFium_ENABLE_V8=${{ github.event.inputs.enable_v8 }}
           PDFium_VERSION=${{ github.event.inputs.version }}
           MUSL_URL=${{ secrets.MUSL_URL }}
           END
