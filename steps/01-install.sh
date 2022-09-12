@@ -1,7 +1,6 @@
 #!/bin/bash -eux
 
 PATH_FILE=${GITHUB_PATH:-$PWD/.path}
-ENV_FILE=${GITHUB_ENV:-.env}
 TARGET_OS=${PDFium_TARGET_OS:?}
 TARGET_LIBC=${PDFium_TARGET_LIBC:-default}
 TARGET_CPU=${PDFium_TARGET_CPU:?}
