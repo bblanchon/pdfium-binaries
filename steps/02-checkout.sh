@@ -12,7 +12,7 @@ if [ "$ENABLE_V8" == "false" ]; then
 fi
 
 # Clone
-gclient config --unmanaged "$PDFium_URL" "${CONFIG_ARGS[@]}"
+gclient config --unmanaged "$PDFium_URL" "${CONFIG_ARGS[@]-}"
 echo "target_os = [ '$OS' ]" >> .gclient
 
 gclient sync -r "origin/${PDFium_BRANCH:-main}" --no-history --shallow
