@@ -83,13 +83,17 @@ Here are the download links for latest release:
   </tr>
 
   <tr>
-    <td rowspan="2">macOS</td>
+    <td rowspan="3">macOS</td>
     <td>arm64</td>
     <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-mac-arm64.tgz">pdfium-mac-arm64.tgz</a></td>
   </tr>
   <tr>
     <td>x64</td>
     <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-mac-x64.tgz">pdfium-mac-x64.tgz</a></td>
+  </tr>
+  <tr>
+    <td>universal</td>
+    <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-mac-universal.tgz">pdfium-mac-universal.tgz</a></td>
   </tr>
 
   <tr>
@@ -168,17 +172,17 @@ Please find the [documentation of the PDFium API on developers.foxit.com](https:
 
 ### How to use PDFium in a CMake project
 
-1. Unzip the downloaded package in a folder (e.g., `C:\Libraries\pdfium`)
-2. Set the environment variable `PDFium_DIR` to this folder (e.g., `C:\Libraries\pdfium`)
-3. In your `CMakeLists.txt`, add
+1.  Unzip the downloaded package in a folder (e.g., `C:\Libraries\pdfium`)
+2.  Set the environment variable `PDFium_DIR` to this folder (e.g., `C:\Libraries\pdfium`)
+3.  In your `CMakeLists.txt`, add
 
         find_package(PDFium)
 
-4. Then link your executable with PDFium:
+4.  Then link your executable with PDFium:
 
         target_link_libraries(my_exe pdfium)
 
-5. On Windows, make sure that `pdfium.dll` can be found by your executable (copy it on the same folder, or put it on the `PATH`).
+5.  On Windows, make sure that `pdfium.dll` can be found by your executable (copy it on the same folder, or put it on the `PATH`).
 
 ### How to use JavaScript V8 enabled binaries
 
@@ -211,40 +215,38 @@ FPDF_DestroyLibrary();
 
 ### How to create macOS universal binary
 
-To  create a universal macOS binary containing both Intel and ARM code, download
+To create a universal macOS binary containing both Intel and ARM code, download
 both CPU versions and use the `mac_create_universal.sh` script to create a
 universal archive.
-
 
 ## Related projects
 
 The following projects use (or recommend using) our PDFium builds:
 
-* [dart_pdf](https://github.com/DavBfr/dart_pdf), PDF creation module for dart/flutter
-* [Flutter native_pdf_renderer](https://github.com/rbcprolabs/packages.flutter/tree/master/packages/native_pdf_renderer), Flutter Plugin to render PDF pages as images
-* [go-pdfium](https://github.com/klippa-app/go-pdfium), a Go wrapper around PDFium with helper functions for various methods like image rendering and text extraction
-* [PDFium RS](https://github.com/asafigan/pdfium_rs), a Rust wrapper around PDFium
-* [PDFiumCore](https://github.com/Dtronix/PDFiumCore), .NET Standard P/Invoke bindings for PDFium
-* [PDFtoImage](https://github.com/sungaila/PDFtoImage), .NET library to render PDF content into images
-* [PyPDFium2](https://github.com/pypdfium2-team/pypdfium2), Python bindings to PDFium
-* [wxPDFView](https://github.com/TcT2k/wxPDFView), wxWidgets components to display PDF content
-* [libvips](https://github.com/libvips/libvips), a performant image processing library
-* [PdfiumLib](https://github.com/ahausladen/PdfiumLib), an interface to libpdfium for Delphi
+- [dart_pdf](https://github.com/DavBfr/dart_pdf), PDF creation module for dart/flutter
+- [Flutter native_pdf_renderer](https://github.com/rbcprolabs/packages.flutter/tree/master/packages/native_pdf_renderer), Flutter Plugin to render PDF pages as images
+- [go-pdfium](https://github.com/klippa-app/go-pdfium), a Go wrapper around PDFium with helper functions for various methods like image rendering and text extraction
+- [PDFium RS](https://github.com/asafigan/pdfium_rs), a Rust wrapper around PDFium
+- [PDFiumCore](https://github.com/Dtronix/PDFiumCore), .NET Standard P/Invoke bindings for PDFium
+- [PDFtoImage](https://github.com/sungaila/PDFtoImage), .NET library to render PDF content into images
+- [PyPDFium2](https://github.com/pypdfium2-team/pypdfium2), Python bindings to PDFium
+- [wxPDFView](https://github.com/TcT2k/wxPDFView), wxWidgets components to display PDF content
+- [libvips](https://github.com/libvips/libvips), a performant image processing library
+- [PdfiumLib](https://github.com/ahausladen/PdfiumLib), an interface to libpdfium for Delphi
 
-*Did we miss a project? Please open a PR!*  
-
+_Did we miss a project? Please open a PR!_
 
 ## Contributors
 
 David Sungaila, [@sungaila](https://github.com/sungaila):
 
-* NuGet packages
+- NuGet packages
 
 Christoffer Green, [@ChristofferGreen](https://github.com/ChristofferGreen):
 
-* Linux ARM build
+- Linux ARM build
 
 Tobias Taschner, [@TcT2k](https://github.com/TcT2k):
 
-* macOS build
-* V8 build
+- macOS build
+- V8 build

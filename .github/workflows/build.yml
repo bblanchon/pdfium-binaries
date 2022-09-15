@@ -10,7 +10,7 @@ on:
       version:
         description: PDFium version
         required: false
-        default: ""
+        default: ''
       enable_v8:
         description: Enable V8
         type: boolean
@@ -191,6 +191,30 @@ jobs:
           allowUpdates: true
           draft: true
           artifacts: pdfium*.tgz
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+  mac_universal:
+    name: Build MacOS Universal Library
+    runs-on: macos-latest
+    needs: build
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Download arm64 tgz
+        run: curl https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-mac-arm64.tgz -o ./pdfium-mac-arm64.tgz
+      - name: Download x64 tgz
+        run: curl https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-mac-x64.tgz -o ./pdfium-mac-x64.tgz
+      - name: Generate universal binary
+        run: ./mac_create_universal.sh
+      - name: Upload tarball to GitHub Release
+        uses: ncipollo/release-action@v1
+        if: ${{ github.event.inputs.repository }}
+        with:
+          repo: ${{ github.event.inputs.repository }}
+          tag: ${{ github.event.inputs.branch }}
+          allowUpdates: true
+          draft: true
+          artifacts: pdfium-mac-universal*.tgz
           token: ${{ secrets.GITHUB_TOKEN }}
 
   nuget:
