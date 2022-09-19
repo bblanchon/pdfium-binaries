@@ -49,7 +49,11 @@ case "$TARGET_OS-$TARGET_LIBC-$TARGET_CPU" in
     ;;
 
   wasm-*)
-    git clone https://github.com/emscripten-core/emsdk.git
+    if [ -e "emsdk" ]; then
+      git -C "emsdk" pull
+    else
+      git clone https://github.com/emscripten-core/emsdk.git
+    fi
     pushd emsdk
     ./emsdk install 2.0.24
     ./emsdk activate 2.0.24
