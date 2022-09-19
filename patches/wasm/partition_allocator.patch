@@ -1,0 +1,13 @@
+diff --git a/partition_alloc_base/threading/platform_thread_posix.cc b/partition_alloc_base/threading/platform_thread_posix.cc
+index 2c00380..ce93b92 100644
+--- a/partition_alloc_base/threading/platform_thread_posix.cc
++++ b/partition_alloc_base/threading/platform_thread_posix.cc
+@@ -121,7 +121,7 @@ PlatformThreadId PlatformThread::CurrentId() {
+ #elif BUILDFLAG(IS_NACL) && !defined(__GLIBC__)
+   // Pointers are 32-bits in NaCl.
+   return reinterpret_cast<int32_t>(pthread_self());
+-#elif BUILDFLAG(IS_POSIX) && BUILDFLAG(IS_AIX)
++#elif BUILDFLAG(IS_POSIX) && (BUILDFLAG(IS_AIX) || defined(OS_ASMJS))
+   return pthread_self();
+ #elif BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_AIX)
+   return reinterpret_cast<int64_t>(pthread_self());

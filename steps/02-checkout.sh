@@ -18,7 +18,7 @@ echo "target_os = [ '$OS' ]" >> .gclient
 
 # Reset
 if [ -e 'pdfium' ]; then
-  for folder in pdfium pdfium/build pdfium/third_party/libjpeg_turbo; do
+  for folder in pdfium pdfium/build pdfium/third_party/libjpeg_turbo pdfium/base/allocator/partition_allocator; do
     git -C $folder reset --hard
     git -C $folder clean -df
   done
