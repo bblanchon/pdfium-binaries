@@ -14,6 +14,7 @@ if [ "$TARGET_CPU" == "wasm" ]; then
     -s LLD_REPORT_UNDEFINED \
     -s WASM=1 \
     -s ALLOW_MEMORY_GROWTH=1 \
+    -s STANDALONE_WASM=1 \
     -s EXPORTED_RUNTIME_METHODS='["ccall", "cwrap"]' \
     -o "$BUILD_DIR/pdfium.html" \
     "$LIBPDFIUMA" \
