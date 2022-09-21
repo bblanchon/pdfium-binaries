@@ -55,8 +55,8 @@ case "$TARGET_OS-$TARGET_LIBC-$TARGET_CPU" in
       git clone https://github.com/emscripten-core/emsdk.git
     fi
     pushd emsdk
-    ./emsdk install 2.0.24
-    ./emsdk activate 2.0.24
+    ./emsdk install 3.1.18
+    ./emsdk activate 3.1.18
     echo "$PWD/upstream/emscripten" >> "$PATH_FILE"
     echo "$PWD/upstream/bin" >> "$PATH_FILE"
     popd
