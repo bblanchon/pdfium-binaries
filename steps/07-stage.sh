@@ -3,8 +3,6 @@
 IS_DEBUG=${PDFium_IS_DEBUG:-false}
 ENABLE_V8=${PDFium_ENABLE_V8:-false}
 OS=${PDFium_TARGET_OS:?}
-TARGET_LIBC=${PDFium_TARGET_LIBC:-default}
-CPU=${PDFium_TARGET_CPU:?}
 VERSION=${PDFium_VERSION:-}
 PATCHES="$PWD/patches"
 
@@ -65,14 +63,3 @@ MINOR=$(echo "$VERSION" | cut -d. -f2)
 BUILD=$(echo "$VERSION" | cut -d. -f3)
 PATCH=$(echo "$VERSION" | cut -d. -f4)
 END
-
-ARTIFACT_BASE="$PWD/pdfium-$OS"
-[ "$TARGET_LIBC" != "default" ] && ARTIFACT_BASE="$ARTIFACT_BASE-$TARGET_LIBC"
-[ "$OS" != "$CPU" ] && ARTIFACT_BASE="$ARTIFACT_BASE-$CPU"
-[ "$ENABLE_V8" == "true" ] && ARTIFACT_BASE="$ARTIFACT_BASE-v8"
-[ "$IS_DEBUG" == "true" ] && ARTIFACT_BASE="$ARTIFACT_BASE-debug"
-ARTIFACT="$ARTIFACT_BASE.tgz"
-
-pushd "$STAGING"
-tar cvzf "$ARTIFACT" -- *
-popd

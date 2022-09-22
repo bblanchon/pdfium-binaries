@@ -171,8 +171,8 @@ jobs:
       - name: Build
         run: steps/06-build.sh
         shell: bash
-      - name: Pack
-        run: steps/07-pack.sh
+      - name: Stage
+        run: steps/07-stage.sh
         shell: bash
       - name: Upload artifact
         uses: actions/upload-artifact@v2

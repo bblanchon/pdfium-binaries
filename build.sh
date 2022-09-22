@@ -25,5 +25,6 @@ export PATH
 . steps/04-install-extras.sh
 . steps/05-configure.sh
 . steps/06-build.sh
-. steps/07-pack.sh
+. steps/07-stage.sh
 . steps/08-test.sh
+. steps/09-pack.sh
