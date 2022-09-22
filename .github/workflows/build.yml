@@ -182,16 +182,6 @@ jobs:
       - name: Test
         run: steps/08-test.sh
         shell: bash
-      - name: Upload tarball to GitHub Release
-        uses: ncipollo/release-action@v1
-        if: ${{ github.event.inputs.repository }}
-        with:
-          repo: ${{ github.event.inputs.repository }}
-          tag: ${{ github.event.inputs.branch }}
-          allowUpdates: true
-          draft: true
-          artifacts: pdfium*.tgz
-          token: ${{ secrets.GITHUB_TOKEN }}
 
   nuget:
     name: Build NuGet packages
@@ -227,6 +217,17 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v2
+      - name: Create tarballs
+        run: |
+          for DIR in pdfium-*; do
+            echo "::group::$DIR"
+            (cd $DIR; tar czf ../$DIR$SUFFIX.tgz *)
+            echo "::endgroup::"
+          done
+        env:
+          SUFFIX: ${{ github.event.inputs.enable_v8 == 'true' && '-v8' || '' }}${{ github.event.inputs.is_debug == 'true' && '-debug' || '' }}
       - name: Write release body
         run: echo 'This version was built with branch `${{ github.event.inputs.branch }}` of PDFium' > RELEASE.md
       - name: Get changes
@@ -246,7 +247,7 @@ jobs:
           repo: ${{ github.event.inputs.repository }}
           allowUpdates: true
           bodyFile: RELEASE.md
-          draft: false
           token: ${{ secrets.GITHUB_TOKEN }}
           name: PDFium ${{ github.event.inputs.version }}
           tag: ${{ github.event.inputs.branch }}
+          artifacts: "pdfium-*.tgz"
