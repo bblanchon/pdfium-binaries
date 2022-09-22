@@ -83,13 +83,17 @@ Here are the download links for latest release:
   </tr>
 
   <tr>
-    <td rowspan="2">macOS</td>
+    <td rowspan="3">macOS</td>
     <td>arm64</td>
     <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-mac-arm64.tgz">pdfium-mac-arm64.tgz</a></td>
   </tr>
   <tr>
     <td>x64</td>
     <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-mac-x64.tgz">pdfium-mac-x64.tgz</a></td>
+  </tr>
+  <tr>
+    <td>univ</td>
+    <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-mac-univ.tgz">pdfium-mac-univ.tgz</a></td>
   </tr>
 
   <tr>

@@ -183,6 +183,28 @@ jobs:
         run: steps/08-test.sh
         shell: bash
 
+  mac_univ:
+    name: Build macOS universal package
+    runs-on: macos-latest
+    needs: build
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v2
+      - name: Create universal library
+        run: |
+          cp -r pdfium-mac-arm64 pdfium-mac-univ
+          sed -i '' '/target_cpu/d' pdfium-mac-univ/args.gn
+          rm pdfium-mac-univ/lib/libpdfium.dylib
+          lipo -create \
+            pdfium-mac-arm64/lib/libpdfium.dylib \
+            pdfium-mac-x64/lib/libpdfium.dylib \
+            -output pdfium-mac-univ/lib/libpdfium.dylib
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: pdfium-mac-univ
+          path: pdfium-mac-univ
+
   nuget:
     name: Build NuGet packages
     runs-on: windows-latest
@@ -215,7 +237,7 @@ jobs:
     name: Publish Release
     if: ${{ github.event.inputs.repository }}
     runs-on: ubuntu-latest
-    needs: build
+    needs: [build, mac_univ]
     steps:
       - name: Download artifacts
         uses: actions/download-artifact@v2

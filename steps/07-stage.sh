@@ -57,9 +57,11 @@ if [ "$ENABLE_V8" == "true" ]; then
   mv "$BUILD/snapshot_blob.bin" "$STAGING_RES"
 fi
 
-[ -n "$VERSION" ] && cat >"$STAGING/VERSION" <<END
+if [ -n "$VERSION" ]; then
+  cat >"$STAGING/VERSION" <<END
 MAJOR=$(echo "$VERSION" | cut -d. -f1)
 MINOR=$(echo "$VERSION" | cut -d. -f2)
 BUILD=$(echo "$VERSION" | cut -d. -f3)
 PATCH=$(echo "$VERSION" | cut -d. -f4)
 END
+fi
