@@ -213,12 +213,6 @@ FPDF_InitLibrary();
 FPDF_DestroyLibrary();
 ```
 
-### How to create macOS universal binary
-
-To  create a universal macOS binary containing both Intel and ARM code, download
-both CPU versions and use the `mac_create_universal.sh` script to create a
-universal archive.
-
 
 ## Related projects
 
