@@ -28,7 +28,7 @@ set -eu
   printf '\n# END lcms license note\n\n'
 
   printf '\n# BEGIN openjpeg license note\n\n'
-  sed -n '1,/\*\//p' third_party/libopenjpeg20/openjpeg.c
+  sed -n '1,/\*\//p' third_party/libopenjpeg/openjpeg.c
   printf '\n# END openjpeg license note\n\n'
 
   printf '\n# BEGIN zlib license\n\n'
