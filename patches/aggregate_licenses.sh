@@ -20,7 +20,7 @@ set -eu
   printf '\n# END agg23 (Anti-Grain Geometry 2.3) license note\n\n'
 
   printf '\n# BEGIN FreeType license\n\n'
-  head -n -2 third_party/freetype/FTL.TXT
+  sed -n '1,166p' third_party/freetype/FTL.TXT
   printf '\n# END FreeType license\n\n'
 
   printf '\n# BEGIN lcms license note\n\n'
