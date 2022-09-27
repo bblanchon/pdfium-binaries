@@ -120,7 +120,8 @@ esac
 CMAKE_ARGS+=("$SOURCE_DIR")
 
 mkdir -p build
-cd build
+pushd build
+
 cmake "${CMAKE_ARGS[@]}"
 cmake --build .
 
@@ -129,3 +130,5 @@ if [ "$OS" == "win" ]; then
 else
   file example
 fi
+
+popd
