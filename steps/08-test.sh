@@ -58,9 +58,11 @@ case "$OS" in
     case "$CPU" in
       arm)
         PREFIX="arm-linux-gnueabihf-"
+        SUFFIX="-9"
         ;;
       arm64)
         PREFIX="aarch64-linux-gnu-"
+        SUFFIX="-9"
         ;;
       x86)
         [ "$TARGET_LIBC" == "musl" ] && PREFIX="i686-linux-musl-"
@@ -74,8 +76,8 @@ case "$OS" in
         ;;
     esac
     CMAKE_ARGS+=(
-      -D CMAKE_C_COMPILER="${PREFIX:-}gcc"
-      -D CMAKE_CXX_COMPILER="${PREFIX:-}g++"
+      -D CMAKE_C_COMPILER="${PREFIX:-}gcc${SUFFIX:-}"
+      -D CMAKE_CXX_COMPILER="${PREFIX:-}g++${SUFFIX:-}"
     )
     ;;
 

@@ -44,11 +44,11 @@ case "$TARGET_OS" in
 
       case "$TARGET_CPU" in
         arm)
-          sudo apt-get install -y g++-arm-linux-gnueabihf
+          sudo apt-get install -y libc6-i386 gcc-9-multilib g++-9-arm-linux-gnueabihf gcc-9-arm-linux-gnueabihf
           ;;
 
         arm64)
-          sudo apt-get install -y g++-aarch64-linux-gnu
+          sudo apt-get install -y libc6-i386 gcc-9-multilib g++-9-aarch64-linux-gnu gcc-9-aarch64-linux-gnu
           ;;
 
         x86)
