@@ -53,8 +53,24 @@ esac
 
 if [ "$ENABLE_V8" == "true" ]; then
   mkdir -p "$STAGING_RES"
-  mv "$BUILD/icudtl.dat" "$STAGING_RES"
   mv "$BUILD/snapshot_blob.bin" "$STAGING_RES"
+
+  case "$OS" in
+    android)
+      ICU_DATA_DIR="android"
+      ;;
+    ios)
+      ICU_DATA_DIR="ios"
+      ;;
+    wasm)
+      ICU_DATA_DIR="flutter"
+      ;;
+    *)
+      ICU_DATA_DIR="common"
+      ;;
+  esac
+
+  mv "$SOURCE/third_party/icu/$ICU_DATA_DIR/icudtl.dat" "$STAGING_RES"
 fi
 
 if [ -n "$VERSION" ]; then
