@@ -41,6 +41,7 @@ mkdir -p "$BUILD"
       echo 'is_musl = true'
       echo 'is_clang = false'
       echo 'use_custom_libcxx = false'
+      echo "v8_snapshot_toolchain = \"//build/toolchain/linux:$TARGET_CPU\""
       ;;
   esac
 
