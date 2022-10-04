@@ -184,35 +184,6 @@ Please find the [documentation of the PDFium API on developers.foxit.com](https:
 
 5. On Windows, make sure that `pdfium.dll` can be found by your executable (copy it on the same folder, or put it on the `PATH`).
 
-### How to use JavaScript V8 enabled binaries
-
-If you are using the V8-enabled binaries, additional initialization is required.
-In your code, before using PDFium you have to call `FPDF_InitEmbeddedLibraries()`
-from the additional header `fpdf_libs.h`, which is only available in V8 enabled
-binaries.
-
-The archive will contain a `res` folder which you have to distribute with your
-application. On macOS, you should include this in your application bundle; for other
-platforms, place it where your application binary will find it.
-
-See the following example for usage:
-
-```c++
-#include "fpdf_libs.h"
-
-...
-
-// Determine the path to files in the res folder from the archive
-const char* resPath = "<path to the res folder>";
-
-// Initialize V8 and other embedded libraries
-FPDF_InitEmbeddedLibraries(resPath);
-
-// Make use of PDFium
-FPDF_InitLibrary();
-FPDF_DestroyLibrary();
-```
-
 
 ## Related projects
 

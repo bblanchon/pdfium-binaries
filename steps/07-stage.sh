@@ -1,7 +1,6 @@
 #!/bin/bash -eux
 
 IS_DEBUG=${PDFium_IS_DEBUG:-false}
-ENABLE_V8=${PDFium_ENABLE_V8:-false}
 OS=${PDFium_TARGET_OS:?}
 VERSION=${PDFium_VERSION:-}
 PATCHES="$PWD/patches"
@@ -12,7 +11,6 @@ BUILD=${PDFium_BUILD_DIR:-pdfium/out}
 STAGING="$PWD/staging"
 STAGING_BIN="$STAGING/bin"
 STAGING_LIB="$STAGING/lib"
-STAGING_RES="$STAGING/res"
 
 mkdir -p "$STAGING"
 mkdir -p "$STAGING_LIB"
@@ -50,28 +48,6 @@ case "$OS" in
     [ "$IS_DEBUG" == "true" ] && mv "$BUILD/pdfium.dll.pdb" "$STAGING_BIN"
     ;;
 esac
-
-if [ "$ENABLE_V8" == "true" ]; then
-  mkdir -p "$STAGING_RES"
-  mv "$BUILD/snapshot_blob.bin" "$STAGING_RES"
-
-  case "$OS" in
-    android)
-      ICU_DATA_DIR="android"
-      ;;
-    ios)
-      ICU_DATA_DIR="ios"
-      ;;
-    wasm)
-      ICU_DATA_DIR="flutter"
-      ;;
-    *)
-      ICU_DATA_DIR="common"
-      ;;
-  esac
-
-  mv "$SOURCE/third_party/icu/$ICU_DATA_DIR/icudtl.dat" "$STAGING_RES"
-fi
 
 if [ -n "$VERSION" ]; then
   cat >"$STAGING/VERSION" <<END
