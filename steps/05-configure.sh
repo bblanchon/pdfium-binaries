@@ -20,6 +20,11 @@ mkdir -p "$BUILD"
   echo "treat_warnings_as_errors = false"
   echo "is_component_build = false"
 
+  if [ "$ENABLE_V8" == "true" ]; then
+    echo "v8_use_external_startup_data = false"
+    echo "v8_enable_i18n_support = false"
+  fi
+
   case "$OS" in
     ios)
       echo "ios_enable_code_signing = false"
