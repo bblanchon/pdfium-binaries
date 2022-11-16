@@ -8,7 +8,7 @@ set -eu
   printf '\n# END PDFium license\n\n'
 
   printf '\n# BEGIN libpng license\n\n'
-  sed -n '4,36p' third_party/libpng16/LICENSE
+  sed -n '4,36p' third_party/libpng/LICENSE
   printf '\n# END libpng license\n\n'
 
   printf '\n# BEGIN LibTIFF License\n\n'
