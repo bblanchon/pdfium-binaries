@@ -13,7 +13,7 @@ set -eu
 
   printf '\n# BEGIN LibTIFF License\n\n'
   sed '1d;s/^.\{0,3\}//;23,$d' third_party/libtiff/t4.h
-  printf '\n# END libpng LibTIFF License\n\n'
+  printf '\n# END LibTIFF License\n\n'
 
   printf '\n# BEGIN agg23 (Anti-Grain Geometry 2.3) license note\n\n'
   sed '/^$/d;/#ifndef/,$d' third_party/agg23/agg_array.h
