@@ -29,6 +29,7 @@ mkdir -p "$BUILD"
       ;;
     wasm):
       echo 'pdf_is_complete_lib = true'
+      echo 'pdf_use_partition_alloc = true'
       echo 'is_clang = false'
       ;;
   esac
