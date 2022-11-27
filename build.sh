@@ -1,7 +1,7 @@
 #!/bin/bash -eu
 
 OS_NAMES="android|ios|linux|mac|wasm|win"
-CPU_NAMES="arm|arm64|x64|x86|warm"
+CPU_NAMES="arm|arm64|x64|x86|wasm"
 
 if [[ $# == 0 ]]
 then
