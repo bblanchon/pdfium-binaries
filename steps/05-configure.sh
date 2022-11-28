@@ -27,7 +27,7 @@ mkdir -p "$BUILD"
     mac)
       echo 'mac_deployment_target = "10.13.0"'
       ;;
-    wasm):
+    wasm)
       echo 'pdf_is_complete_lib = true'
       echo 'pdf_use_partition_alloc = false'
       echo 'is_clang = false'
@@ -39,7 +39,7 @@ mkdir -p "$BUILD"
       echo 'is_musl = true'
       echo 'is_clang = false'
       echo 'use_custom_libcxx = false'
-      echo "v8_snapshot_toolchain = \"//build/toolchain/linux:$TARGET_CPU\""
+      [ "$ENABLE_V8" == "true" ] && echo "v8_snapshot_toolchain = \"//build/toolchain/linux:$TARGET_CPU\""
       ;;
   esac
 
