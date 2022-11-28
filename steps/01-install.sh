@@ -28,17 +28,19 @@ case "$TARGET_OS" in
       case "$TARGET_CPU" in
         x86)
           MUSL_VERSION="i686-linux-musl-cross"
+          PACKAGES="g++-10 g++-10-multilib"
           ;;
 
         x64)
           MUSL_VERSION="x86_64-linux-musl-cross"
+          PACKAGES="g++-10"
           ;;
       esac
 
       [ -d "$MUSL_VERSION" ] || curl -L "$MUSL_URL/$MUSL_VERSION.tgz" | tar xz
       echo "$PWD/$MUSL_VERSION/bin" >> "$PATH_FILE"
 
-      sudo apt-get install -y g++-10
+      sudo apt-get install -y $PACKAGES
       sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 10
       sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-10 10
 
