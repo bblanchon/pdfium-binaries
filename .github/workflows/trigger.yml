@@ -22,7 +22,7 @@ jobs:
     - name: Trigger build
       uses: benc-uk/workflow-dispatch@v1
       with:
-        workflow: Build
+        workflow: Build all
         token: "${{ secrets.PERSONAL_ACCESS_TOKEN }}"
         inputs: |
           {
