@@ -297,7 +297,7 @@ jobs:
           name: NuGet packages
           path: '*.nupkg'
       - name: Push to nuget.org
-        if: ${{ github.event.inputs.push_nuget }}
+        if: ${{ github.event.inputs.push_nuget == 'true' }}
         run: nuget push -Source nuget.org -ApiKey ${{ secrets.NUGET_API_KEY }} *.nupkg
 
   publish:
