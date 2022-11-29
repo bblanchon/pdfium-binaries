@@ -24,95 +24,115 @@ Here are the download links for latest release:
     <th>OS</th>
     <th>CPU</th>
     <th>PDFium</th>
+    <th>PDFium V8</th>
   </tr>
 
   <tr>
     <td rowspan="4">Android</td>
     <td>arm</td>
     <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-android-arm.tgz">pdfium-android-arm.tgz</a></td>
+    <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-v8-android-arm.tgz">pdfium-v8-android-arm.tgz</a></td>
   </tr>
   <tr>
     <td>arm64</td>
     <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-android-arm64.tgz">pdfium-android-arm64.tgz</a></td>
+    <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-v8-android-arm64.tgz">pdfium-v8-android-arm64.tgz</a></td>
   </tr>
   <tr>
     <td>x64</td>
     <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-android-x64.tgz">pdfium-android-x64.tgz</a></td>
+    <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-v8-android-x64.tgz">pdfium-v8-android-x64.tgz</a></td>
   </tr>
   <tr>
     <td>x86</td>
     <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-android-x86.tgz">pdfium-android-x86.tgz</a></td>
+    <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-v8-android-x86.tgz">pdfium-v8-android-x86.tgz</a></td>
   </tr>
 
   <tr>
     <td rowspan="2">iOS</td>
     <td>arm64</td>
     <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-ios-arm64.tgz">pdfium-ios-arm64.tgz</a></td>
+    <td><a href="https://groups.google.com/g/pdfium/c/8R56bd60PSI/m/QzlDy6CFAgAJ">failing</a></td>
   </tr>
   <tr>
     <td>x64</td>
     <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-ios-x64.tgz">pdfium-ios-x64.tgz</a></td>
+    <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-v8-ios-x64.tgz">pdfium-v8-ios-x64.tgz</a></td>
   </tr>
 
   <tr>
     <td rowspan="4">Linux</td>
     <td>arm</td>
     <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-linux-arm.tgz">pdfium-linux-arm.tgz</a></td>
+    <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-v8-linux-arm.tgz">pdfium-v8-linux-arm.tgz</a></td>
   </tr>
   <tr>
     <td>arm64</td>
     <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-linux-arm64.tgz">pdfium-linux-arm64.tgz</a></td>
+    <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-v8-linux-arm64.tgz">pdfium-v8-linux-arm64.tgz</a></td>
   </tr>
   <tr>
     <td>x64</td>
     <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-linux-x64.tgz">pdfium-linux-x64.tgz</a></td>
+    <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-v8-linux-x64.tgz">pdfium-v8-linux-x64.tgz</a></td>
   </tr>
   <tr>
     <td>x86</td>
     <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-linux-x86.tgz">pdfium-linux-x86.tgz</a></td>
+    <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-v8-linux-x86.tgz">pdfium-v8-linux-x86.tgz</a></td>
   </tr>
 
   <tr>
     <td rowspan="2">Linux<br>musl</td>
     <td>x64</td>
     <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-linux-musl-x64.tgz">pdfium-linux-musl-x64.tgz</a></td>
+    <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-v8-linux-musl-x64.tgz">pdfium-v8-linux-musl-x64.tgz</a></td>
   </tr>
   <tr>
     <td>x86</td>
     <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-linux-musl-x86.tgz">pdfium-linux-musl-x86.tgz</a></td>
+    <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-v8-linux-musl-x86.tgz">pdfium-v8-linux-musl-x86.tgz</a></td>
   </tr>
 
   <tr>
     <td rowspan="3">macOS</td>
     <td>arm64</td>
     <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-mac-arm64.tgz">pdfium-mac-arm64.tgz</a></td>
+    <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-v8-mac-arm64.tgz">pdfium-v8-mac-arm64.tgz</a></td>
   </tr>
   <tr>
     <td>x64</td>
     <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-mac-x64.tgz">pdfium-mac-x64.tgz</a></td>
+    <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-v8-mac-x64.tgz">pdfium-v8-mac-x64.tgz</a></td>
   </tr>
   <tr>
     <td>univ</td>
     <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-mac-univ.tgz">pdfium-mac-univ.tgz</a></td>
+    <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-v8-mac-univ.tgz">pdfium-v8-mac-univ.tgz</a></td>
   </tr>
 
   <tr>
     <td rowspan="3">Windows</td>
     <td>arm64</td>
     <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-win-arm64.tgz">pdfium-win-arm64.tgz</a></td>
+    <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-v8-win-arm64.tgz">pdfium-v8-win-arm64.tgz</a></td>
   </tr>
   <tr>
     <td>x64</td>
     <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-win-x64.tgz">pdfium-win-x64.tgz</a></td>
+    <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-v8-win-x64.tgz">pdfium-v8-win-x64.tgz</a></td>
   </tr>
   <tr>
     <td>x86</td>
     <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-win-x86.tgz">pdfium-win-x86.tgz</a></td>
+    <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-v8-win-x86.tgz">pdfium-v8-win-x86.tgz</a></td>
   </tr>
 
   <tr>
     <td colspan="2">WebAssembly<sup>1</sup></td>
     <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-wasm.tgz">pdfium-wasm.tgz</a></td>
+    <td>not supported</td>
   </tr>
 </table>
 
