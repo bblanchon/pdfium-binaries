@@ -105,7 +105,7 @@ jobs:
           [ "${{matrix.enable_v8}}" == "true" ] && ARTIFACT="$ARTIFACT-v8"
           echo "artifact=$ARTIFACT" >> $GITHUB_OUTPUT
       - name: Checkout this repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Workaround for libpcre2 i386 # https://github.com/actions/virtual-environments/issues/4589#issuecomment-1100899313
         if: matrix.target_os == 'android'
         run: |
@@ -148,7 +148,7 @@ jobs:
         run: steps/07-stage.sh
         shell: bash
       - name: Upload artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: ${{ steps.init.outputs.artifact }}
           path: staging/
@@ -162,7 +162,7 @@ jobs:
     needs: build
     steps:
       - name: Download artifacts
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
       - name: Create universal library
         run: |
           cp -r pdfium-mac-arm64 pdfium-mac-univ
@@ -173,7 +173,7 @@ jobs:
             pdfium-mac-x64/lib/libpdfium.dylib \
             -output pdfium-mac-univ/lib/libpdfium.dylib
       - name: Upload artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: pdfium-mac-univ
           path: pdfium-mac-univ
@@ -184,9 +184,9 @@ jobs:
     needs: build
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Download artifacts
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           path: nuget
       - name: Pack
@@ -198,7 +198,7 @@ jobs:
             echo "::endgroup::"
           done
       - name: Upload artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: NuGet packages
           path: '*.nupkg'
@@ -213,7 +213,7 @@ jobs:
     needs: [build, mac_univ]
     steps:
       - name: Download artifacts
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
       - name: Create tarballs
         run: |
           for DIR in pdfium-*; do
