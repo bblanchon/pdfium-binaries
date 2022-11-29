@@ -37,82 +37,73 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - artifact: pdfium-android-arm
-            target_os: android
+          - target_os: android
             target_cpu: arm
 
-          - artifact: pdfium-android-arm64
-            target_os: android
+          - target_os: android
             target_cpu: arm64
 
-          - artifact: pdfium-android-x64
-            target_os: android
+          - target_os: android
             target_cpu: x64
 
-          - artifact: pdfium-android-x86
-            target_os: android
+          - target_os: android
             target_cpu: x86
 
-          - artifact: pdfium-ios-arm64
-            target_os: ios
+          - target_os: ios
             target_cpu: arm64
 
-          - artifact: pdfium-ios-x64
-            target_os: ios
+          - target_os: ios
             target_cpu: x64
 
-          - artifact: pdfium-linux-arm
-            target_os: linux
+          - target_os: linux
             target_cpu: arm
 
-          - artifact: pdfium-linux-arm64
-            target_os: linux
+          - target_os: linux
             target_cpu: arm64
 
-          - artifact: pdfium-linux-x64
-            target_os: linux
+          - target_os: linux
             target_cpu: x64
 
-          - artifact: pdfium-linux-x86
-            target_os: linux
+          - target_os: linux
             target_cpu: x86
 
-          - artifact: pdfium-linux-musl-x64
-            target_os: linux
+          - target_os: linux
             target_libc: musl
             target_cpu: x64
 
-          - artifact: pdfium-linux-musl-x86
-            target_os: linux
+          - target_os: linux
             target_libc: musl
             target_cpu: x86
 
-          - artifact: pdfium-mac-arm64
-            target_os: mac
+          - target_os: mac
             target_cpu: arm64
 
-          - artifact: pdfium-mac-x64
-            target_os: mac
+          - target_os: mac
             target_cpu: x64
 
-          - artifact: pdfium-win-arm64
-            target_os: win
+          - target_os: win
             target_cpu: arm64
 
-          - artifact: pdfium-win-x64
-            target_os: win
+          - target_os: win
             target_cpu: x64
 
-          - artifact: pdfium-win-x86
-            target_os: win
+          - target_os: win
             target_cpu: x86
 
-          - artifact: pdfium-wasm
-            target_os: wasm
+          - target_os: wasm
             target_cpu: wasm
 
     runs-on: ${{ (matrix.target_os == 'ios' || matrix.target_os == 'mac') && 'macos-latest' || matrix.target_os == 'win' && 'windows-2019' || 'ubuntu-20.04' }}
     steps:
+      - name: Initialize
+        id: init
+        shell: bash
+        run: |
+          ARTIFACT="pdfium-${{matrix.target_os}}"
+          [ "${{matrix.target_libc}}" != "" ] && ARTIFACT="$ARTIFACT-${{matrix.target_libc}}"
+          [ "${{matrix.target_os}}" != "${{matrix.target_cpu}}" ] && ARTIFACT="$ARTIFACT-${{matrix.target_cpu}}"
+          [ "${{matrix.enable_v8}}" == "true" ] && ARTIFACT="$ARTIFACT-v8"
+          echo "artifact=$ARTIFACT" >> $GITHUB_OUTPUT
       - name: Checkout this repo
         uses: actions/checkout@v2
       - name: Workaround for libpcre2 i386 # https://github.com/actions/virtual-environments/issues/4589#issuecomment-1100899313
@@ -159,7 +150,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v2
         with:
-          name: ${{ matrix.artifact }}
+          name: ${{ steps.init.outputs.artifact }}
           path: staging/
       - name: Test
         run: steps/08-test.sh
