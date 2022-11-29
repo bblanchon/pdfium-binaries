@@ -93,68 +93,15 @@ jobs:
           - target_os: wasm
             target_cpu: wasm
 
-    runs-on: ${{ (matrix.target_os == 'ios' || matrix.target_os == 'mac') && 'macos-latest' || matrix.target_os == 'win' && 'windows-2019' || 'ubuntu-20.04' }}
-    steps:
-      - name: Initialize
-        id: init
-        shell: bash
-        run: |
-          ARTIFACT="pdfium-${{matrix.target_os}}"
-          [ "${{matrix.target_libc}}" != "" ] && ARTIFACT="$ARTIFACT-${{matrix.target_libc}}"
-          [ "${{matrix.target_os}}" != "${{matrix.target_cpu}}" ] && ARTIFACT="$ARTIFACT-${{matrix.target_cpu}}"
-          [ "${{matrix.enable_v8}}" == "true" ] && ARTIFACT="$ARTIFACT-v8"
-          echo "artifact=$ARTIFACT" >> $GITHUB_OUTPUT
-      - name: Checkout this repo
-        uses: actions/checkout@v3
-      - name: Workaround for libpcre2 i386 # https://github.com/actions/virtual-environments/issues/4589#issuecomment-1100899313
-        if: matrix.target_os == 'android'
-        run: |
-          sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
-          sudo apt-get update -qq
-          sudo apt-get install -yqq --allow-downgrades libpcre2-8-0/focal libpcre2-16-0/focal libpcre2-32-0/focal libpcre2-posix2/focal
-      - name: Set environment variables
-        run: |
-          cat >>$GITHUB_ENV <<END
-          PDFium_BRANCH=${{ github.event.inputs.branch }}
-          PDFium_IS_DEBUG=${{ github.event.inputs.is_debug }}
-          PDFium_TARGET_CPU=${{ matrix.target_cpu }}
-          PDFium_TARGET_OS=${{ matrix.target_os }}
-          PDFium_TARGET_LIBC=${{ matrix.target_libc }}
-          PDFium_ENABLE_V8=${{ github.event.inputs.enable_v8 }}
-          PDFium_VERSION=${{ github.event.inputs.version }}
-          MUSL_URL=${{ secrets.MUSL_URL }}
-          END
-          steps/00-environment.sh
-        shell: bash
-      - name: Install (1/2)
-        run: steps/01-install.sh
-        shell: bash
-      - name: Checkout PDFium
-        run: steps/02-checkout.sh
-        shell: bash
-      - name: Apply patches
-        run: steps/03-patch.sh
-        shell: bash
-      - name: Install (2/2)
-        run: steps/04-install-extras.sh
-        shell: bash
-      - name: Configure
-        run: steps/05-configure.sh
-        shell: bash
-      - name: Build
-        run: steps/06-build.sh
-        shell: bash
-      - name: Stage
-        run: steps/07-stage.sh
-        shell: bash
-      - name: Upload artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: ${{ steps.init.outputs.artifact }}
-          path: staging/
-      - name: Test
-        run: steps/08-test.sh
-        shell: bash
+    uses: ./.github/workflows/build.yml
+    with:
+      branch: ${{ github.event.inputs.branch }}
+      version: ${{ github.event.inputs.version }}
+      enable_v8: ${{ github.event.inputs.enable_v8 == 'true' }}
+      is_debug: ${{ github.event.inputs.is_debug == 'true' }}
+      target_os: ${{ matrix.target_os }}
+      target_cpu: ${{ matrix.target_cpu }}
+      target_libc: ${{ matrix.target_libc }}
 
   mac_univ:
     name: Build macOS universal package
