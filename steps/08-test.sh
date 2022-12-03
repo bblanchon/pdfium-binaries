@@ -6,6 +6,7 @@ TARGET_LIBC="${PDFium_TARGET_LIBC:-default}"
 SOURCE_DIR="$PWD/example"
 ANDROID_TOOLCHAIN="${PDFium_SOURCE_DIR:?}/third_party/android_ndk/toolchains/llvm/prebuilt/linux-x86_64/bin/"
 CMAKE_ARGS=()
+CAN_RUN_ON_HOST=false
 
 export PDFium_DIR="$PWD/staging"
 
@@ -65,14 +66,22 @@ case "$OS" in
         SUFFIX="-9"
         ;;
       x86)
-        [ "$TARGET_LIBC" == "musl" ] && PREFIX="i686-linux-musl-"
+        if [ "$TARGET_LIBC" == "musl" ]; then
+          PREFIX="i686-linux-musl-"
+        else
+          CAN_RUN_ON_HOST=true
+        fi
         CMAKE_ARGS+=(
           -D CMAKE_CXX_FLAGS="-m32"
           -D CMAKE_C_FLAGS="-m32"
         )
         ;;
       x64)
-        [ "$TARGET_LIBC" == "musl" ] && PREFIX="x86_64-linux-musl-"
+        if [ "$TARGET_LIBC" == "musl" ]; then
+          PREFIX="x86_64-linux-musl-"
+        else
+          CAN_RUN_ON_HOST=true
+        fi
         ;;
     esac
     CMAKE_ARGS+=(
@@ -88,6 +97,7 @@ case "$OS" in
         ;;
       x64)
         ARCH="x86_64"
+        CAN_RUN_ON_HOST=true
         ;;
     esac
     CMAKE_ARGS+=(
@@ -102,9 +112,11 @@ case "$OS" in
         ;;
       x86)
         ARCH="Win32"
+        CAN_RUN_ON_HOST=true
         ;;
       x64)
         ARCH="x64"
+        CAN_RUN_ON_HOST=true
         ;;
     esac
     CMAKE_ARGS+=(
@@ -131,6 +143,14 @@ if [ "$OS" == "win" ]; then
   file Debug/example.exe
 else
   file example
+fi
+
+if [ $CAN_RUN_ON_HOST == "true" ]; then
+  if [ "$OS" == "win" ]; then
+    Debug/example.exe
+  else
+    ./example
+  fi
 fi
 
 popd
