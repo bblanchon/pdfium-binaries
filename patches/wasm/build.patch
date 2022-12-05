@@ -1,24 +1,3 @@
-diff --git a/config/BUILDCONFIG.gn b/config/BUILDCONFIG.gn
-index c737e53c2..2f582ea4d 100644
---- a/config/BUILDCONFIG.gn
-+++ b/config/BUILDCONFIG.gn
-@@ -264,6 +264,8 @@ if (target_os == "android") {
-   _default_toolchain = "//build/toolchain/aix:$target_cpu"
- } else if (target_os == "zos") {
-   _default_toolchain = "//build/toolchain/zos:$target_cpu"
-+} else if (target_cpu == "wasm") {
-+  _default_toolchain = "//build/toolchain/wasm:emscripten"
- } else {
-   assert(false, "Unsupported target_os: $target_os")
- }
-@@ -302,6 +304,7 @@ is_linux = current_os == "linux"
- is_mac = current_os == "mac"
- is_nacl = current_os == "nacl"
- is_win = current_os == "win" || current_os == "winuwp"
-+is_wasm = current_os == "wasm"
- 
- is_apple = is_ios || is_mac
- is_posix = !is_win && !is_fuchsia
 diff --git a/config/compiler/BUILD.gn b/config/compiler/BUILD.gn
 index ba1a6222e..33052be60 100644
 --- a/config/compiler/BUILD.gn
