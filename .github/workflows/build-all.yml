@@ -21,9 +21,6 @@ on:
         type: boolean
         required: false
         default: false
-      repository:
-        description: Upload to repo
-        required: false
       push_nuget:
         description: Publish to nuget.org
         type: boolean
@@ -302,7 +299,7 @@ jobs:
 
   publish:
     name: Publish Release
-    if: ${{ github.event.inputs.repository }}
+    if: startsWith(github.event.inputs.branch, 'chromium/') && github.event.inputs.version
     runs-on: ubuntu-latest
     needs:
       - android_arm
@@ -342,7 +339,7 @@ jobs:
         continue-on-error: true
         run: |
           CURRENT_REV=${{ github.event.inputs.branch }}
-          PREVIOUS_REV=$(curl --silent "https://api.github.com/repos/${{ github.repository_owner }}/${{ github.event.inputs.repository }}/releases/latest" | jq -r ".tag_name")
+          PREVIOUS_REV=$(curl --silent "https://api.github.com/repos/${{ github.repository }}/releases/latest" | jq -r ".tag_name")
           git clone -b "${{ github.event.inputs.branch }}" https://pdfium.googlesource.com/pdfium.git
           cat <<END >> RELEASE.md
           ### Changes
@@ -352,7 +349,6 @@ jobs:
       - name: Publish Release
         uses: ncipollo/release-action@v1
         with:
-          repo: ${{ github.event.inputs.repository }}
           allowUpdates: true
           bodyFile: RELEASE.md
           token: ${{ secrets.GITHUB_TOKEN }}
