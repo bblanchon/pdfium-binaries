@@ -51,10 +51,12 @@ jobs:
         id: init
         shell: bash
         run: |
-          ARTIFACT="pdfium-${{inputs.target_os}}"
+          ARTIFACT="pdfium"
+          [ "${{inputs.enable_v8}}" == "true" ] && ARTIFACT="$ARTIFACT-v8"
+          ARTIFACT="$ARTIFACT-${{inputs.target_os}}"
           [ "${{inputs.target_libc}}" != "" ] && ARTIFACT="$ARTIFACT-${{inputs.target_libc}}"
           [ "${{inputs.target_os}}" != "${{inputs.target_cpu}}" ] && ARTIFACT="$ARTIFACT-${{inputs.target_cpu}}"
-          [ "${{inputs.enable_v8}}" == "true" ] && ARTIFACT="$ARTIFACT-v8"
+          [ "${{inputs.is_debug}}" == "true" ] && ARTIFACT="$ARTIFACT-debug"
           echo "artifact=$ARTIFACT" >> $GITHUB_OUTPUT
       - name: Checkout this repo
         uses: actions/checkout@v3
