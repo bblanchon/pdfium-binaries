@@ -224,28 +224,14 @@ jobs:
       target_cpu: wasm
 
   mac_univ:
-    name: Build macOS universal package
-    runs-on: macos-latest
+    name: macOS univ
     needs:
       - mac_arm64
       - mac_x64
-    steps:
-      - name: Download artifacts
-        uses: actions/download-artifact@v3
-      - name: Create universal library
-        run: |
-          cp -r pdfium-mac-arm64 pdfium-mac-univ
-          sed -i '' '/target_cpu/d' pdfium-mac-univ/args.gn
-          rm pdfium-mac-univ/lib/libpdfium.dylib
-          lipo -create \
-            pdfium-mac-arm64/lib/libpdfium.dylib \
-            pdfium-mac-x64/lib/libpdfium.dylib \
-            -output pdfium-mac-univ/lib/libpdfium.dylib
-      - name: Upload artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: pdfium-mac-univ
-          path: pdfium-mac-univ
+    uses: ./.github/workflows/mac-univ.yml
+    with:
+      artifact_x64: ${{ needs.mac_x64.outputs.artifact }}
+      artifact_arm64: ${{ needs.mac_arm64.outputs.artifact }}
 
   nuget:
     name: Build NuGet packages
