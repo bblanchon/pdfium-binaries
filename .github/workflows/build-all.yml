@@ -311,11 +311,9 @@ jobs:
         run: |
           for DIR in pdfium-*; do
             echo "::group::$DIR"
-            (cd $DIR; tar czf ../$DIR$SUFFIX.tgz *)
+            (cd $DIR; tar czf ../$DIR.tgz *)
             echo "::endgroup::"
           done
-        env:
-          SUFFIX: ${{ github.event.inputs.enable_v8 == 'true' && '-v8' || '' }}${{ github.event.inputs.is_debug == 'true' && '-debug' || '' }}
       - name: Write release body
         run: echo 'This version was built with branch `${{ github.event.inputs.branch }}` of PDFium' > RELEASE.md
       - name: Get changes
