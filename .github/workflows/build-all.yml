@@ -461,22 +461,39 @@ jobs:
     runs-on: windows-latest
     needs:
       - android_arm
+      - android_arm_v8
       - android_arm64
+      - android_arm64_v8
       - android_x64
+      - android_x64_v8
       - android_x86
+      - android_x86_v8
       - ios_arm64
+      # - ios_arm64_v8
       - ios_x64
+      - ios_x64_v8
       - linux_arm
+      - linux_arm_v8
       - linux_arm64
+      - linux_arm64_v8
       - linux_x64
+      - linux_x64_v8
       - linux_x86
+      - linux_x86_v8
       - linux_musl_x64
+      - linux_musl_x64_v8
       - linux_musl_x86
+      - linux_musl_x86_v8
       - mac_arm64
+      - mac_arm64_v8
       - mac_x64
+      - mac_x64_v8
       - win_arm64
+      - win_arm64_v8
       - win_x64
+      - win_x64_v8
       - win_x86
+      - win_x86_v8
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -499,6 +516,7 @@ jobs:
           path: '*.nupkg'
       - name: Push to nuget.org
         if: env.NUGET_API_KEY && startsWith(github.event.inputs.branch, 'chromium/') && github.event.inputs.version
+        shell: bash
         run: nuget push -Source nuget.org -ApiKey $NUGET_API_KEY *.nupkg
         env:
           NUGET_API_KEY: ${{ secrets.NUGET_API_KEY  }}

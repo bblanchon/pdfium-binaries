@@ -147,37 +147,44 @@ The following NuGet packages are available:
 <table>
   <tr>
     <th>OS</th>
-    <th>NuGet package</th>
+    <th>PDFium</th>
+    <th>PDFium V8</th>
   </tr>
 
   <tr>
     <td>All (meta package)</td>
     <td><a href="https://www.nuget.org/packages/bblanchon.PDFium/">bblanchon.PDFium</a></td>
+    <td><a href="https://www.nuget.org/packages/bblanchon.PDFiumV8/">bblanchon.PDFiumV8</a></td>
   </tr>
 
   <tr>
     <td>Android</td>
     <td><a href="https://www.nuget.org/packages/bblanchon.PDFium.Android/">bblanchon.PDFium.Android</a></td>
+    <td><a href="https://www.nuget.org/packages/bblanchon.PDFiumV8.Android/">bblanchon.PDFiumV8.Android</a></td>
   </tr>
 
   <tr>
     <td>iOS</td>
     <td><a href="https://www.nuget.org/packages/bblanchon.PDFium.iOS/">bblanchon.PDFium.iOS</a></td>
+    <td><a href="https://www.nuget.org/packages/bblanchon.PDFiumV8.iOS/">bblanchon.PDFiumV8.iOS</a></td>
   </tr>
 
   <tr>
     <td>Linux</td>
     <td><a href="https://www.nuget.org/packages/bblanchon.PDFium.Linux/">bblanchon.PDFium.Linux</a></td>
+    <td><a href="https://www.nuget.org/packages/bblanchon.PDFiumV8.Linux/">bblanchon.PDFiumV8.Linux</a></td>
   </tr>
 
   <tr>
     <td>macOS</td>
     <td><a href="https://www.nuget.org/packages/bblanchon.PDFium.macOS/">bblanchon.PDFium.macOS</a></td>
+    <td><a href="https://www.nuget.org/packages/bblanchon.PDFiumV8.macOS/">bblanchon.PDFiumV8.macOS</a></td>
   </tr>
 
   <tr>
     <td>Windows</td>
     <td><a href="https://www.nuget.org/packages/bblanchon.PDFium.Win32/">bblanchon.PDFium.Win32</a></td>
+    <td><a href="https://www.nuget.org/packages/bblanchon.PDFiumV8.Win32/">bblanchon.PDFiumV8.Win32</a></td>
   </tr>
 </table>
 
