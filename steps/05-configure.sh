@@ -28,6 +28,7 @@ mkdir -p "$BUILD"
   case "$OS" in
     ios)
       echo "ios_enable_code_signing = false"
+      [ "$ENABLE_V8" == "true" ] && [ "$TARGET_CPU" == "arm64" ] && echo 'arm_control_flow_integrity = "none"'
       ;;
     mac)
       echo 'mac_deployment_target = "10.13.0"'
