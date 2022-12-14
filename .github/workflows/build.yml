@@ -93,7 +93,15 @@ jobs:
         run: steps/04-install-extras.sh
         shell: bash
       - name: Configure
-        run: steps/05-configure.sh
+        run: |
+          steps/05-configure.sh
+          cat <<END >>$GITHUB_STEP_SUMMARY
+          ## args.gn
+
+          \`\`\`gn
+          $(cat pdfium/out/args.gn)
+          \`\`\`
+          END
         shell: bash
       - name: Build
         run: steps/06-build.sh
