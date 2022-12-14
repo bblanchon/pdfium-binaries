@@ -130,8 +130,17 @@ jobs:
       target_cpu: arm64
       enable_v8: false
 
-  # ios_arm64_v8:
-  # https://groups.google.com/g/pdfium/c/8R56bd60PSI/m/QzlDy6CFAgAJ
+  ios_arm64_v8:
+    name: iOS ARM64 V8
+    if: github.event.inputs.enable_v8 == 'true'
+    uses: ./.github/workflows/build.yml
+    with:
+      branch: ${{ github.event.inputs.branch }}
+      version: ${{ github.event.inputs.version }}
+      is_debug: ${{ github.event.inputs.is_debug == 'true' }}
+      target_os: ios
+      target_cpu: arm64
+      enable_v8: true
 
   ios_x64:
     name: iOS x64
@@ -469,7 +478,7 @@ jobs:
       - android_x86
       - android_x86_v8
       - ios_arm64
-      # - ios_arm64_v8
+      - ios_arm64_v8
       - ios_x64
       - ios_x64_v8
       - linux_arm
@@ -534,7 +543,7 @@ jobs:
       - android_x86
       - android_x86_v8
       - ios_arm64
-      # - ios_arm64_v8
+      - ios_arm64_v8
       - ios_x64
       - ios_x64_v8
       - linux_arm

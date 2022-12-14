@@ -53,7 +53,7 @@ Here are the download links for latest release:
     <td rowspan="2">iOS</td>
     <td>arm64</td>
     <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-ios-arm64.tgz">pdfium-ios-arm64.tgz</a></td>
-    <td><a href="https://groups.google.com/g/pdfium/c/8R56bd60PSI/m/QzlDy6CFAgAJ">failing</a></td>
+    <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-v8-ios-arm64.tgz">pdfium-v8-ios-arm64.tgz</a></td>
   </tr>
   <tr>
     <td>x64</td>
