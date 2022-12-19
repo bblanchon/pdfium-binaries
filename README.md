@@ -186,7 +186,15 @@ The following NuGet packages are available:
     <td><a href="https://www.nuget.org/packages/bblanchon.PDFium.Win32/">bblanchon.PDFium.Win32</a></td>
     <td><a href="https://www.nuget.org/packages/bblanchon.PDFiumV8.Win32/">bblanchon.PDFiumV8.Win32</a></td>
   </tr>
+
+  <tr>
+    <td>WebAssembly<sup>1</sup></td>
+    <td><a href="https://www.nuget.org/packages/bblanchon.PDFium.WebAssembly/">bblanchon.PDFium.WebAssembly</a></td>
+    <td>not supported</td>
+  </tr>
 </table>
+
+<small>1: WebAssembly build is experimental; please [provide feedback](https://github.com/bblanchon/pdfium-binaries/issues/28).</small>
 
 **HELP WANTED!**  
 I can provide packages for your favorite package manager, but I need help from someone who knows the format. Contact me via [GitHub issues](https://github.com/bblanchon/pdfium-binaries/issues) if you want to help.

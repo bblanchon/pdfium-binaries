@@ -497,6 +497,7 @@ jobs:
       - mac_arm64_v8
       - mac_x64
       - mac_x64_v8
+      - wasm
       - win_arm64
       - win_arm64_v8
       - win_x64
