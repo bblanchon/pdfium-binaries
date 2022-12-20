@@ -5,7 +5,7 @@
 #   1. set the environment variable PDFium_DIR to the folder containing this file.
 #   2. in your CMakeLists.txt, add
 #       find_package(PDFium)
-#   3. then link you excecutable with PDFium
+#   3. then link you executable with PDFium
 #       target_link_libraries(my_exe pdfium)
 
 include(FindPackageHandleStandardArgs)
