@@ -133,6 +133,7 @@ jobs:
   ios_arm64_v8:
     name: iOS ARM64 V8
     if: github.event.inputs.enable_v8 == 'true'
+    needs: ios_arm64
     uses: ./.github/workflows/build.yml
     with:
       branch: ${{ github.event.inputs.branch }}
