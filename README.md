@@ -224,19 +224,21 @@ Please find the [documentation of the PDFium API on developers.foxit.com](https:
 
 The following projects use (or recommend using) our PDFium builds:
 
-* [dart_pdf](https://github.com/DavBfr/dart_pdf), PDF creation module for dart/flutter
-* [Flutter native_pdf_renderer](https://github.com/rbcprolabs/packages.flutter/tree/master/packages/native_pdf_renderer), Flutter Plugin to render PDF pages as images
-* [go-pdfium](https://github.com/klippa-app/go-pdfium), a Go wrapper around PDFium with helper functions for various methods like image rendering and text extraction
-* [PDFium RS](https://github.com/asafigan/pdfium_rs), a Rust wrapper around PDFium
-* [PDFiumCore](https://github.com/Dtronix/PDFiumCore), .NET Standard P/Invoke bindings for PDFium
-* [PDFtoImage](https://github.com/sungaila/PDFtoImage), .NET library to render PDF content into images
-* [PyPDFium2](https://github.com/pypdfium2-team/pypdfium2), Python bindings to PDFium
-* [wxPDFView](https://github.com/TcT2k/wxPDFView), wxWidgets components to display PDF content
-* [libvips](https://github.com/libvips/libvips), a performant image processing library
-* [PdfiumLib](https://github.com/ahausladen/PdfiumLib), an interface to libpdfium for Delphi
-* [PdfLibCore](https://github.com/jbaarssen/PdfLibCore), a fast PDF editing and reading library for modern .NET Core applications.
-* [DtronixPdf](https://github.com/Dtronix/DtronixPdf), PDF viewer and editor toolset.
-* [PDFtoZPL](https://github.com/sungaila/PDFtoZPL), a .NET library to convert PDF files (and bitmaps) into Zebra Programming Language code.
+| Name                     | Language | Description                                                                                                 |
+|:-------------------------|:---------|:------------------------------------------------------------------------------------------------------------|
+| [dart_pdf][dart_pdf]     | Dart     | PDF creation module for dart/flutter                                                                        |
+| [DtronixPdf][dtronixpdf] | C#       | PDF viewer and editor toolset                                                                               |
+| [go-pdfium][go-pdfium]   | Go       | Go wrapper around PDFium with helper functions for various methods like image rendering and text extraction |
+| [libvips][libvips]       | C        | A performant image processing library                                                                       |
+| [PDFium RS][pdfium_rs]   | Rust     | Rust wrapper around PDFium                                                                                  |
+| [PDFiumCore][pdfiumcore] | C#       | .NET Standard P/Invoke bindings for PDFium                                                                  |
+| [PdfiumLib][pdfiumlib]   | Pascal   | An interface to libpdfium for Delphi                                                                        |
+| [PdfLibCore][pdflibcore] | C#       | A fast PDF editing and reading library for modern .NET Core applications                                    |
+| [PDFtoImage][pdftoimage] | C#       | .NET library to render PDF content into images                                                              |
+| [PDFtoZPL][pdftozpl]     | C#       | A .NET library to convert PDF files (and bitmaps) into Zebra Programming Language code                      |
+| [PDFx][pdfx]             | Dart     | Flutter Render & show PDF documents on Web, MacOs 10.11+, Android 5.0+, iOS and Windows                     |
+| [PyPDFium2][pypdfium2]   | Python   | Python bindings to PDFium                                                                                   |
+| [wxPDFView][wxpdfview]   | C++      | wxWidgets components to display PDF content                                                                 |
 
 *Did we miss a project? Please open a PR!*  
 
@@ -255,3 +257,18 @@ Tobias Taschner, [@TcT2k](https://github.com/TcT2k):
 
 * macOS build
 * V8 build
+
+
+[dart_pdf]: https://github.com/DavBfr/dart_pdf
+[pdfx]: https://github.com/scerio/packages.flutter/tree/main/packages/pdfx
+[go-pdfium]: https://github.com/klippa-app/go-pdfium
+[pdfium_rs]: https://github.com/asafigan/pdfium_rs
+[pdfiumcore]: https://github.com/Dtronix/PDFiumCore
+[pdftoimage]: https://github.com/sungaila/PDFtoImage
+[pypdfium2]: https://github.com/pypdfium2-team/pypdfium2
+[wxpdfview]: https://github.com/TcT2k/wxPDFView
+[libvips]: https://github.com/libvips/libvips
+[pdfiumlib]: https://github.com/ahausladen/PdfiumLib
+[pdflibcore]: https://github.com/jbaarssen/PdfLibCore
+[dtronixpdf]: https://github.com/Dtronix/DtronixPdf
+[pdftozpl]: https://github.com/sungaila/PDFtoZPL
