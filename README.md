@@ -234,6 +234,9 @@ The following projects use (or recommend using) our PDFium builds:
 * [wxPDFView](https://github.com/TcT2k/wxPDFView), wxWidgets components to display PDF content
 * [libvips](https://github.com/libvips/libvips), a performant image processing library
 * [PdfiumLib](https://github.com/ahausladen/PdfiumLib), an interface to libpdfium for Delphi
+* [PdfLibCore](https://github.com/jbaarssen/PdfLibCore), a fast PDF editing and reading library for modern .NET Core applications.
+* [DtronixPdf](https://github.com/Dtronix/DtronixPdf), PDF viewer and editor toolset.
+* [PDFtoZPL](https://github.com/sungaila/PDFtoZPL), a .NET library to convert PDF files (and bitmaps) into Zebra Programming Language code.
 
 *Did we miss a project? Please open a PR!*  
 
