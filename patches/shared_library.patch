@@ -1,17 +1,17 @@
 diff --git a/BUILD.gn b/BUILD.gn
-index bf0994aee..021d1bd99 100644
+index 62210c2f6..053fbff6d 100644
 --- a/BUILD.gn
 +++ b/BUILD.gn
-@@ -160,7 +160,7 @@ group("pdfium_public_headers") {
+@@ -341,7 +341,7 @@ group("pdfium_public_headers") {
    ]
  }
  
 -component("pdfium") {
 +shared_library("pdfium") {
+   output_name = "pdfium"
    libs = []
    configs += [ ":pdfium_strict_config" ]
-   public_configs = [ ":pdfium_public_config" ]
-@@ -199,6 +199,9 @@ component("pdfium") {
+@@ -381,6 +381,9 @@ component("pdfium") {
        "gdi32.lib",
        "user32.lib",
      ]
