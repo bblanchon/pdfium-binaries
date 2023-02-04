@@ -20,7 +20,6 @@ case "$OS" in
   ios)
     git apply -v "$PATCHES/ios/pdfium.patch"
     git -C build apply -v "$PATCHES/ios/build.patch"
-    git -C third_party/libjpeg_turbo apply -v "$PATCHES/ios/libjpeg_turbo.patch"
     ;;
 
   wasm)
