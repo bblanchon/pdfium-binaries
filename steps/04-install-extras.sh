@@ -10,11 +10,11 @@ case "$OS" in
   linux)
     build/linux/sysroot_scripts/install-sysroot.py "--arch=$CPU"
     ;;
-    
+
   android)
     sudo apt-get update
     sudo apt-get remove -y php7.4-common
-    build/install-build-deps-android.sh
+    build/install-build-deps.sh --android
     gclient runhooks
     ;;
 esac
