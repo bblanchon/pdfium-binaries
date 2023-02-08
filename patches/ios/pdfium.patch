@@ -27,15 +27,3 @@ index 9d528da98..2c2a6706f 100644
        if (!defined(extra_substitutions)) {
          extra_substitutions = []
        }
-diff --git a/skia/BUILD.gn b/skia/BUILD.gn
-index 4bbef90a6..fd8b5cf73 100644
---- a/skia/BUILD.gn
-+++ b/skia/BUILD.gn
-@@ -360,7 +360,6 @@ component("skia") {
- 
-   if (is_ios) {
-     frameworks += [ "ImageIO.framework" ]
--    sources += [ "//third_party/skia/src/utils/mac/SkCreateCGImageRef.cpp" ]
-   }
- 
-   if (skia_support_pdf) {
