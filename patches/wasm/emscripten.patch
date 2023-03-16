@@ -23,7 +23,7 @@ index f3bb425f6..117a8da46 100644
   * Open flags used by `path_open`.
   */
 diff --git a/system/lib/standalone/standalone.c b/system/lib/standalone/standalone.c
-index 690106cce..4169440a5 100644
+index 690106cce..65f344681 100644
 --- a/system/lib/standalone/standalone.c
 +++ b/system/lib/standalone/standalone.c
 @@ -6,6 +6,7 @@
@@ -364,8 +364,8 @@ index 690106cce..4169440a5 100644
 +  }
 +
 +  return dirent_processed;
- }
- 
++}
++
 +int __syscall_newfstatat(int dirfd, intptr_t path, intptr_t buf, int flags) {
 +  // Convert flags to WASI.
 +  __wasi_lookupflags_t lookup_flags = 0;
@@ -389,8 +389,8 @@ index 690106cce..4169440a5 100644
 +  __wasi_filestat_to_stat(&fsb_cur, (struct stat *) buf);
 +
 +  return 0;
-+}
-+
+ }
+ 
 +__attribute__((__weak__))
 +int __syscall_stat64(intptr_t path, intptr_t buf) {
 +  return __syscall_newfstatat(AT_FDCWD, path, buf, 0);
@@ -411,13 +411,19 @@ index 690106cce..4169440a5 100644
  // Emscripten additions
  
  extern void emscripten_notify_memory_growth(size_t memory_index);
-@@ -156,12 +476,18 @@ double emscripten_get_now(void) {
+@@ -156,12 +476,24 @@ double emscripten_get_now(void) {
    return (1000 * clock()) / (double)CLOCKS_PER_SEC;
  }
  
 +__attribute__((__weak__))
 +void _emscripten_throw_longjmp() {
 +  REPORT_UNSUPPORTED(call longjmp);
++  abort();
++}
++
++__attribute__((__weak__))
++int _setitimer_js(int which, double timeout) {
++  REPORT_UNSUPPORTED(set itimer);
 +  abort();
 +}
 +
@@ -431,7 +437,7 @@ index 690106cce..4169440a5 100644
  //
  // Define these symbols as weak so that when we build with exceptions
  // enabled (using wasm-eh) we get the real versions of these functions
-@@ -169,11 +495,7 @@ double emscripten_get_now(void) {
+@@ -169,11 +501,7 @@ double emscripten_get_now(void) {
  
  __attribute__((__weak__))
  void __cxa_throw(void* ptr, void* type, void* destructor) {
