@@ -25,6 +25,7 @@ case "$OS" in
 
   wasm)
     git apply -v "$PATCHES/wasm/pdfium.patch"
+    git apply -v "$PATCHES/wasm/data_avail.patch"
     git -C build apply -v "$PATCHES/wasm/build.patch"
     mkdir -p "build/toolchain/wasm"
     cp "$PATCHES/wasm/toolchain.gn" "build/toolchain/wasm/BUILD.gn"

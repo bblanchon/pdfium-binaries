@@ -1,0 +1,55 @@
+diff --git a/fpdfsdk/BUILD.gn b/fpdfsdk/BUILD.gn
+index 1f75bef05..0abc3d55b 100644
+--- a/fpdfsdk/BUILD.gn
++++ b/fpdfsdk/BUILD.gn
+@@ -59,6 +59,7 @@ source_set("fpdfsdk") {
+     "fpdf_thumbnail.cpp",
+     "fpdf_transformpage.cpp",
+     "fpdf_view.cpp",
++    "fpdf_emscripten.c",
+   ]
+ 
+   configs += [
+diff --git a/fpdfsdk/fpdf_emscripten.c b/fpdfsdk/fpdf_emscripten.c
+new file mode 100644
+index 000000000..8e20927d3
+--- /dev/null
++++ b/fpdfsdk/fpdf_emscripten.c
+@@ -0,0 +1,36 @@
++#include <emscripten.h>
++#include <stdlib.h>
++#include <stdio.h>
++#include "public/fpdfview.h"
++#include "public/fpdf_save.h"
++
++extern int FPDF_FILEACCESS_CB(void* param, unsigned long position, unsigned char* pBuf, unsigned long size);
++
++EMSCRIPTEN_KEEPALIVE
++FPDF_FILEACCESS* FPDF_FILEACCESS_Create(unsigned long m_FileLen, void* m_Param) {
++  FPDF_FILEACCESS* access = malloc(sizeof(FPDF_FILEACCESS));
++  access->m_FileLen = m_FileLen;
++  access->m_Param = m_Param;
++  access->m_GetBlock = FPDF_FILEACCESS_CB;
++  return access;
++}
++
++EMSCRIPTEN_KEEPALIVE
++int FPDF_FILEACCESS_Size() {
++  return sizeof(FPDF_FILEACCESS);
++}
++
++extern int FPDF_FILEWRITE_CB(FPDF_FILEWRITE* pThis, const void* pData, unsigned long size);
++
++EMSCRIPTEN_KEEPALIVE
++FPDF_FILEWRITE* FPDF_FILEWRITE_Create() {
++  FPDF_FILEWRITE* writer = malloc(sizeof(FPDF_FILEWRITE));
++  writer->version = 1;
++  writer->WriteBlock = FPDF_FILEWRITE_CB;
++  return writer;
++}
++
++EMSCRIPTEN_KEEPALIVE
++int FPDF_FILEWRITE_Size() {
++  return sizeof(FPDF_FILEWRITE);
++}
+\ No newline at end of file
