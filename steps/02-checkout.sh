@@ -17,11 +17,11 @@ echo "target_os = [ '$OS' ]" >> .gclient
 
 
 # Reset
-if [ -e 'pdfium' ]; then
-  for folder in pdfium pdfium/build pdfium/third_party/libjpeg_turbo; do
-    git -C $folder reset --hard
-    git -C $folder clean -df
-  done
-fi
+for FOLDER in pdfium pdfium/build pdfium/third_party/libjpeg_turbo pdfium/base/allocator/partition_allocator; do
+  if [ -e "$FOLDER" ]; then
+    git -C $FOLDER reset --hard
+    git -C $FOLDER clean -df
+  fi
+done
 
 gclient sync -r "origin/${PDFium_BRANCH:-main}" --no-history --shallow

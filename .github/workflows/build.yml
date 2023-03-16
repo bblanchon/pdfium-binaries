@@ -1,14 +1,16 @@
 name: Build
 
 on:
-  workflow_dispatch:
+  workflow_call:
     inputs:
       branch:
         description: PDFium branch
+        type: string
         required: false
         default: main
       version:
         description: PDFium version
+        type: string
         required: false
         default: ""
       enable_v8:
@@ -21,14 +23,23 @@ on:
         type: boolean
         required: false
         default: false
-      repository:
-        description: Upload to repo
+      target_os:
+        description: Target OS (android|ios|linux|mac|wasm|win)
+        type: string
+        required: true
+      target_cpu:
+        description: Target (CPU arm|arm64|x64|x86|wasm)
+        type: string
+        required: true
+      target_libc:
+        description: Target libc (empty string or "musl")
+        type: string
         required: false
-      push_nuget:
-        description: Publish to nuget.org
-        type: boolean
-        required: false
-        default: false
+        default: ''
+    outputs:
+      artifact:
+        description: "The name of the artifact"
+        value: ${{ jobs.build.outputs.artifact }}
 
 jobs:
   build:
@@ -41,13 +52,25 @@ jobs:
             target_os: wasm
             target_cpu: wasm
             runner: ubuntu-20.04
-
-    runs-on: ${{ matrix.runner }}
+    outputs:
+      artifact: ${{ steps.init.outputs.artifact }}
+    runs-on: ${{ (inputs.target_os == 'ios' || inputs.target_os == 'mac') && 'macos-latest' || inputs.target_os == 'win' && 'windows-2019' || 'ubuntu-20.04' }}
     steps:
+      - name: Initialize
+        id: init
+        shell: bash
+        run: |
+          ARTIFACT="pdfium"
+          [ "${{inputs.enable_v8}}" == "true" ] && ARTIFACT="$ARTIFACT-v8"
+          ARTIFACT="$ARTIFACT-${{inputs.target_os}}"
+          [ "${{inputs.target_libc}}" != "" ] && ARTIFACT="$ARTIFACT-${{inputs.target_libc}}"
+          [ "${{inputs.target_os}}" != "${{inputs.target_cpu}}" ] && ARTIFACT="$ARTIFACT-${{inputs.target_cpu}}"
+          [ "${{inputs.is_debug}}" == "true" ] && ARTIFACT="$ARTIFACT-debug"
+          echo "artifact=$ARTIFACT" >> $GITHUB_OUTPUT
       - name: Checkout this repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Workaround for libpcre2 i386 # https://github.com/actions/virtual-environments/issues/4589#issuecomment-1100899313
-        if: matrix.target_os == 'android'
+        if: inputs.target_os == 'android'
         run: |
           sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
           sudo apt-get update -qq
@@ -55,13 +78,13 @@ jobs:
       - name: Set environment variables
         run: |
           cat >>$GITHUB_ENV <<END
-          PDFium_BRANCH=${{ github.event.inputs.branch }}
-          PDFium_IS_DEBUG=${{ github.event.inputs.is_debug }}
-          PDFium_TARGET_CPU=${{ matrix.target_cpu }}
-          PDFium_TARGET_OS=${{ matrix.target_os }}
-          PDFium_TARGET_LIBC=${{ matrix.target_libc }}
-          PDFium_ENABLE_V8=${{ github.event.inputs.enable_v8 }}
-          PDFium_VERSION=${{ github.event.inputs.version }}
+          PDFium_BRANCH=${{ inputs.branch }}
+          PDFium_IS_DEBUG=${{ inputs.is_debug }}
+          PDFium_TARGET_CPU=${{ inputs.target_cpu }}
+          PDFium_TARGET_OS=${{ inputs.target_os }}
+          PDFium_TARGET_LIBC=${{ inputs.target_libc }}
+          PDFium_ENABLE_V8=${{ inputs.enable_v8 }}
+          PDFium_VERSION=${{ inputs.version }}
           MUSL_URL=${{ secrets.MUSL_URL }}
           END
           steps/00-environment.sh
@@ -79,29 +102,27 @@ jobs:
         run: steps/04-install-extras.sh
         shell: bash
       - name: Configure
-        run: steps/05-configure.sh
+        run: |
+          steps/05-configure.sh
+          cat <<END >>$GITHUB_STEP_SUMMARY
+          ## args.gn
+
+          \`\`\`gn
+          $(cat pdfium/out/args.gn)
+          \`\`\`
+          END
         shell: bash
       - name: Build
         run: steps/06-build.sh
         shell: bash
-      - name: Pack
-        run: steps/07-pack.sh
+      - name: Stage
+        run: steps/07-stage.sh
         shell: bash
       - name: Upload artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
-          name: ${{ matrix.artifact }}
+          name: ${{ steps.init.outputs.artifact }}
           path: staging/
       - name: Test
         run: steps/08-test.sh
         shell: bash
-      - name: Upload tarball to GitHub Release
-        uses: ncipollo/release-action@v1
-        if: ${{ github.event.inputs.repository }}
-        with:
-          repo: ${{ github.event.inputs.repository }}
-          tag: ${{ github.event.inputs.branch }}
-          allowUpdates: true
-          draft: true
-          artifacts: pdfium*.tgz
-          token: ${{ secrets.GITHUB_TOKEN }}

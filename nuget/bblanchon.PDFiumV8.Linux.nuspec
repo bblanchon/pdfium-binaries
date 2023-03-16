@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>bblanchon.PDFiumV8.Linux</id>
+    <version>$version$</version>
+    <authors>Benoit Blanchon</authors>
+    <owners>Benoit Blanchon</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <license type="expression">Apache-2.0</license>
+    <licenseUrl>https://licenses.nuget.org/Apache-2.0</licenseUrl>
+    <projectUrl>https://github.com/bblanchon/pdfium-binaries</projectUrl>
+    <description>This package contains pre-compiled binaries of the PDFium library, an open-source library for PDF manipulation and rendering.</description>
+    <releaseNotes>$releaseNotes$</releaseNotes>
+    <copyright>Copyright © Benoit Blanchon 2017-2022</copyright>
+    <tags>PDFium PDF binaries library native Chromium</tags>
+    <repository type="git" url="https://github.com/bblanchon/pdfium-binaries.git" branch="$branch$" commit="$commit$" />
+    <icon>icon.png</icon>
+    <iconUrl>https://raw.githubusercontent.com/bblanchon/pdfium-binaries/master/nuget/bblanchon.PDFiumV8.Linux.png</iconUrl>
+  </metadata>
+
+  <files>
+    <file src="bblanchon.PDFiumV8.Linux.png" target="icon.png" />
+
+    <!-- the native PDFium binaries -->
+    <!-- see list of available runtime identifiers -->
+    <!-- https://docs.microsoft.com/en-us/dotnet/core/rid-catalog -->
+    <file src="pdfium-v8-linux-arm/lib/libpdfium.so" target="runtimes/linux-arm/native/libpdfium.so" />
+    <file src="pdfium-v8-linux-arm64/lib/libpdfium.so" target="runtimes/linux-arm64/native/libpdfium.so" />
+    <file src="pdfium-v8-linux-x64/lib/libpdfium.so" target="runtimes/linux-x64/native/libpdfium.so" />
+    <file src="pdfium-v8-linux-x86/lib/libpdfium.so" target="runtimes/linux-x86/native/libpdfium.so" />
+    <file src="pdfium-v8-linux-musl-x64/lib/libpdfium.so" target="runtimes/linux-musl-x64/native/libpdfium.so" />
+    <file src="pdfium-v8-linux-musl-x86/lib/libpdfium.so" target="runtimes/linux-musl-x86/native/libpdfium.so" />
+  </files>
+</package>

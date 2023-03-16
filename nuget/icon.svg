@@ -7,9 +7,9 @@
    viewBox="0 0 33.866666 33.866668"
    version="1.1"
    id="svg93"
-   inkscape:version="1.1.1 (3bf5ae0d25, 2021-09-20)"
+   inkscape:version="1.2 (dc2aedaf03, 2022-05-15)"
    sodipodi:docname="icon.svg"
-   inkscape:export-filename="bblanchon.PDFium.Linux.png"
+   inkscape:export-filename="bblanchon.PDFium.WebAssembly.png"
    inkscape:export-xdpi="96"
    inkscape:export-ydpi="96"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
@@ -27,21 +27,34 @@
      inkscape:document-units="mm"
      showgrid="false"
      units="px"
-     inkscape:zoom="4.2045706"
-     inkscape:cx="46.734856"
-     inkscape:cy="151.5018"
-     inkscape:window-width="1920"
-     inkscape:window-height="1009"
-     inkscape:window-x="-8"
-     inkscape:window-y="-8"
+     inkscape:zoom="2.1022853"
+     inkscape:cx="14.270185"
+     inkscape:cy="116.53984"
+     inkscape:window-width="3440"
+     inkscape:window-height="1334"
+     inkscape:window-x="-11"
+     inkscape:window-y="-11"
      inkscape:window-maximized="1"
-     inkscape:current-layer="g50663"
+     inkscape:current-layer="g57"
      showguides="true"
-     inkscape:guide-bbox="true">
+     inkscape:guide-bbox="true"
+     inkscape:showpageshadow="2"
+     inkscape:deskcolor="#d1d1d1">
     <sodipodi:guide
        position="27.654574,1.67345"
        orientation="0,-1"
-       id="guide30772" />
+       id="guide30772"
+       inkscape:locked="false" />
+    <sodipodi:guide
+       position="17.934352,8.4439362"
+       orientation="0,-1"
+       id="guide929"
+       inkscape:locked="false" />
+    <sodipodi:guide
+       position="32.281833,21.155302"
+       orientation="1,0"
+       id="guide931"
+       inkscape:locked="false" />
   </sodipodi:namedview>
   <defs
      id="defs90">
@@ -175,9 +188,68 @@
   </g>
   <g
      inkscape:groupmode="layer"
+     id="layer2"
+     inkscape:label="V8"
+     style="display:none">
+    <g
+       id="g913"
+       transform="matrix(0.00467731,0,0,0.00467731,23.67469,17.382438)"
+       style="display:inline">
+      <g
+         fill="#ffffff"
+         clip-path="url(#a)"
+         id="g891"
+         transform="matrix(0.9956879,0,0,0.9956879,28.007178,7.4125285)">
+        <path
+           fill="#9e9e9e"
+           d="m 1530,589 -43,90 h 122 l 6,-10 45,-80 H 1529 Z M 338,589 H 210 l 51,90 h 121 z"
+           id="path871" />
+        <path
+           fill="#424242"
+           d="M 1815,319 1655,599 H 1543 L 1364,940 935,1719 506,939 327,599 H 215 L 55,319 h 460 l 75,149 244,445 100,183 96,-183 240,-445 85,-149"
+           id="path873" />
+        <g
+           fill-opacity="0.2"
+           id="g889">
+          <path
+             d="M 520.6,329 H 60.6 L 55,319 h 460 z m 834.4,-10 -5.5,10 h 459.8 l 5.7,-10 z"
+             id="path875" />
+          <path
+             fill="#263238"
+             d="m 1615.4,668.8 -5.8,10.2 H 1501 L 1363.7,939.5 935,1719 506.3,939.3 369.3,679 H 260.6 L 255,669 h 114.3 l 5.3,10 L 506.3,929.3 935,1709 1363.7,929.5 1501.1,668.8"
+             id="path877" />
+          <g
+             fill-opacity="1"
+             id="g883">
+            <path
+               d="m 1105,1039 a 170,170 0 1 1 -340,0 170,170 0 0 1 340,0 z m -20,-520 a 150,150 0 1 1 -300,0 150,150 0 0 1 300,0 z"
+               id="path879" />
+            <path
+               fill="#4285f4"
+               d="M 1364,940 C 1341,842 1287,758 1212,697 A 340,340 0 1 0 597,468 339,339 0 0 0 658,697 439,439 0 0 0 506,939 437,437 0 0 0 495,1039 c 0,186 116,346 280,410 a 441,441 0 0 0 160,30 439,439 0 0 0 429,-539 z M 935,379 a 140,140 0 1 1 0,280 140,140 0 0 1 0,-280 z m 0,820 c -88,0 -160,-72 -160,-160 a 160,160 0 0 1 258,-126 159,159 0 0 1 62,126 160,160 0 0 1 -160,160 z"
+               id="path881" />
+          </g>
+          <path
+             d="m 1275,499 v 5 C 1272.2,318.5 1121,169 935,169 749,169 597.7,318.5 595,504 v -5 c 0,-187.8 152.2,-340 340,-340 187.8,0 340,152.2 340,340 z M 654,700.5 C 557,781 495,902.8 495,1039 v 5 c 1.5,-136.2 65,-257.5 163.4,-337.2 l 4.6,-3.7 -4.6,-6 -4.4,4 z m 562,0 -4.4,-3.7 -4.6,6.3 4.6,4 c 98.5,80 162,201 163.4,337 v -5 c 0,-136 -62,-258 -159,-338 z"
+             id="path885" />
+          <path
+             fill="#263238"
+             d="m 1375,1034 v 5 c 0,243 -197,440 -440,440 -243,0 -440,-197 -440,-440 v -5 c 2.7,240.7 198.7,435 440,435 241.3,0 437.3,-194.3 440,-435 z M 595,494 v 5 a 338,338 0 0 0 68,204 c 1.6,-1 3.2,-2.4 5,-3.6 A 338.8,338.8 0 0 1 595,494 Z m 680,0 a 338.57,338.57 0 0 1 -73,205.4 c 1.8,1.2 3.4,2.5 5,3.7 42.7,-56 68,-127 68,-204 v -5 z"
+             id="path887" />
+        </g>
+      </g>
+      <path
+         fill="url(#b)"
+         d="m 1815,319 -160,280 -45,80 h -109 l -137,261 a 441,441 0 0 1 -283,514 l -146,265 -145,-265 -15,-5 A 442,442 0 0 1 506,939 L 369,679 H 261 L 215,599 55,319 h 460 l 75,149 4,2 1,-2 a 340,340 0 0 1 678,0 l -2,2 -1,-2 85,-149 z"
+         id="path893" />
+    </g>
+  </g>
+  <g
+     inkscape:groupmode="layer"
      id="g37884"
      inkscape:label="Windows"
-     style="display:none">
+     style="display:none"
+     sodipodi:insensitive="true">
     <text
        xml:space="preserve"
        transform="matrix(0.2281604,0,0,0.2281604,58.906692,54.39993)"
@@ -189,16 +261,17 @@
        x="59.503082"
        y="0"><tspan
          x="-252.36166"
-         y="-97.397814"
-         id="tspan55970"><tspan
+         y="-97.481533"
+          id="tspan1077"><tspan
            style="font-family:'Roboto Black';-inkscape-font-specification:'Roboto Black, '"
-           id="tspan55968">Windows</tspan></tspan></text>
+           id="tspan1075">Windows</tspan></tspan></text>
   </g>
   <g
      inkscape:groupmode="layer"
      id="g34113"
      inkscape:label="macOS"
-     style="display:none">
+     style="display:none"
+     sodipodi:insensitive="true">
     <text
        xml:space="preserve"
        transform="matrix(0.2281604,0,0,0.2281604,58.906692,54.39993)"
@@ -210,16 +283,39 @@
        x="59.503082"
        y="0"><tspan
          x="-238.03608"
-         y="-97.397814"
-         id="tspan55974"><tspan
+         y="-97.481533"
+         id="tspan1081"><tspan
            style="font-family:'Roboto Black';-inkscape-font-specification:'Roboto Black, '"
-           id="tspan55972">macOS</tspan></tspan></text>
+           id="tspan1079">macOS</tspan></tspan></text>
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="g57"
+     inkscape:label="WebAssembly"
+     style="display:inline"
+     sodipodi:insensitive="true">
+    <text
+       xml:space="preserve"
+       transform="matrix(0.2281604,0,0,0.2281604,58.906692,54.39993)"
+       id="text55"
+       style="font-style:normal;font-weight:normal;font-size:34.016px;line-height:1.25;font-family:sans-serif;text-align:center;white-space:pre;shape-inside:url(#rect34115);fill:#4d4d4d;fill-opacity:1;stroke:none"
+       inkscape:export-filename="bblanchon.PDFium.WebAssembly"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       x="59.503082"
+       y="0"><tspan
+         x="-230.03036"
+         y="-97.397814"
+         id="tspan198"><tspan
+           style="font-family:'Roboto Black';-inkscape-font-specification:'Roboto Black, '"
+           id="tspan196">Wasm</tspan></tspan></text>
   </g>
   <g
      inkscape:groupmode="layer"
      id="g50663"
      inkscape:label="Linux"
-     style="display:inline">
+     style="display:none"
+     sodipodi:insensitive="true">
     <text
        xml:space="preserve"
        transform="matrix(0.2281604,0,0,0.2281604,58.906692,54.39993)"
@@ -231,16 +327,17 @@
        x="59.503082"
        y="0"><tspan
          x="-224.9645"
-         y="-97.397814"
-         id="tspan55978"><tspan
+         y="-97.481533"
+         id="tspan1085"><tspan
            style="font-family:'Roboto Black';-inkscape-font-specification:'Roboto Black, '"
-           id="tspan55976">Linux</tspan></tspan></text>
+           id="tspan1083">Linux</tspan></tspan></text>
   </g>
   <g
      inkscape:groupmode="layer"
      id="g45136"
      inkscape:label="iOS"
-     style="display:none">
+     style="display:none"
+     sodipodi:insensitive="true">
     <text
        xml:space="preserve"
        transform="matrix(0.2281604,0,0,0.2281604,58.906692,54.39993)"
@@ -252,16 +349,17 @@
        x="59.503082"
        y="0"><tspan
          x="-210.19876"
-         y="-97.397814"
-         id="tspan55982"><tspan
+         y="-97.481533"
+         id="tspan1089"><tspan
            style="font-family:'Roboto Black';-inkscape-font-specification:'Roboto Black, '"
-           id="tspan55980">iOS</tspan></tspan></text>
+           id="tspan1087">iOS</tspan></tspan></text>
   </g>
   <g
      inkscape:groupmode="layer"
      id="g11579"
      inkscape:label="Android"
-     style="display:none">
+     style="display:none"
+     sodipodi:insensitive="true">
     <text
        xml:space="preserve"
        transform="matrix(0.2281604,0,0,0.2281604,58.906692,54.39993)"
@@ -273,9 +371,9 @@
        x="59.503082"
        y="0"><tspan
          x="-243.41751"
-         y="-97.397814"
-         id="tspan55986"><tspan
+         y="-97.481533"
+         id="tspan1093"><tspan
            style="font-family:'Roboto Black';-inkscape-font-specification:'Roboto Black, '"
-           id="tspan55984">Android</tspan></tspan></text>
+           id="tspan1091">Android</tspan></tspan></text>
   </g>
 </svg>

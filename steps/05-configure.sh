@@ -18,18 +18,23 @@ mkdir -p "$BUILD"
   echo "pdf_enable_v8 = $ENABLE_V8"
   echo "pdf_enable_xfa = $ENABLE_V8"
   echo "treat_warnings_as_errors = false"
+  echo "is_component_build = false"
+
+  if [ "$ENABLE_V8" == "true" ]; then
+    echo "v8_use_external_startup_data = false"
+    echo "v8_enable_i18n_support = false"
+  fi
 
   case "$OS" in
     ios)
       echo "ios_enable_code_signing = false"
+      echo "use_blink = true"
+      [ "$ENABLE_V8" == "true" ] && [ "$TARGET_CPU" == "arm64" ] && echo 'arm_control_flow_integrity = "none"'
       ;;
     mac)
       echo 'mac_deployment_target = "10.13.0"'
       ;;
-    win)
-      echo 'pdf_use_win32_gdi = true'
-      ;;
-    wasm):
+    wasm)
       echo 'pdf_is_complete_lib = true'
       echo 'pdf_use_partition_alloc = false'
       echo 'is_clang = false'
@@ -41,6 +46,7 @@ mkdir -p "$BUILD"
       echo 'is_musl = true'
       echo 'is_clang = false'
       echo 'use_custom_libcxx = false'
+      [ "$ENABLE_V8" == "true" ] && echo "v8_snapshot_toolchain = \"//build/toolchain/linux:$TARGET_CPU\""
       ;;
   esac
 
