@@ -26,6 +26,9 @@ case "$OS" in
     git apply -v "$PATCHES/wasm/pdfium.patch"
     git apply -v "$PATCHES/wasm/data_avail.patch"
     git -C build apply -v "$PATCHES/wasm/build.patch"
+    pushd ../emsdk/upstream/emscripten
+    patch -p1 --forward < "$PATCHES/wasm/emscripten.patch" || true
+    popd
     mkdir -p "build/toolchain/wasm"
     cp "$PATCHES/wasm/toolchain.gn" "build/toolchain/wasm/BUILD.gn"
     mkdir -p "build/config/wasm"

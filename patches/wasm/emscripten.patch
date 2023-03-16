@@ -1,0 +1,446 @@
+diff --git a/system/include/wasi/api.h b/system/include/wasi/api.h
+index f3bb425f6..117a8da46 100644
+--- a/system/include/wasi/api.h
++++ b/system/include/wasi/api.h
+@@ -1008,6 +1008,19 @@ typedef uint32_t __wasi_lookupflags_t;
+ _Static_assert(sizeof(__wasi_lookupflags_t) == 4, "witx calculated size");
+ _Static_assert(_Alignof(__wasi_lookupflags_t) == 4, "witx calculated align");
+ 
++/**
++ * Default FD for the root folder.
++ * Why file descriptor 3?
++ * While not specified, the most common WASI implementation, wasi-libc, expects
++ * POSIX style file descriptor allocation, where the lowest available number is
++ * used to open the next file. Since 1 and 2 are taken by stdout and stderr,
++ * `root` is assigned 3.
++ *   - https://github.com/WebAssembly/WASI/issues/122
++ *   - https://pubs.opengroup.org/onlinepubs/9699919799/functions/V2_chap02.html#tag_15_14
++ *   - https://github.com/WebAssembly/wasi-libc/blob/wasi-sdk-16/libc-bottom-half/sources/preopens.c#L215
++ */
++#define __WASI_FD_ROOT 3
++
+ /**
+  * Open flags used by `path_open`.
+  */
+diff --git a/system/lib/standalone/standalone.c b/system/lib/standalone/standalone.c
+index 690106cce..4169440a5 100644
+--- a/system/lib/standalone/standalone.c
++++ b/system/lib/standalone/standalone.c
+@@ -6,6 +6,7 @@
+  */
+ 
+ #define _GNU_SOURCE
++#include <dirent.h>
+ #include <assert.h>
+ #include <errno.h>
+ #include <signal.h>
+@@ -16,6 +17,10 @@
+ #include <syscall_arch.h>
+ #include <time.h>
+ #include <unistd.h>
++#include <fcntl.h>
++#include <sys/stat.h>
++#include <fcntl.h>
++#include <stdio.h>
+ 
+ #include <emscripten.h>
+ #include <emscripten/heap.h>
+@@ -33,6 +38,13 @@
+ 
+ // libc
+ 
++#ifdef NDEBUG
++#define REPORT_UNSUPPORTED(action)
++#else
++#define REPORT_UNSUPPORTED(action) \
++  emscripten_console_error("the program tried to " #action ", this is not supported in standalone mode");
++#endif
++
+ void abort() {
+   _Exit(1);
+ }
+@@ -90,16 +102,77 @@ __attribute__((__weak__)) int _munmap_js(
+ // open()
+ __attribute__((__weak__))
+ int __syscall_openat(int dirfd, intptr_t path, int flags, ...) {
+-  if (!strcmp((const char*)path, "/dev/stdin")) {
++  const char* pathname = (const char*)path;
++  if (!strcmp(pathname, "/dev/stdin")) {
+     return STDIN_FILENO;
+   }
+-  if (!strcmp((const char*)path, "/dev/stdout")) {
++  if (!strcmp(pathname, "/dev/stdout")) {
+     return STDOUT_FILENO;
+   }
+-  if (!strcmp((const char*)path, "/dev/stderr")) {
++  if (!strcmp(pathname, "/dev/stderr")) {
+     return STDERR_FILENO;
+   }
+-  return -EPERM;
++
++  // @todo: implement AT_FDCWD properly.
++  if (pathname[0] == '/') {
++    dirfd = __WASI_FD_ROOT;
++  }
++
++  // Compute rights corresponding with the access modes provided.
++  // Attempt to obtain all rights, except the ones that contradict the
++  // access mode provided to openat().
++  __wasi_rights_t max =
++    ~(__WASI_RIGHTS_FD_DATASYNC | __WASI_RIGHTS_FD_READ |
++      __WASI_RIGHTS_FD_WRITE | __WASI_RIGHTS_FD_ALLOCATE |
++      __WASI_RIGHTS_FD_READDIR | __WASI_RIGHTS_FD_FILESTAT_SET_SIZE);
++  switch (flags & O_ACCMODE) {
++    case O_RDONLY:
++    case O_RDWR:
++    case O_WRONLY:
++      if ((flags & O_RDONLY) != 0) {
++        max |= __WASI_RIGHTS_FD_READ | __WASI_RIGHTS_FD_READDIR;
++      }
++      if ((flags & O_WRONLY) != 0) {
++        max |= __WASI_RIGHTS_FD_DATASYNC | __WASI_RIGHTS_FD_WRITE |
++               __WASI_RIGHTS_FD_ALLOCATE |
++               __WASI_RIGHTS_FD_FILESTAT_SET_SIZE;
++      }
++      break;
++    case O_EXEC: // O_EXEC => O_PATH => 010000000
++    //case O_SEARCH: O_SEARCH => O_PATH => 010000000, both are the same, so causes errors.
++      break;
++    default:
++      errno = EINVAL;
++      return -1;
++  }
++
++  // Ensure that we can actually obtain the minimal rights needed.
++  __wasi_fdstat_t fsb_cur;
++  __wasi_errno_t error = __wasi_fd_fdstat_get(dirfd, &fsb_cur);
++  if (error != __WASI_ERRNO_SUCCESS) {
++    return __wasi_syscall_ret(error);
++  }
++
++  // Path lookup properties.
++  __wasi_lookupflags_t lookup_flags = 0;
++  if ((flags & O_NOFOLLOW) == 0)
++    lookup_flags |= __WASI_LOOKUPFLAGS_SYMLINK_FOLLOW;
++
++  // Open file with appropriate rights.
++  __wasi_fdflags_t fs_flags = flags & 0xfff;
++  __wasi_rights_t fs_rights_base = max & fsb_cur.fs_rights_inheriting;
++  __wasi_rights_t fs_rights_inheriting = fsb_cur.fs_rights_inheriting;
++  __wasi_fd_t newfd;
++
++  error = __wasi_path_open(dirfd, lookup_flags, pathname, strlen(pathname),
++                           (flags >> 12) & 0xfff,
++                           fs_rights_base, fs_rights_inheriting, fs_flags,
++                           &newfd);
++  if (error != __WASI_ERRNO_SUCCESS) {
++    return __wasi_syscall_ret(error);
++  }
++
++  return newfd;
+ }
+ 
+ __attribute__((__weak__)) int __syscall_ioctl(int fd, int op, ...) {
+@@ -110,17 +183,264 @@ __attribute__((__weak__)) int __syscall_fcntl64(int fd, int cmd, ...) {
+   return -ENOSYS;
+ }
+ 
+-__attribute__((__weak__)) int __syscall_fstat64(int fd, intptr_t buf) {
++__attribute__((__weak__)) int __syscall_ftruncate64(int fd, uint64_t size) {
+   return -ENOSYS;
+ }
+ 
+-// There is no good source of entropy without an import. Make this weak so that
+-// it can be replaced with a pRNG or a proper import.
++__attribute__((__weak__)) int __syscall_rmdir(intptr_t path) {
++  return -ENOSYS;
++}
++
++__attribute__((__weak__)) int __syscall_unlinkat(int dirfd, intptr_t path, int flags) {
++  return -ENOSYS;
++}
++
++static void __wasi_filestat_to_stat(const __wasi_filestat_t *in,
++                                  struct stat *out) {
++  *out = (struct stat){
++    .st_dev = in->dev,
++    .st_ino = in->ino,
++    .st_nlink = in->nlink,
++    .st_size = in->size,
++    .st_atim = __wasi_timestamp_to_timespec(in->atim),
++    .st_mtim = __wasi_timestamp_to_timespec(in->mtim),
++    .st_ctim = __wasi_timestamp_to_timespec(in->ctim),
++  };
++
++  // Convert file type to legacy types encoded in st_mode.
++  switch (in->filetype) {
++    case __WASI_FILETYPE_BLOCK_DEVICE:
++      out->st_mode |= S_IFBLK;
++      break;
++    case __WASI_FILETYPE_CHARACTER_DEVICE:
++      out->st_mode |= S_IFCHR;
++      break;
++    case __WASI_FILETYPE_DIRECTORY:
++      out->st_mode |= S_IFDIR;
++      break;
++    case __WASI_FILETYPE_REGULAR_FILE:
++      out->st_mode |= S_IFREG;
++      break;
++    case __WASI_FILETYPE_SOCKET_DGRAM:
++    case __WASI_FILETYPE_SOCKET_STREAM:
++      out->st_mode |= S_IFSOCK;
++      break;
++    case __WASI_FILETYPE_SYMBOLIC_LINK:
++      out->st_mode |= S_IFLNK;
++      break;
++  }
++}
++
+ __attribute__((__weak__))
+-int getentropy(void* buffer, size_t length) {
+-  abort();
++int __syscall_fstat64(int fd, intptr_t buf) {
++  __wasi_filestat_t internal_stat;
++  __wasi_errno_t error = __wasi_fd_filestat_get(fd, &internal_stat);
++  if (error != __WASI_ERRNO_SUCCESS) {
++    return __wasi_syscall_ret(error);
++  }
++  __wasi_filestat_to_stat(&internal_stat, (struct stat *) buf);
++  return 0;
++}
++
++__attribute__((__weak__))
++int __syscall_getdents64(int fd, intptr_t dirp, size_t count) {
++  intptr_t dirpointer = dirp;
++  struct dirent *de;
++  de = (void *)(dirpointer);
++
++  // Check if the result buffer is too small.
++  if (count / sizeof(struct dirent) == 0) {
++    return -EINVAL;
++  }
++
++  __wasi_dirent_t entry;
++
++  // Create new buffer size to save same amount of __wasi_dirent_t as dirp records.
++  size_t buffer_size = (count / sizeof(struct dirent)) * (sizeof(entry) + 256);
++  char *buffer = malloc(buffer_size);
++  if (buffer == NULL) {
++    return -1;
++  }
++
++  size_t buffer_processed = buffer_size;
++  size_t buffer_used = buffer_size;
++  size_t dirent_processed = 0;
++
++  // Use the cookie of the previous entries, readdir reuses the buffer so
++  // a nonzero de->d_off is the cookie of the last readdir call.
++  int i;
++  struct dirent *checkde;
++  __wasi_dircookie_t cookie = 0;
++  for (i = 0; i < (count / sizeof(struct dirent)); ++i) {
++    checkde = (void *)(dirpointer + (sizeof(struct dirent) * i));
++
++    // Store cookie if it's bigger than the last known.
++    if (checkde->d_off > cookie) {
++      cookie = checkde->d_off;
++    }
++
++    // Reset cookie to 0 so that this offset isn't going to hunt us in later calls.
++    checkde->d_off = 0;
++  }
++
++  for (;;) {
++    // Extract the next dirent header.
++    size_t buffer_left = buffer_used - buffer_processed;
++    if (buffer_left < sizeof(__wasi_dirent_t)) {
++      // End-of-file.
++      if (buffer_used < buffer_size) {
++        break;
++      }
++
++      goto read_entries;
++    }
++    __wasi_dirent_t entry;
++    memcpy(&entry, buffer + buffer_processed, sizeof(entry));
++
++    size_t entry_size = sizeof(__wasi_dirent_t) + entry.d_namlen;
++    if (entry.d_namlen == 0) {
++      // Invalid pathname length. Skip the entry.
++      buffer_processed += entry_size;
++      continue;
++    }
++
++    // The entire entry must be present in buffer space. If not, read
++    // the entry another time. Ensure that the read buffer is large
++    // enough to fit at least this single entry.
++    if (buffer_left < entry_size) {
++      while (buffer_size < entry_size) {
++        buffer_size *= 2;
++      }
++      char *new_buffer = realloc(buffer, buffer_size);
++      if (new_buffer == NULL) {
++        return -1;
++      }
++      buffer = new_buffer;
++      goto read_entries;
++    }
++
++    const char *name = buffer + buffer_processed + sizeof(entry);
++    buffer_processed += entry_size;
++
++    // Skip entries that do not fit in the dirent name buffer.
++    if (entry.d_namlen > sizeof de->d_name) {
++      continue;
++    }
++
++    // Skip entries having null bytes in the filename.
++    if (memchr(name, '\0', entry.d_namlen) != NULL) {
++      continue;
++    }
++
++    de->d_ino = entry.d_ino;
++
++    // Map the right WASI type to dirent type.
++    // I could not get the dirent.h import to work to use defines.
++    switch (entry.d_type) {
++      case __WASI_FILETYPE_UNKNOWN:
++        de->d_type = 0;
++        break;
++      case __WASI_FILETYPE_BLOCK_DEVICE:
++        de->d_type = 6;
++        break;
++      case __WASI_FILETYPE_CHARACTER_DEVICE:
++        de->d_type = 2;
++        break;
++      case __WASI_FILETYPE_DIRECTORY:
++        de->d_type = 4;
++        break;
++      case __WASI_FILETYPE_REGULAR_FILE:
++        de->d_type = 8;
++        break;
++      case __WASI_FILETYPE_SOCKET_DGRAM:
++        de->d_type = 12;
++        break;
++      case __WASI_FILETYPE_SOCKET_STREAM:
++        de->d_type = 12;
++        break;
++      case __WASI_FILETYPE_SYMBOLIC_LINK:
++        de->d_type = 10;
++        break;
++      default:
++        de->d_type = 0;
++        break;
++    }
++
++    de->d_off = entry.d_next;
++    de->d_reclen = sizeof(struct dirent);
++    memcpy(de->d_name, name, entry.d_namlen);
++    de->d_name[entry.d_namlen] = '\0';
++    cookie = entry.d_next;
++    dirent_processed = dirent_processed + sizeof(struct dirent);
++
++    // Can't fit more in my buffer.
++    if (dirent_processed + sizeof(struct dirent) > count) {
++      break;
++    }
++
++    // Set entry to next entry in memory.
++    dirpointer = dirpointer + sizeof(struct dirent);
++    de = (void *)(dirpointer);
++
++    continue;
++
++    read_entries:;
++      // Load more directory entries and continue.
++      // TODO: Remove the cast on `buffer` once the witx is updated with char8 support.
++      __wasi_errno_t error = __wasi_fd_readdir(fd, (uint8_t *)buffer, buffer_size,
++                                               cookie, &buffer_used);
++      if (error != 0) {
++        errno = error;
++        return -1;
++      }
++      buffer_processed = 0;
++  }
++
++  return dirent_processed;
+ }
+ 
++int __syscall_newfstatat(int dirfd, intptr_t path, intptr_t buf, int flags) {
++  // Convert flags to WASI.
++  __wasi_lookupflags_t lookup_flags = 0;
++  if ((flags & AT_SYMLINK_NOFOLLOW) == 0) {
++    lookup_flags |= __WASI_LOOKUPFLAGS_SYMLINK_FOLLOW;
++  }
++
++  const char* pathname = (const char*)path;
++
++  // @todo: implement AT_FDCWD properly.
++  if (pathname[0] == '/') {
++    dirfd = __WASI_FD_ROOT;
++  }
++
++  __wasi_filestat_t fsb_cur;
++  __wasi_errno_t error = __wasi_path_filestat_get(dirfd, lookup_flags, pathname, strlen(pathname), &fsb_cur);
++  if (error != __WASI_ERRNO_SUCCESS) {
++    return __wasi_syscall_ret(error);
++  }
++
++  __wasi_filestat_to_stat(&fsb_cur, (struct stat *) buf);
++
++  return 0;
++}
++
++__attribute__((__weak__))
++int __syscall_stat64(intptr_t path, intptr_t buf) {
++  return __syscall_newfstatat(AT_FDCWD, path, buf, 0);
++}
++
++__attribute__((__weak__))
++int __syscall_lstat64(intptr_t path, intptr_t buf) {
++  return __syscall_newfstatat(AT_FDCWD, path, buf, AT_SYMLINK_NOFOLLOW);
++}
++
++__attribute__((__weak__))
++int getentropy(void *buffer, size_t length) {
++  return __wasi_syscall_ret(__wasi_random_get(buffer, length));
++}
++
++
++
+ // Emscripten additions
+ 
+ extern void emscripten_notify_memory_growth(size_t memory_index);
+@@ -156,12 +476,18 @@ double emscripten_get_now(void) {
+   return (1000 * clock()) / (double)CLOCKS_PER_SEC;
+ }
+ 
++__attribute__((__weak__))
++void _emscripten_throw_longjmp() {
++  REPORT_UNSUPPORTED(call longjmp);
++  abort();
++}
++
+ // C++ ABI
+ 
+ // Emscripten disables exception catching by default, but not throwing. That
+ // allows users to see a clear error if a throw happens, and 99% of the
+ // overhead is in the catching, so this is a reasonable tradeoff.
+-// For now, in a standalone build just terminate. TODO nice error message
++// For now, in a standalone build just terminate.
+ //
+ // Define these symbols as weak so that when we build with exceptions
+ // enabled (using wasm-eh) we get the real versions of these functions
+@@ -169,11 +495,7 @@ double emscripten_get_now(void) {
+ 
+ __attribute__((__weak__))
+ void __cxa_throw(void* ptr, void* type, void* destructor) {
+-  abort();
+-}
+-
+-__attribute__((__weak__))
+-void* __cxa_allocate_exception(size_t thrown_size) {
++  REPORT_UNSUPPORTED(throw an exception);
+   abort();
+ }
+ 
