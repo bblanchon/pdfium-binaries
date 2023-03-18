@@ -12,10 +12,10 @@ index b97d88141..ec98cbb38 100644
    configs += [
 diff --git a/fpdfsdk/fpdf_emscripten.c b/fpdfsdk/fpdf_emscripten.c
 new file mode 100644
-index 000000000..245c82914
+index 000000000..c5e6d0e71
 --- /dev/null
 +++ b/fpdfsdk/fpdf_emscripten.c
-@@ -0,0 +1,130 @@
+@@ -0,0 +1,179 @@
 +#include <emscripten.h>
 +#include <stdlib.h>
 +#include <stdio.h>
@@ -23,6 +23,7 @@ index 000000000..245c82914
 +#include "public/fpdf_save.h"
 +#include "public/fpdf_dataavail.h"
 +#include "public/fpdf_ext.h"
++#include "public/fpdf_formfill.h"
 +
 +extern int FPDF_FILEACCESS_CB(void* param, unsigned long position, unsigned char* pBuf, unsigned long size);
 +
@@ -145,5 +146,53 @@ index 000000000..245c82914
 +EMSCRIPTEN_KEEPALIVE
 +void FSDK_SetLocaltimeFunction_SET_CB() {
 +  FSDK_SetLocaltimeFunction(&setLocaltimeFunction_INLINE_CB);
++}
++
++extern void FPDF_FORMFILLINFO_Release_CB(struct _FPDF_FORMFILLINFO *this);
++extern void FPDF_FORMFILLINFO_FFI_Invalidate_CB(struct _FPDF_FORMFILLINFO *this, FPDF_PAGE page, double left, double top, double right, double bottom);
++extern void FPDF_FORMFILLINFO_FFI_OutputSelectedRect_CB(struct _FPDF_FORMFILLINFO *this, FPDF_PAGE page, double left, double top, double right, double bottom);
++extern void FPDF_FORMFILLINFO_FFI_SetCursor_CB(struct _FPDF_FORMFILLINFO *this, int nCursorType);
++extern int FPDF_FORMFILLINFO_FFI_SetTimer_CB(struct _FPDF_FORMFILLINFO *this, int uElapse, TimerCallback lpTimerFunc);
++extern void FPDF_FORMFILLINFO_FFI_KillTimer_CB(struct _FPDF_FORMFILLINFO *this, int nTimerID);
++extern FPDF_SYSTEMTIME FPDF_FORMFILLINFO_FFI_GetLocalTime_CB(struct _FPDF_FORMFILLINFO *this);
++extern void FPDF_FORMFILLINFO_FFI_OnChange_CB(struct _FPDF_FORMFILLINFO *this);
++extern FPDF_PAGE FPDF_FORMFILLINFO_FFI_GetPage_CB(struct _FPDF_FORMFILLINFO *this, FPDF_DOCUMENT document, int nPageIndex);
++extern FPDF_PAGE FPDF_FORMFILLINFO_FFI_GetCurrentPage_CB(struct _FPDF_FORMFILLINFO *this, FPDF_DOCUMENT document);
++extern int FPDF_FORMFILLINFO_FFI_GetRotation_CB(struct _FPDF_FORMFILLINFO *this, FPDF_PAGE page);
++extern void FPDF_FORMFILLINFO_FFI_ExecuteNamedAction_CB(struct _FPDF_FORMFILLINFO *this, FPDF_BYTESTRING namedAction);
++extern void FPDF_FORMFILLINFO_FFI_SetTextFieldFocus_CB(struct _FPDF_FORMFILLINFO *this, FPDF_WIDESTRING value, FPDF_DWORD valueLen, FPDF_BOOL is_focus);
++extern void FPDF_FORMFILLINFO_FFI_DoURIAction_CB(struct _FPDF_FORMFILLINFO *this, FPDF_BYTESTRING bsURI);
++extern void FPDF_FORMFILLINFO_FFI_DoGoToAction_CB(struct _FPDF_FORMFILLINFO *this, int nPageIndex, int zoomMode, float* fPosArray, int sizeofArray);
++
++EMSCRIPTEN_KEEPALIVE
++void FPDF_FORMFILLINFO_CALL_TIMER(TimerCallback t, int id) {
++  t(id);
++}
++
++EMSCRIPTEN_KEEPALIVE
++FPDF_FORMFILLINFO* FPDF_FORMFILLINFO_Create() {
++  FPDF_FORMFILLINFO* formFillInfo = malloc(sizeof(FPDF_FORMFILLINFO));
++  formFillInfo->version = 1;
++  formFillInfo->Release = &FPDF_FORMFILLINFO_Release_CB;
++  formFillInfo->FFI_Invalidate = &FPDF_FORMFILLINFO_FFI_Invalidate_CB;
++  formFillInfo->FFI_OutputSelectedRect = &FPDF_FORMFILLINFO_FFI_OutputSelectedRect_CB;
++  formFillInfo->FFI_SetCursor = &FPDF_FORMFILLINFO_FFI_SetCursor_CB;
++  formFillInfo->FFI_SetTimer = &FPDF_FORMFILLINFO_FFI_SetTimer_CB;
++  formFillInfo->FFI_KillTimer = &FPDF_FORMFILLINFO_FFI_KillTimer_CB;
++  formFillInfo->FFI_GetLocalTime = &FPDF_FORMFILLINFO_FFI_GetLocalTime_CB;
++  formFillInfo->FFI_OnChange = &FPDF_FORMFILLINFO_FFI_OnChange_CB;
++  formFillInfo->FFI_GetPage = &FPDF_FORMFILLINFO_FFI_GetPage_CB;
++  formFillInfo->FFI_GetCurrentPage = &FPDF_FORMFILLINFO_FFI_GetCurrentPage_CB;
++  formFillInfo->FFI_GetRotation = &FPDF_FORMFILLINFO_FFI_GetRotation_CB;
++  formFillInfo->FFI_ExecuteNamedAction = &FPDF_FORMFILLINFO_FFI_ExecuteNamedAction_CB;
++  formFillInfo->FFI_SetTextFieldFocus = &FPDF_FORMFILLINFO_FFI_SetTextFieldFocus_CB;
++  formFillInfo->FFI_DoURIAction = &FPDF_FORMFILLINFO_FFI_DoURIAction_CB;
++  formFillInfo->FFI_DoGoToAction = &FPDF_FORMFILLINFO_FFI_DoGoToAction_CB;
++  return formFillInfo;
++}
++
++EMSCRIPTEN_KEEPALIVE
++int FPDF_FORMFILLINFO_Size() {
++  return sizeof(FPDF_FORMFILLINFO);
 +}
 \ No newline at end of file
