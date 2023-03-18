@@ -1,5 +1,5 @@
 diff --git a/fpdfsdk/BUILD.gn b/fpdfsdk/BUILD.gn
-index 1f75bef05..0abc3d55b 100644
+index b97d88141..ec98cbb38 100644
 --- a/fpdfsdk/BUILD.gn
 +++ b/fpdfsdk/BUILD.gn
 @@ -59,6 +59,7 @@ source_set("fpdfsdk") {
@@ -12,15 +12,16 @@ index 1f75bef05..0abc3d55b 100644
    configs += [
 diff --git a/fpdfsdk/fpdf_emscripten.c b/fpdfsdk/fpdf_emscripten.c
 new file mode 100644
-index 000000000..8e20927d3
+index 000000000..9facee7de
 --- /dev/null
 +++ b/fpdfsdk/fpdf_emscripten.c
-@@ -0,0 +1,36 @@
+@@ -0,0 +1,65 @@
 +#include <emscripten.h>
 +#include <stdlib.h>
 +#include <stdio.h>
 +#include "public/fpdfview.h"
 +#include "public/fpdf_save.h"
++#include "public/fpdf_dataavail.h"
 +
 +extern int FPDF_FILEACCESS_CB(void* param, unsigned long position, unsigned char* pBuf, unsigned long size);
 +
@@ -51,5 +52,33 @@ index 000000000..8e20927d3
 +EMSCRIPTEN_KEEPALIVE
 +int FPDF_FILEWRITE_Size() {
 +  return sizeof(FPDF_FILEWRITE);
++}
++
++extern int FX_FILEAVAIL_IS_DATA_AVAILABLE_CB(struct _FX_FILEAVAIL *me, size_t offset, size_t size);
++
++EMSCRIPTEN_KEEPALIVE
++FX_FILEAVAIL* FX_FILEAVAIL_Create() {
++  FX_FILEAVAIL* fileAvail = malloc(sizeof(FX_FILEAVAIL));
++  fileAvail->IsDataAvail = FX_FILEAVAIL_IS_DATA_AVAILABLE_CB;
++  return fileAvail;
++}
++
++EMSCRIPTEN_KEEPALIVE
++int FX_FILEAVAIL_Size() {
++  return sizeof(FX_FILEAVAIL);
++}
++
++extern void FX_DOWNLOADHINTS_ADD_SEGMENT_CB(struct _FX_DOWNLOADHINTS *me, size_t offset, size_t size);
++
++EMSCRIPTEN_KEEPALIVE
++FX_DOWNLOADHINTS* FX_DOWNLOADHINTS_Create() {
++  FX_DOWNLOADHINTS* fileDownloadHints = malloc(sizeof(FX_DOWNLOADHINTS));
++  fileDownloadHints->AddSegment = FX_DOWNLOADHINTS_ADD_SEGMENT_CB;
++  return fileDownloadHints;
++}
++
++EMSCRIPTEN_KEEPALIVE
++int FX_DOWNLOADHINTS_Size() {
++  return sizeof(FX_DOWNLOADHINTS);
 +}
 \ No newline at end of file
