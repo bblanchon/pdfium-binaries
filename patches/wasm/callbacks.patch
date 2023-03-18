@@ -12,16 +12,17 @@ index b97d88141..ec98cbb38 100644
    configs += [
 diff --git a/fpdfsdk/fpdf_emscripten.c b/fpdfsdk/fpdf_emscripten.c
 new file mode 100644
-index 000000000..9facee7de
+index 000000000..245c82914
 --- /dev/null
 +++ b/fpdfsdk/fpdf_emscripten.c
-@@ -0,0 +1,65 @@
+@@ -0,0 +1,130 @@
 +#include <emscripten.h>
 +#include <stdlib.h>
 +#include <stdio.h>
 +#include "public/fpdfview.h"
 +#include "public/fpdf_save.h"
 +#include "public/fpdf_dataavail.h"
++#include "public/fpdf_ext.h"
 +
 +extern int FPDF_FILEACCESS_CB(void* param, unsigned long position, unsigned char* pBuf, unsigned long size);
 +
@@ -80,5 +81,69 @@ index 000000000..9facee7de
 +EMSCRIPTEN_KEEPALIVE
 +int FX_DOWNLOADHINTS_Size() {
 +  return sizeof(FX_DOWNLOADHINTS);
++}
++
++extern void UNSUPPORT_INFO_HANDLER_CB(struct _UNSUPPORT_INFO *pThis, int nType);
++
++EMSCRIPTEN_KEEPALIVE
++UNSUPPORT_INFO* UNSUPPORT_INFO_Create() {
++  UNSUPPORT_INFO* unsupportInfo = malloc(sizeof(UNSUPPORT_INFO));
++  unsupportInfo->version = 1;
++  unsupportInfo->FSDK_UnSupport_Handler = UNSUPPORT_INFO_HANDLER_CB;
++  return unsupportInfo;
++}
++
++EMSCRIPTEN_KEEPALIVE
++int UNSUPPORT_INFO_Size() {
++  return sizeof(UNSUPPORT_INFO);
++}
++
++extern time_t FSDK_SetTimeFunction_CB();
++
++EMSCRIPTEN_KEEPALIVE
++void FSDK_SetTimeFunction_SET_CB() {
++  FSDK_SetTimeFunction(&FSDK_SetTimeFunction_CB);
++}
++
++typedef struct PdfiumLocalTime {
++  int tm_sec;
++  int tm_min;
++  int tm_hour;
++  int tm_mday;
++  int tm_mon;
++  int tm_year;
++  int tm_wday;
++  int tm_yday;
++  int tm_isdst;
++} PdfiumLocalTime;
++
++typedef const time_t ctime_t;
++extern PdfiumLocalTime* FSDK_SetLocaltimeFunction_CB(ctime_t *curTime);
++
++static inline struct tm* setLocaltimeFunction_INLINE_CB(const time_t *curTime) {
++  // Initialize a tm struct.
++  struct tm * local_time = localtime(curTime);
++
++  // For some reason I could not get the tm struct available in Go.
++  // So we have to do it like this.
++  PdfiumLocalTime* goLocalTime = FSDK_SetLocaltimeFunction_CB(curTime);
++
++  // Overwrite the tm struct values with the custom values.
++  local_time->tm_sec = goLocalTime->tm_sec;
++  local_time->tm_min = goLocalTime->tm_min;
++  local_time->tm_hour = goLocalTime->tm_hour;
++  local_time->tm_mday = goLocalTime->tm_mday;
++  local_time->tm_mon = goLocalTime->tm_mon;
++  local_time->tm_year = goLocalTime->tm_year;
++  local_time->tm_wday = goLocalTime->tm_wday;
++  local_time->tm_yday = goLocalTime->tm_yday;
++  local_time->tm_isdst = goLocalTime->tm_isdst;
++
++  return local_time;
++}
++
++EMSCRIPTEN_KEEPALIVE
++void FSDK_SetLocaltimeFunction_SET_CB() {
++  FSDK_SetLocaltimeFunction(&setLocaltimeFunction_INLINE_CB);
 +}
 \ No newline at end of file
