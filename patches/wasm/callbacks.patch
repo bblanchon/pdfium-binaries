@@ -12,10 +12,10 @@ index b97d88141..ec98cbb38 100644
    configs += [
 diff --git a/fpdfsdk/fpdf_emscripten.c b/fpdfsdk/fpdf_emscripten.c
 new file mode 100644
-index 000000000..c5e6d0e71
+index 000000000..c2779b55b
 --- /dev/null
 +++ b/fpdfsdk/fpdf_emscripten.c
-@@ -0,0 +1,179 @@
+@@ -0,0 +1,196 @@
 +#include <emscripten.h>
 +#include <stdlib.h>
 +#include <stdio.h>
@@ -24,6 +24,7 @@ index 000000000..c5e6d0e71
 +#include "public/fpdf_dataavail.h"
 +#include "public/fpdf_ext.h"
 +#include "public/fpdf_formfill.h"
++#include "public/fpdf_progressive.h"
 +
 +extern int FPDF_FILEACCESS_CB(void* param, unsigned long position, unsigned char* pBuf, unsigned long size);
 +
@@ -194,5 +195,21 @@ index 000000000..c5e6d0e71
 +EMSCRIPTEN_KEEPALIVE
 +int FPDF_FORMFILLINFO_Size() {
 +  return sizeof(FPDF_FORMFILLINFO);
++}
++
++extern int IFSDK_PAUSE_NeedToPauseNow_CB(struct _IFSDK_PAUSE *me);
++
++EMSCRIPTEN_KEEPALIVE
++IFSDK_PAUSE* IFSDK_PAUSE_Create(char *id) {
++  IFSDK_PAUSE* pause = malloc(sizeof(IFSDK_PAUSE));
++  pause->version = 1;
++  pause->user = id;
++  pause->NeedToPauseNow = &IFSDK_PAUSE_NeedToPauseNow_CB;
++  return pause;
++}
++
++EMSCRIPTEN_KEEPALIVE
++int IFSDK_PAUSE_Size() {
++  return sizeof(IFSDK_PAUSE);
 +}
 \ No newline at end of file
