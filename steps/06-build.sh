@@ -26,6 +26,7 @@ if [ "$TARGET_CPU" == "wasm" ]; then
       "$LIBPDFIUMA" \
       --no-entry
   else
+    # O3 does not work! Strips out too much!
     em++ \
       -s EXPORTED_FUNCTIONS="$EXPORTED_FUNCTIONS" \
       -s LLD_REPORT_UNDEFINED \
@@ -34,7 +35,7 @@ if [ "$TARGET_CPU" == "wasm" ]; then
       -s STANDALONE_WASM=1 \
       -s EXPORTED_RUNTIME_METHODS='["ccall", "cwrap"]' \
       -s ERROR_ON_UNDEFINED_SYMBOLS=0 \
-      -O2 \ # O3 does not work! Strips out too much!
+      -O2 \
       -o "$BUILD_DIR/pdfium.html" \
       "$LIBPDFIUMA" \
       --no-entry
