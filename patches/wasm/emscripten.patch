@@ -23,7 +23,7 @@ index f3bb425f6..117a8da46 100644
   * Open flags used by `path_open`.
   */
 diff --git a/system/lib/standalone/standalone.c b/system/lib/standalone/standalone.c
-index 690106cce..36d81626a 100644
+index 690106cce..1c7a601c8 100644
 --- a/system/lib/standalone/standalone.c
 +++ b/system/lib/standalone/standalone.c
 @@ -6,6 +6,7 @@
@@ -59,7 +59,7 @@ index 690106cce..36d81626a 100644
  void abort() {
    _Exit(1);
  }
-@@ -90,16 +102,108 @@ __attribute__((__weak__)) int _munmap_js(
+@@ -90,16 +102,111 @@ __attribute__((__weak__)) int _munmap_js(
  // open()
  __attribute__((__weak__))
  int __syscall_openat(int dirfd, intptr_t path, int flags, ...) {
@@ -81,6 +81,9 @@ index 690106cce..36d81626a 100644
 +  // @todo: implement AT_FDCWD properly.
 +  if (pathname[0] == '/') {
 +    dirfd = __WASI_FD_ROOT;
++
++    // Remove first char.
++    pathname++;
 +  }
 +
 +  // Compute rights corresponding with the access modes provided.
@@ -172,7 +175,7 @@ index 690106cce..36d81626a 100644
  }
  
  __attribute__((__weak__)) int __syscall_ioctl(int fd, int op, ...) {
-@@ -110,17 +214,264 @@ __attribute__((__weak__)) int __syscall_fcntl64(int fd, int cmd, ...) {
+@@ -110,17 +217,267 @@ __attribute__((__weak__)) int __syscall_fcntl64(int fd, int cmd, ...) {
    return -ENOSYS;
  }
  
@@ -409,6 +412,9 @@ index 690106cce..36d81626a 100644
 +  // @todo: implement AT_FDCWD properly.
 +  if (pathname[0] == '/') {
 +    dirfd = __WASI_FD_ROOT;
++
++    // Remove first char.
++    pathname++;
 +  }
 +
 +  __wasi_filestat_t fsb_cur;
@@ -442,7 +448,7 @@ index 690106cce..36d81626a 100644
  // Emscripten additions
  
  extern void emscripten_notify_memory_growth(size_t memory_index);
-@@ -156,12 +507,24 @@ double emscripten_get_now(void) {
+@@ -156,12 +513,24 @@ double emscripten_get_now(void) {
    return (1000 * clock()) / (double)CLOCKS_PER_SEC;
  }
  
@@ -468,7 +474,7 @@ index 690106cce..36d81626a 100644
  //
  // Define these symbols as weak so that when we build with exceptions
  // enabled (using wasm-eh) we get the real versions of these functions
-@@ -169,11 +532,7 @@ double emscripten_get_now(void) {
+@@ -169,11 +538,7 @@ double emscripten_get_now(void) {
  
  __attribute__((__weak__))
  void __cxa_throw(void* ptr, void* type, void* destructor) {
