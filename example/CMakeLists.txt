@@ -1,6 +1,5 @@
 cmake_minimum_required(VERSION 2.8)
 project(example)
-enable_testing()
 
 find_package(PDFium REQUIRED)
 
@@ -15,5 +14,3 @@ add_custom_command(
 	COMMAND
 		${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:pdfium> $<TARGET_FILE_DIR:example>
 )
-
-add_test(example example)
