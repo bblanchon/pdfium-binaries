@@ -58,6 +58,10 @@ case "$TARGET_OS" in
         x86)
           sudo apt-get install -y g++-multilib
           ;;
+
+        x64)
+          sudo apt-get install -y g++
+          ;;
       esac
 
     fi
