@@ -22,7 +22,7 @@ int main(int argc, char *argv[]) {
   }
 
   FPDF_FORMFILLINFO form_callbacks = {0};
-  form_callbacks.version = 1;
+  form_callbacks.version = 2;
   FPDF_FORMHANDLE form = FPDFDOC_InitFormFillEnvironment(doc, &form_callbacks);
 
   FPDF_PAGE page = FPDF_LoadPage(doc, 0);
