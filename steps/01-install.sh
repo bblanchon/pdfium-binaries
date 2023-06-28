@@ -58,6 +58,10 @@ case "$TARGET_OS" in
         x86)
           sudo apt-get install -y g++-multilib
           ;;
+
+        x64)
+          sudo apt-get install -y g++
+          ;;
       esac
 
     fi
@@ -70,8 +74,8 @@ case "$TARGET_OS" in
       git clone https://github.com/emscripten-core/emsdk.git
     fi
     pushd emsdk
-    ./emsdk install 3.1.34
-    ./emsdk activate 3.1.34
+    ./emsdk install 3.1.42
+    ./emsdk activate 3.1.42
     echo "$PWD/upstream/emscripten" >> "$PATH_FILE"
     echo "$PWD/upstream/bin" >> "$PATH_FILE"
     popd

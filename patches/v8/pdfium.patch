@@ -1,5 +1,5 @@
 diff --git a/fpdfsdk/fpdf_view.cpp b/fpdfsdk/fpdf_view.cpp
-index a93cf9520..bccad3840 100644
+index 723af28..8088d0c 100644
 --- a/fpdfsdk/fpdf_view.cpp
 +++ b/fpdfsdk/fpdf_view.cpp
 @@ -60,6 +60,9 @@
@@ -24,13 +24,18 @@ index a93cf9520..bccad3840 100644
  void UseRendererType(FPDF_RENDERER_TYPE public_type) {
    // Internal definition of renderer types must stay updated with respect to
    // the public definition, such that all public definitions can be mapped to
-@@ -221,6 +229,17 @@ FPDF_InitLibraryWithConfig(const FPDF_LIBRARY_CONFIG* config) {
+@@ -221,6 +229,22 @@ FPDF_InitLibraryWithConfig(const FPDF_LIBRARY_CONFIG* config) {
    if (g_bLibraryInitialized)
      return;
  
 +#ifdef PDF_ENABLE_V8
 +  g_platform = v8::platform::NewDefaultPlatform().release();
 +  v8::V8::InitializePlatform(g_platform);
++
++#ifdef PDF_ENABLE_XFA
++  cppgc::InitializeProcess(g_platform->GetPageAllocator());
++#endif
++
 +  v8::V8::Initialize();
 +
 +  v8::Isolate::CreateParams params;
@@ -42,7 +47,7 @@ index a93cf9520..bccad3840 100644
    FX_InitializeMemoryAllocators();
    CFX_GEModule::Create(config ? config->m_pUserFontPaths : nullptr);
    CPDF_PageModule::Create();
-@@ -229,14 +248,13 @@ FPDF_InitLibraryWithConfig(const FPDF_LIBRARY_CONFIG* config) {
+@@ -229,14 +253,13 @@ FPDF_InitLibraryWithConfig(const FPDF_LIBRARY_CONFIG* config) {
    CPDFXFA_ModuleInit();
  #endif  // PDF_ENABLE_XFA
  
@@ -63,10 +68,14 @@ index a93cf9520..bccad3840 100644
    g_bLibraryInitialized = true;
  }
  
-@@ -252,6 +270,15 @@ FPDF_EXPORT void FPDF_CALLCONV FPDF_DestroyLibrary() {
+@@ -252,6 +275,19 @@ FPDF_EXPORT void FPDF_CALLCONV FPDF_DestroyLibrary() {
    CFX_GEModule::Destroy();
    IJS_Runtime::Destroy();
  
++#ifdef PDF_ENABLE_XFA
++  cppgc::ShutdownProcess();
++#endif
++
 +#ifdef PDF_ENABLE_V8
 +  g_isolate->Dispose();
 +  g_isolate = nullptr;

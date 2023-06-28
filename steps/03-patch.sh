@@ -19,7 +19,6 @@ case "$OS" in
 
   ios)
     git apply -v "$PATCHES/ios/pdfium.patch"
-    git -C build apply -v "$PATCHES/ios/build.patch"
     ;;
 
   wasm)

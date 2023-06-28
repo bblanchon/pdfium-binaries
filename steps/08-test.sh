@@ -140,17 +140,15 @@ cmake "${CMAKE_ARGS[@]}"
 cmake --build .
 
 if [ "$OS" == "win" ]; then
-  file Debug/example.exe
+  EXAMPLE="Debug/example.exe"
 else
-  file example
+  EXAMPLE="./example"
 fi
 
+file $EXAMPLE
+
 if [ $CAN_RUN_ON_HOST == "true" ]; then
-  if [ "$OS" == "win" ]; then
-    Debug/example.exe
-  else
-    ./example
-  fi
+  $EXAMPLE "${PDFium_SOURCE_DIR}/testing/resources/hello_world.pdf" hello_world.ppm
 fi
 
 popd
