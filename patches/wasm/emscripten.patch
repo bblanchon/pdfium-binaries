@@ -23,7 +23,7 @@ index f3bb425f6..117a8da46 100644
   * Open flags used by `path_open`.
   */
 diff --git a/system/lib/standalone/standalone.c b/system/lib/standalone/standalone.c
-index 690106cce..1c7a601c8 100644
+index 690106cce..c268aeb4f 100644
 --- a/system/lib/standalone/standalone.c
 +++ b/system/lib/standalone/standalone.c
 @@ -6,6 +6,7 @@
@@ -175,7 +175,7 @@ index 690106cce..1c7a601c8 100644
  }
  
  __attribute__((__weak__)) int __syscall_ioctl(int fd, int op, ...) {
-@@ -110,17 +217,267 @@ __attribute__((__weak__)) int __syscall_fcntl64(int fd, int cmd, ...) {
+@@ -110,15 +217,290 @@ __attribute__((__weak__)) int __syscall_fcntl64(int fd, int cmd, ...) {
    return -ENOSYS;
  }
  
@@ -185,15 +185,15 @@ index 690106cce..1c7a601c8 100644
 +}
 +
 +__attribute__((__weak__)) int __syscall_rmdir(intptr_t path) {
-+  return -ENOSYS;
-+}
-+
-+__attribute__((__weak__)) int __syscall_unlinkat(int dirfd, intptr_t path, int flags) {
    return -ENOSYS;
  }
  
 -// There is no good source of entropy without an import. Make this weak so that
 -// it can be replaced with a pRNG or a proper import.
++__attribute__((__weak__)) int __syscall_unlinkat(int dirfd, intptr_t path, int flags) {
++  return -ENOSYS;
++}
++
 +static void __wasi_filestat_to_stat(const __wasi_filestat_t *in,
 +                                  struct stat *out) {
 +  *out = (struct stat){
@@ -426,8 +426,8 @@ index 690106cce..1c7a601c8 100644
 +  __wasi_filestat_to_stat(&fsb_cur, (struct stat *) buf);
 +
 +  return 0;
- }
- 
++}
++
 +__attribute__((__weak__))
 +int __syscall_stat64(intptr_t path, intptr_t buf) {
 +  return __syscall_newfstatat(AT_FDCWD, path, buf, 0);
@@ -443,12 +443,35 @@ index 690106cce..1c7a601c8 100644
 +  return __wasi_syscall_ret(__wasi_random_get(buffer, length));
 +}
 +
++__attribute__((__weak__))
++int __syscall_getcwd(intptr_t buf, size_t size) {
++  // Check if buf points to a bad address.
++  if (!buf && size > 0) {
++    return -EFAULT;
++  }
 +
++  // Check if the size argument is zero and buf is not a null pointer.
++  if (buf && size == 0) {
++    return -EINVAL;
++  }
 +
- // Emscripten additions
++  char res[1]="/"
++  int len = 2;
++
++  // Check if the size argument is less than the length of the absolute
++  // pathname of the working directory, including null terminator.
++  if (len >= size) {
++    return -ERANGE;
++  }
++
++  // Return value is a null-terminated c string.
++  strcpy((char*)buf, res);
++
++  return len;
+ }
  
- extern void emscripten_notify_memory_growth(size_t memory_index);
-@@ -156,12 +513,24 @@ double emscripten_get_now(void) {
+ // Emscripten additions
+@@ -156,12 +538,24 @@ double emscripten_get_now(void) {
    return (1000 * clock()) / (double)CLOCKS_PER_SEC;
  }
  
@@ -474,7 +497,7 @@ index 690106cce..1c7a601c8 100644
  //
  // Define these symbols as weak so that when we build with exceptions
  // enabled (using wasm-eh) we get the real versions of these functions
-@@ -169,11 +538,7 @@ double emscripten_get_now(void) {
+@@ -169,11 +563,7 @@ double emscripten_get_now(void) {
  
  __attribute__((__weak__))
  void __cxa_throw(void* ptr, void* type, void* destructor) {
