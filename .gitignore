@@ -11,3 +11,4 @@
 /build/
 *.tgz
 /*-musl-cross/
+/android-ndk*
