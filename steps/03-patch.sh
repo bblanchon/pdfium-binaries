@@ -27,6 +27,7 @@ case "$OS" in
     git -C build apply -v "$PATCHES/wasm/build.patch"
     pushd ../emsdk/upstream/emscripten
     patch -p1 --forward < "$PATCHES/wasm/emscripten.patch" || true
+    rm -Rf cache
     popd
     mkdir -p "build/toolchain/wasm"
     cp "$PATCHES/wasm/toolchain.gn" "build/toolchain/wasm/BUILD.gn"
