@@ -23,15 +23,3 @@ index 2b9bbd6..a7f3b6e 100644
      _default_toolchain = "//build/toolchain/linux:clang_$target_cpu"
    } else {
      _default_toolchain = "//build/toolchain/linux:$target_cpu"
-diff --git a/core/fxcodec/gif/cfx_gifcontext.cpp b/core/fxcodec/gif/cfx_gifcontext.cpp
-index e7fc432..9811759 100644
---- a/core/fxcodec/gif/cfx_gifcontext.cpp
-+++ b/core/fxcodec/gif/cfx_gifcontext.cpp
-@@ -7,6 +7,7 @@
- #include "core/fxcodec/gif/cfx_gifcontext.h"
- 
- #include <stdint.h>
-+#include <string.h>
- 
- #include <algorithm>
- #include <iterator>
