@@ -1,5 +1,5 @@
 diff --git a/build_overrides/BUILDCONFIG.gn b/build_overrides/BUILDCONFIG.gn
-index 768fe60e0..51329f704 100644
+index 2b9bbd6..a7f3b6e 100644
 --- a/build_overrides/BUILDCONFIG.gn
 +++ b/build_overrides/BUILDCONFIG.gn
 @@ -139,6 +139,9 @@ declare_args() {

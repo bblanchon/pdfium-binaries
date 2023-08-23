@@ -19,6 +19,20 @@ fi
 echo "$DepotTools_DIR" >> "$PATH_FILE"
 
 case "$TARGET_OS" in
+  android)
+    # pdfium installs its version of the NDK, but we need one for compiling the example
+    ANDROID_NDK_VERSION="r25c"
+    ANDROID_NDK_FOLDER="android-ndk-$ANDROID_NDK_VERSION"
+    ANDROID_NDK_ZIP="android-ndk-$ANDROID_NDK_VERSION-linux.zip"
+    if [ ! -d "$ANDROID_NDK_FOLDER" ];
+    then
+      [ -f "$ANDROID_NDK_ZIP" ] || curl -Os "https://dl.google.com/android/repository/$ANDROID_NDK_ZIP"
+      unzip -o -q "$ANDROID_NDK_ZIP"
+      rm -f "$ANDROID_NDK_ZIP"
+    fi
+    echo "$PWD/$ANDROID_NDK_FOLDER/toolchains/llvm/prebuilt/linux-x86_64/bin" >> "$PATH_FILE"
+    ;;
+
   linux)
     sudo apt-get update
     sudo apt-get install -y cmake pkg-config

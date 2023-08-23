@@ -4,7 +4,6 @@ OS=${PDFium_TARGET_OS:?}
 CPU="${PDFium_TARGET_CPU:?}"
 TARGET_LIBC="${PDFium_TARGET_LIBC:-default}"
 SOURCE_DIR="$PWD/example"
-ANDROID_TOOLCHAIN="${PDFium_SOURCE_DIR:?}/third_party/android_ndk/toolchains/llvm/prebuilt/linux-x86_64/bin/"
 CMAKE_ARGS=()
 CAN_RUN_ON_HOST=false
 
@@ -14,7 +13,7 @@ case "$OS" in
   android)
     case "$CPU" in
       arm)
-        PREFIX="armv7a-linux-androideabi16-"
+        PREFIX="armv7a-linux-androideabi19-"
         ;;
       arm64)
         PREFIX="aarch64-linux-android21-"
@@ -23,10 +22,9 @@ case "$OS" in
         PREFIX="x86_64-linux-android21-"
         ;;
       x86)
-        PREFIX="i686-linux-android16-"
+        PREFIX="i686-linux-android19-"
         ;;
     esac
-    export PATH="$ANDROID_TOOLCHAIN:$PATH"
     CMAKE_ARGS+=(
       -D CMAKE_C_COMPILER="${PREFIX:-}clang"
       -D CMAKE_CXX_COMPILER="${PREFIX:-}clang++"

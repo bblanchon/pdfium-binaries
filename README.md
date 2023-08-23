@@ -201,6 +201,10 @@ I can provide packages for your favorite package manager, but I need help from s
 
 ## Documentation
 
+### PDFium API documentation
+
+Please find the [documentation of the PDFium API on developers.foxit.com](https://developers.foxit.com/resources/pdf-sdk/c_api_reference_pdfium/index.html).
+
 ### How to use PDFium in a CMake project
 
 1. Unzip the downloaded package in a folder (e.g., `C:\Libraries\pdfium`)
