@@ -51,11 +51,13 @@ case "$OS" in
     ;;
 esac
 
+V_BUILD=0
 if [ -n "$VERSION" ]; then
+  V_BUILD=$(echo "$VERSION" | cut -d. -f3)
   cat >"$STAGING/VERSION" <<END
 MAJOR=$(echo "$VERSION" | cut -d. -f1)
 MINOR=$(echo "$VERSION" | cut -d. -f2)
-BUILD=$(echo "$VERSION" | cut -d. -f3)
+BUILD=$V_BUILD
 PATCH=$(echo "$VERSION" | cut -d. -f4)
 END
 fi
@@ -77,10 +79,11 @@ case "$OS" in
     ;;
 esac
 
-if [ $CONDA_HOST != "none" ] && [ "$LIBC" != "musl" ]; then
+if [ "$CONDA_HOST" != "none" ] && [ "$LIBC" != "musl" ]; then
     
   mkdir -p conda/staging/
-  VERSION=${VERSION:-0.0.0.0} conda build conda/ --output-folder conda/out/
+  # use only the build version for conda packages to simplify pinning
+  VERSION=$V_BUILD conda build conda/ --output-folder conda/out/
   
   case "$OS-$CPU" in
     linux-x86)
@@ -106,7 +109,7 @@ if [ $CONDA_HOST != "none" ] && [ "$LIBC" != "musl" ]; then
       ;;
   esac
   
-  if [ $CONDA_TARGET == "none" ]; then
+  if [ "$CONDA_TARGET" == "none" ]; then
     mkdir -p conda/staging/$CONDA_HOST/
     cp conda/out/$CONDA_HOST/*.tar.bz2 conda/staging/$CONDA_HOST/
   else
