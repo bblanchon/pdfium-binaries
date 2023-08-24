@@ -2,6 +2,8 @@
 
 IS_DEBUG=${PDFium_IS_DEBUG:-false}
 OS=${PDFium_TARGET_OS:?}
+CPU=${PDFium_TARGET_CPU:?}
+LIBC=${PDFium_TARGET_LIBC:-default}
 VERSION=${PDFium_VERSION:-}
 PATCHES="$PWD/patches"
 
@@ -19,33 +21,33 @@ sed "s/#VERSION#/${VERSION:-0.0.0.0}/" <"$PATCHES/PDFiumConfig.cmake" >"$STAGING
 
 cp "$SOURCE/LICENSES" "$STAGING/LICENSE"
 cp "$BUILD/args.gn" "$STAGING"
-cp -R "$SOURCE/public" "$STAGING/include"
+cp -R "$SOURCE/public" -T "$STAGING/include"
 rm -f "$STAGING/include/DEPS"
 rm -f "$STAGING/include/README"
 rm -f "$STAGING/include/PRESUBMIT.py"
 
 case "$OS" in
   android|linux)
-    mv "$BUILD/libpdfium.so" "$STAGING_LIB"
+    cp "$BUILD/libpdfium.so" "$STAGING_LIB"
     ;;
 
   mac|ios)
-    mv "$BUILD/libpdfium.dylib" "$STAGING_LIB"
+    cp "$BUILD/libpdfium.dylib" "$STAGING_LIB"
     ;;
 
   wasm)
-    mv "$BUILD/pdfium.html" "$STAGING_LIB"
-    mv "$BUILD/pdfium.js" "$STAGING_LIB"
-    mv "$BUILD/pdfium.wasm" "$STAGING_LIB"
+    cp "$BUILD/pdfium.html" "$STAGING_LIB"
+    cp "$BUILD/pdfium.js" "$STAGING_LIB"
+    cp "$BUILD/pdfium.wasm" "$STAGING_LIB"
     rm -rf "$STAGING/include/cpp"
     rm "$STAGING/PDFiumConfig.cmake"
     ;;
 
   win)
-    mv "$BUILD/pdfium.dll.lib" "$STAGING_LIB"
+    cp "$BUILD/pdfium.dll.lib" "$STAGING_LIB"
     mkdir -p "$STAGING_BIN"
-    mv "$BUILD/pdfium.dll" "$STAGING_BIN"
-    [ "$IS_DEBUG" == "true" ] && mv "$BUILD/pdfium.dll.pdb" "$STAGING_BIN"
+    cp "$BUILD/pdfium.dll" "$STAGING_BIN"
+    [ "$IS_DEBUG" == "true" ] && cp "$BUILD/pdfium.dll.pdb" "$STAGING_BIN"
     ;;
 esac
 
@@ -57,3 +59,62 @@ BUILD=$(echo "$VERSION" | cut -d. -f3)
 PATCH=$(echo "$VERSION" | cut -d. -f4)
 END
 fi
+
+# begin conda packaging
+
+case "$OS" in
+  linux)
+    CONDA_HOST="linux-64"
+    ;;
+  mac)
+    CONDA_HOST="osx-64"
+    ;;
+  win)
+    CONDA_HOST="win-64"
+    ;;
+  *)
+    CONDA_HOST="none"
+    ;;
+esac
+
+if [ $CONDA_HOST != "none" ] && [ "$LIBC" != "musl" ]; then
+    
+  mkdir -p conda/staging/
+  VERSION=${VERSION:-0.0.0.0} conda build conda/ --output-folder conda/out/
+  
+  case "$OS-$CPU" in
+    linux-x86)
+      CONDA_TARGET="linux-32"
+      ;;
+    linux-arm64)
+      CONDA_TARGET="linux-aarch64"
+      ;;
+    linux-arm)
+      CONDA_TARGET="linux-armv7l"
+      ;;
+    mac-arm64)
+      CONDA_TARGET="osx-arm64"
+      ;;
+    win-x86)
+      CONDA_TARGET="win-32"
+      ;;
+    win-arm64)
+      CONDA_TARGET="win-arm64"
+      ;;
+    *)
+      CONDA_TARGET="none"
+      ;;
+  esac
+  
+  if [ $CONDA_TARGET == "none" ]; then
+    mkdir -p conda/staging/$CONDA_HOST/
+    cp conda/out/$CONDA_HOST/*.tar.bz2 conda/staging/$CONDA_HOST/
+  else
+    conda convert conda/out/$CONDA_HOST/*.tar.bz2 -p $CONDA_TARGET -o conda/out/
+    mkdir -p conda/staging/$CONDA_TARGET/
+    cp conda/out/$CONDA_TARGET/*.tar.bz2 conda/staging/$CONDA_TARGET/
+  fi
+  
+fi
+
+# end conda packaging

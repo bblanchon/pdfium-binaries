@@ -1,0 +1,27 @@
+package:
+  name: pdfium-binaries-bblanchon
+  version: {{ environ["VERSION"] }}
+
+source:
+  path: ../../staging
+
+build:
+  number: 0
+
+test:
+  commands:
+    - test -f $PREFIX/lib/libpdfium.dylib  # [osx]
+    - test -f $PREFIX/lib/libpdfium.so  # [linux]
+    - if not exist "%LIBRARY_BIN%\\pdfium.dll" exit 1  # [win]
+
+about:
+  summary: PDFium binaries
+  description: PDFium is an open-source library for PDF manipulation and rendering.
+  license: Apache-2.0 OR BSD-3-Clause (+ third party licenses)
+  license_file: LICENSE
+  dev_url: https://github.com/bblanchon/pdfium-binaries
+
+extra:
+  recipe-maintainers:
+    - bblanchon
+    - mara004
