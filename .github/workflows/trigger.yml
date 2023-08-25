@@ -29,5 +29,6 @@ jobs:
             "branch": "${{ steps.chromium.outputs.branch }}",
             "version": "${{ steps.chromium.outputs.version }}",
             "is_debug": "false",
-            "enable_v8": "true"
+            "enable_v8": "true",
+            "publish": "true"
           }
