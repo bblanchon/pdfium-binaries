@@ -539,6 +539,56 @@ jobs:
         env:
           NUGET_API_KEY: ${{ secrets.NUGET_API_KEY  }}
 
+  conda:
+    name: Build Conda packages
+    if: github.event.inputs.version
+    runs-on: ubuntu-latest
+    needs:
+      - linux_arm
+      - linux_arm64
+      - linux_x64
+      - linux_x86
+      - mac_arm64
+      - mac_x64
+      - win_arm64
+      - win_x64
+      - win_x86
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Download artifacts
+        uses: actions/download-artifact@v3
+      - name: Create build script
+        run: |
+          cat >conda-build.sh <<END
+          #!/bin/bash -eux
+          python conda/build.py pdfium-binaries \$1 ${{ github.event.inputs.version }} --about-file conda/about.json --source-dir \$2 --output-dir conda/out
+          END
+          chmod +x conda-build.sh
+      - name: Build for linux-32
+        run: ./conda-build.sh linux-32 pdfium-linux-x86
+      - name: Build for linux-64
+        run: ./conda-build.sh linux-64 pdfium-linux-x64
+      - name: Build for linux-aarch64
+        run: ./conda-build.sh linux-aarch64 pdfium-linux-arm64
+      - name: Build for linux-armv7l
+        run: ./conda-build.sh linux-armv7l pdfium-linux-arm
+      - name: Build for osx-arm64
+        run: ./conda-build.sh osx-arm64 pdfium-mac-arm64
+      - name: Build for osx-64
+        run: ./conda-build.sh osx-64 pdfium-mac-x64
+      - name: Build for win-32
+        run: ./conda-build.sh win-32 pdfium-win-x86
+      - name: Build for win-64
+        run: ./conda-build.sh win-64 pdfium-win-x64
+      - name: Build for win-arm64
+        run: ./conda-build.sh win-arm64 pdfium-win-arm64
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: Conda packages
+          path: conda/out/
+
   publish:
     name: Publish Release
     if: startsWith(github.event.inputs.branch, 'chromium/') && github.event.inputs.version && github.event.inputs.publish == 'true'
