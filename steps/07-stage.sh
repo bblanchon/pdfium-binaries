@@ -11,6 +11,7 @@ BUILD=${PDFium_BUILD_DIR:-pdfium/out}
 STAGING="$PWD/staging"
 STAGING_BIN="$STAGING/bin"
 STAGING_LIB="$STAGING/lib"
+STAGING_OBJ="$STAGING/obj"
 
 mkdir -p "$STAGING"
 mkdir -p "$STAGING_LIB"
@@ -37,7 +38,7 @@ case "$OS" in
     mv "$BUILD/pdfium.html" "$STAGING_LIB"
     mv "$BUILD/pdfium.js" "$STAGING_LIB"
     mv "$BUILD/pdfium.wasm" "$STAGING_LIB"
-    mv "$BUILD/obj/libpdfium.a" "$STAGING_LIB"
+    mv "$BUILD/obj/libpdfium.a" "$STAGING_OBJ/${emsdk_VERSION:3.1.12}"
     rm -rf "$STAGING/include/cpp"
     rm "$STAGING/PDFiumConfig.cmake"
     ;;
