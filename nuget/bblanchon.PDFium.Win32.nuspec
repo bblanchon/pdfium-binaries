@@ -16,6 +16,7 @@
     <repository type="git" url="https://github.com/bblanchon/pdfium-binaries.git" branch="$branch$" commit="$commit$" />
     <icon>icon.png</icon>
     <iconUrl>https://raw.githubusercontent.com/bblanchon/pdfium-binaries/master/nuget/bblanchon.PDFium.Win32.png</iconUrl>
+    <readme>README.md</readme>
 
     <dependencies>
       <group targetFramework="netstandard2.0" />
@@ -24,6 +25,7 @@
 
   <files>
     <file src="bblanchon.PDFium.Win32.png" target="icon.png" />
+    <file src="../README.md" target="README.md" />
 
     <!-- placeholder file because this package contains native binaries only -->
     <!-- we want to fail on any platform not compatible with .NET Standard 2.0 (on Windows only) -->
@@ -36,11 +38,11 @@
     <file src="bblanchon.PDFium.Win32.targets" target="buildTransitive/net461/bblanchon.PDFium.Win32.targets" />
 
     <!-- include hearder and lib files for C++ projects -->
-    <file src="bblanchon.PDFium.Win32.native.targets" target="build/native/bblanchon.PDFium.Win32.native.targets" />
+    <file src="bblanchon.PDFium.Win32.native.targets" target="build/native/bblanchon.PDFium.Win32.targets" />
     <file src="pdfium-win-arm64/lib/pdfium.dll.lib" target="build/native/lib/win-arm64/pdfium.dll.lib" />
     <file src="pdfium-win-x64/lib/pdfium.dll.lib" target="build/native/lib/win-x64/pdfium.dll.lib" />
     <file src="pdfium-win-x86/lib/pdfium.dll.lib" target="build/native/lib/win-x86/pdfium.dll.lib" />
-    <file src="pdfium-win-x86/include/*.h" target="build/native/include" />
+    <file src="include/**/*.h" target="build/native" />
 
     <!-- the native PDFium binaries -->
     <!-- see list of available runtime identifiers -->
