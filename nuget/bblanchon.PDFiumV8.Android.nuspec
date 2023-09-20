@@ -38,6 +38,10 @@
     <file src="bblanchon.PDFium.Android.targets" target="build/monoandroid1.0/bblanchon.PDFiumV8.Android.targets" />
     <file src="bblanchon.PDFium.Android.targets" target="buildTransitive/monoandroid1.0/bblanchon.PDFiumV8.Android.targets" />
 
+    <!-- include hearder and lib files for C++ projects -->
+    <file src="bblanchon.PDFium.native.targets" target="build/native/bblanchon.PDFiumV8.Android.targets" />
+    <file src="include/**/*.h" target="build/native" />
+
     <!-- the native PDFium binaries -->
     <!-- see list of available runtime identifiers -->
     <!-- https://docs.microsoft.com/en-us/dotnet/core/rid-catalog -->

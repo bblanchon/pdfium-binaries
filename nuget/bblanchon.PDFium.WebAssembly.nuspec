@@ -38,6 +38,10 @@
     <file src="bblanchon.PDFium.WebAssembly.props" target="build/netstandard1.0/bblanchon.PDFium.WebAssembly.props" />
     <file src="bblanchon.PDFium.WebAssembly.props" target="buildTransitive/netstandard1.0/bblanchon.PDFium.WebAssembly.props" />
 
+    <!-- include hearder and lib files for C++ projects -->
+    <file src="bblanchon.PDFium.native.targets" target="build/native/bblanchon.PDFium.WebAssembly.targets" />
+    <file src="include/**/*.h" target="build/native" />
+
     <!-- the native PDFium binaries -->
     <!-- see list of available runtime identifiers -->
     <!-- https://docs.microsoft.com/en-us/dotnet/core/rid-catalog -->

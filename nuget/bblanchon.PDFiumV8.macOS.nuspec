@@ -23,6 +23,10 @@
     <file src="bblanchon.PDFiumV8.macOS.png" target="icon.png" />
     <file src="../README.md" target="README.md" />
 
+    <!-- include hearder and lib files for C++ projects -->
+    <file src="bblanchon.PDFium.native.targets" target="build/native/bblanchon.PDFiumV8.macOS.targets" />
+    <file src="include/**/*.h" target="build/native" />
+
     <!-- the native PDFium binaries -->
     <!-- see list of available runtime identifiers -->
     <!-- https://docs.microsoft.com/en-us/dotnet/core/rid-catalog -->
