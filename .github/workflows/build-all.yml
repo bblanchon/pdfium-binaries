@@ -518,9 +518,8 @@ jobs:
         with:
           path: nuget
       - name: Prepare header files
-        shell: pwsh
-        run: |
-            xcopy nuget\pdfium-win-x86\include nuget\include\pdfium\ /E /Y
+        shell: bash
+        run: mkdir -p nuget/include/pdfium && cp -r nuget/pdfium-win-x86/include nuget/include/pdfium
       - name: Pack
         shell: bash
         run: |
