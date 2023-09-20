@@ -128,7 +128,7 @@ index 206b5c3ee..42b891150 100644
 +
 +weak_alias(freopen, freopen64);
 diff --git a/system/lib/standalone/standalone.c b/system/lib/standalone/standalone.c
-index 0238e91e5..3b52f7a70 100644
+index 70452e0f0..7aa2091b2 100644
 --- a/system/lib/standalone/standalone.c
 +++ b/system/lib/standalone/standalone.c
 @@ -6,6 +6,7 @@
@@ -1196,7 +1196,7 @@ index 0238e91e5..3b52f7a70 100644
  }
  
  // Emscripten additions
-@@ -187,6 +1152,7 @@ weak double emscripten_get_now(void) {
+@@ -190,6 +1155,7 @@ weak double emscripten_date_now(void) {
  // When exception catching is disabled, we stub out calls to `__cxa_throw`.
  // Otherwise, `__cxa_throw` will be imported from the host.
  void __cxa_throw(void* ptr, void* type, void* destructor) {
@@ -1204,7 +1204,7 @@ index 0238e91e5..3b52f7a70 100644
    abort();
  }
  #endif
-@@ -289,6 +1255,21 @@ int _setitimer_js(int which, double timeout) {
+@@ -292,6 +1258,21 @@ int _setitimer_js(int which, double timeout) {
    return -1;
  }
  
