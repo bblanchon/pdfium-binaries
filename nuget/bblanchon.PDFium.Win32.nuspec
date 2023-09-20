@@ -11,7 +11,7 @@
     <projectUrl>https://github.com/bblanchon/pdfium-binaries</projectUrl>
     <description>This package contains pre-compiled binaries of the PDFium library, an open-source library for PDF manipulation and rendering.</description>
     <releaseNotes>$releaseNotes$</releaseNotes>
-    <copyright>Copyright © Benoit Blanchon 2017-2022</copyright>
+    <copyright>Copyright © Benoit Blanchon 2017-2023</copyright>
     <tags>PDFium PDF binaries library native Chromium</tags>
     <repository type="git" url="https://github.com/bblanchon/pdfium-binaries.git" branch="$branch$" commit="$commit$" />
     <icon>icon.png</icon>
@@ -34,6 +34,13 @@
     <!-- .NET (Core) does not need this and handles the runtimes folder on its own -->
     <file src="bblanchon.PDFium.Win32.targets" target="build/net461/bblanchon.PDFium.Win32.targets" />
     <file src="bblanchon.PDFium.Win32.targets" target="buildTransitive/net461/bblanchon.PDFium.Win32.targets" />
+
+    <!-- include hearder and lib files for C++ projects -->
+    <file src="bblanchon.PDFium.Win32.native.targets" target="build/native/bblanchon.PDFium.Win32.native.targets" />
+    <file src="pdfium-win-arm64/lib/pdfium.dll.lib" target="build/native/lib/win-arm64/pdfium.dll.lib" />
+    <file src="pdfium-win-x64/lib/pdfium.dll.lib" target="build/native/lib/win-x64/pdfium.dll.lib" />
+    <file src="pdfium-win-x86/lib/pdfium.dll.lib" target="build/native/lib/win-x86/pdfium.dll.lib" />
+    <file src="pdfium-win-x86/include/*.h" target="build/native/include" />
 
     <!-- the native PDFium binaries -->
     <!-- see list of available runtime identifiers -->
