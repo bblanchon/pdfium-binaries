@@ -588,6 +588,13 @@ jobs:
         with:
           name: Conda packages
           path: conda/out/
+      - name: Install anaconda-client
+        run: conda install -y anaconda-client
+      - name: Upload to Anaconda
+        if: env.ANACONDA_API_TOKEN && startsWith(github.event.inputs.branch, 'chromium/') && github.event.inputs.version && github.event.inputs.publish == 'true'
+        run: find conda/out -name 'pdfium-binaries-*.tar.bz2' -exec anaconda upload --force {} \;
+        env:
+          ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_API_TOKEN  }}
 
   publish:
     name: Publish Release
