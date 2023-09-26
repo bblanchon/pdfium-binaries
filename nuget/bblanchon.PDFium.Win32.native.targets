@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- this target file adds support for C++ projects -->
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemDefinitionGroup>
+    <!-- include pdfium lib files -->
+    <Link>
+      <AdditionalDependencies Condition="'$(Platform)' == 'arm64'">$(MSBuildThisFileDirectory)lib\win-arm64\pdfium.dll.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies Condition="'$(Platform)' == 'x64' or '$(Platform)' == 'arm64ec'">$(MSBuildThisFileDirectory)lib\win-x64\pdfium.dll.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies Condition="'$(Platform)' != 'arm64' and '$(Platform)' != 'arm64ec' and '$(Platform)' != 'x64'">$(MSBuildThisFileDirectory)lib\win-x86\pdfium.dll.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories Condition="'$(Platform)' == 'arm64'">$(MSBuildThisFileDirectory)lib\win-arm64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories Condition="'$(Platform)' == 'x64' or '$(Platform)' == 'arm64ec'">$(MSBuildThisFileDirectory)lib\win-x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories Condition="'$(Platform)' != 'arm64' and '$(Platform)' != 'arm64ec' and '$(Platform)' != 'x64'">$(MSBuildThisFileDirectory)lib\win-x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+
+    <!-- include pdfium header files -->
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(MSBuildThisFileDirectory)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+  </ItemDefinitionGroup>
+
+  <!-- include pdfium native binaries -->
+  <ItemGroup Condition="'$(Platform)' == 'arm64'">
+    <ReferenceCopyLocalPaths Include="$(MSBuildThisFileDirectory)..\..\runtimes\win-arm64\native\pdfium.dll" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(Platform)' == 'x64' or '$(Platform)' == 'arm64ec'">
+    <ReferenceCopyLocalPaths Include="$(MSBuildThisFileDirectory)..\..\runtimes\win-x64\native\pdfium.dll" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(Platform)' != 'arm64' and '$(Platform)' != 'arm64ec' and '$(Platform)' != 'x64'">
+    <ReferenceCopyLocalPaths Include="$(MSBuildThisFileDirectory)..\..\runtimes\win-x86\native\pdfium.dll" />
+  </ItemGroup>
+</Project>

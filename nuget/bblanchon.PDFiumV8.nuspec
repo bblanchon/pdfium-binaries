@@ -7,15 +7,15 @@
     <owners>Benoit Blanchon</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <license type="expression">Apache-2.0</license>
-    <licenseUrl>https://licenses.nuget.org/Apache-2.0</licenseUrl>
     <projectUrl>https://github.com/bblanchon/pdfium-binaries</projectUrl>
     <description>This package contains pre-compiled binaries of the PDFium library, an open-source library for PDF manipulation and rendering.</description>
     <releaseNotes>$releaseNotes$</releaseNotes>
-    <copyright>Copyright © Benoit Blanchon 2017-2022</copyright>
+    <copyright>Copyright © Benoit Blanchon 2017-2023</copyright>
     <tags>PDFium PDF binaries library native Chromium</tags>
     <repository type="git" url="https://github.com/bblanchon/pdfium-binaries.git" branch="$branch$" commit="$commit$" />
     <icon>icon.png</icon>
     <iconUrl>https://raw.githubusercontent.com/bblanchon/pdfium-binaries/master/nuget/bblanchon.PDFiumV8.png</iconUrl>
+    <readme>README.md</readme>
     <dependencies>
       <group>
         <dependency id="bblanchon.PDFiumV8.Android" version="$version$" />
@@ -30,5 +30,6 @@
   <!-- just a meta package without content -->
   <files>
     <file src="bblanchon.PDFiumV8.png" target="icon.png" />
+    <file src="../README.md" target="README.md" />
   </files>
 </package>
