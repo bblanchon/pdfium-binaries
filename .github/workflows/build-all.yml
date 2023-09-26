@@ -562,7 +562,17 @@ jobs:
         run: |
           cat >conda-build.sh <<END
           #!/bin/bash -eux
-          python conda/build.py pdfium-binaries \$1 ${{ github.event.inputs.version }} --about-file conda/about.json --source-dir \$2 --output-dir conda/out
+
+          PLATFORM=\$1
+          SOURCE_DIR=\$2
+          VERSION="${{ github.event.inputs.version }}"
+
+          # rename "include/" into "include/pdfium/"
+          shopt -s extglob
+          mkdir -p \$SOURCE_DIR/include/pdfium
+          mv \$SOURCE_DIR/include/!(pdfium) \$SOURCE_DIR/include/pdfium
+
+          python conda/build.py pdfium-binaries \$PLATFORM \$VERSION --about-file conda/about.json --source-dir \$SOURCE_DIR --output-dir conda/out
           END
           chmod +x conda-build.sh
       - name: Build for linux-32
