@@ -11,7 +11,7 @@ gcc_toolchain("x86") {
   ar = "${toolprefix}ar"
   ld = cxx
 
-  extra_cxxflags = "-D_LIBCPP_HAS_MUSL_LIBC"
+  extra_ldflags = "-static-libgcc -static-libstdc++"
 
   toolchain_args = {
     current_cpu = "x86"
@@ -33,7 +33,7 @@ gcc_toolchain("x64") {
   ar = "${toolprefix}ar"
   ld = cxx
 
-  extra_cxxflags = "-D_LIBCPP_HAS_MUSL_LIBC"
+  extra_ldflags = "-static-libgcc -static-libstdc++"
 
   toolchain_args = {
     current_cpu = "x64"
