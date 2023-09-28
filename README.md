@@ -256,6 +256,11 @@ Christoffer Green, [@ChristofferGreen](https://github.com/ChristofferGreen):
 
 * Linux ARM build
 
+[@mara004](https://github.com/mara004):
+
+* Conda packages
+* Frequent help with many aspects of the project
+
 Jeroen Bobbeldijk, [@jerbob92](https://github.com/jerbob92)
 
 * Musl build
