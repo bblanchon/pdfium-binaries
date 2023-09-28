@@ -256,11 +256,15 @@ Christoffer Green, [@ChristofferGreen](https://github.com/ChristofferGreen):
 
 * Linux ARM build
 
+Jeroen Bobbeldijk, [@jerbob92](https://github.com/jerbob92)
+
+* Musl build
+* WebAssembly build
+
 Tobias Taschner, [@TcT2k](https://github.com/TcT2k):
 
 * macOS build
 * V8 build
-
 
 [dart_pdf]: https://github.com/DavBfr/dart_pdf
 [pdfx]: https://github.com/scerio/packages.flutter/tree/main/packages/pdfx
