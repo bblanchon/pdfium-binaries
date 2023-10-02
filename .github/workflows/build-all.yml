@@ -602,9 +602,11 @@ jobs:
         uses: conda-incubator/setup-miniconda@v2
       - name: Install anaconda-client
         run: conda install -yq anaconda-client
+        shell: bash -l {0}
       - name: Upload to Anaconda
         if: env.ANACONDA_API_TOKEN && startsWith(github.event.inputs.branch, 'chromium/') && github.event.inputs.version && github.event.inputs.publish == 'true'
         run: find conda/out -name 'pdfium-binaries-*.tar.bz2' -exec anaconda upload --force {} +
+        shell: bash -l {0}
         env:
           ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_API_TOKEN  }}
 
