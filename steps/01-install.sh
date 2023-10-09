@@ -52,12 +52,12 @@ case "$TARGET_OS" in
 
         arm)
           MUSL_VERSION="arm-linux-musleabihf-cross"
-          PACKAGES="g++-10 g++-10-multilib g++-10-arm-linux-gnueabihf libstdc++-10-dev-armhf-cross libgcc-10-dev-armhf-cross"
+          PACKAGES="g++-10"
           ;;
 
         arm64)
           MUSL_VERSION="aarch64-linux-musl-cross"
-          PACKAGES="g++-10 g++-10-multilib g++-10-aarch64-linux-gnu"
+          PACKAGES="g++-10"
           ;;
       esac
 
