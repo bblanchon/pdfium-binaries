@@ -118,7 +118,7 @@ case "$OS" in
         ;;
     esac
     CMAKE_ARGS+=(
-      -G "Visual Studio 16 2019"
+      -G "Visual Studio 17 2022"
       -A "$ARCH"
     )
     ;;
