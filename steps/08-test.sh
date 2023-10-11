@@ -57,11 +57,11 @@ case "$OS" in
     case "$CPU" in
       arm)
         PREFIX="arm-linux-gnueabihf-"
-        SUFFIX="-9"
+        SUFFIX="-10"
         ;;
       arm64)
         PREFIX="aarch64-linux-gnu-"
-        SUFFIX="-9"
+        SUFFIX="-10"
         ;;
       x86)
         if [ "$TARGET_LIBC" == "musl" ]; then
