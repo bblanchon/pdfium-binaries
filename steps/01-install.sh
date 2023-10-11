@@ -49,6 +49,16 @@ case "$TARGET_OS" in
           MUSL_VERSION="x86_64-linux-musl-cross"
           PACKAGES="g++-10"
           ;;
+
+        arm)
+          MUSL_VERSION="arm-linux-musleabihf-cross"
+          PACKAGES="g++-10"
+          ;;
+
+        arm64)
+          MUSL_VERSION="aarch64-linux-musl-cross"
+          PACKAGES="g++-10"
+          ;;
       esac
 
       [ -d "$MUSL_VERSION" ] || curl -L "$MUSL_URL/$MUSL_VERSION.tgz" | tar xz
