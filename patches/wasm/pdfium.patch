@@ -1,26 +1,5 @@
-diff --git a/build_overrides/BUILDCONFIG.gn b/build_overrides/BUILDCONFIG.gn
-index 768fe60e0..65afd1de4 100644
---- a/build_overrides/BUILDCONFIG.gn
-+++ b/build_overrides/BUILDCONFIG.gn
-@@ -272,6 +272,8 @@ if (target_os == "android") {
-   _default_toolchain = "//build/toolchain/aix:$target_cpu"
- } else if (target_os == "zos") {
-   _default_toolchain = "//build/toolchain/zos:$target_cpu"
-+} else if (target_cpu == "wasm") {
-+  _default_toolchain = "//build/toolchain/wasm:emscripten"
- } else {
-   assert(false, "Unsupported target_os: $target_os")
- }
-@@ -310,6 +312,7 @@ is_linux = current_os == "linux"
- is_mac = current_os == "mac"
- is_nacl = current_os == "nacl"
- is_win = current_os == "win" || current_os == "winuwp"
-+is_wasm = current_os == "wasm"
- 
- is_apple = is_ios || is_mac
- is_posix = !is_win && !is_fuchsia
 diff --git a/core/fxcrt/BUILD.gn b/core/fxcrt/BUILD.gn
-index 09400e881..f05d55a04 100644
+index 1b3f6e4..ac8c65f 100644
 --- a/core/fxcrt/BUILD.gn
 +++ b/core/fxcrt/BUILD.gn
 @@ -140,7 +140,7 @@ source_set("fxcrt") {
@@ -33,10 +12,10 @@ index 09400e881..f05d55a04 100644
        "cfx_fileaccess_posix.cpp",
        "cfx_fileaccess_posix.h",
 diff --git a/core/fxge/BUILD.gn b/core/fxge/BUILD.gn
-index 8d4138131..958650952 100644
+index a3d2b0e..bcfd1be 100644
 --- a/core/fxge/BUILD.gn
 +++ b/core/fxge/BUILD.gn
-@@ -163,7 +163,7 @@ source_set("fxge") {
+@@ -157,7 +157,7 @@ source_set("fxge") {
      ]
    }
  

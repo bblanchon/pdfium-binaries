@@ -14,7 +14,7 @@ git apply -v "$PATCHES/public_headers.patch"
 
 case "$OS" in
   android)
-    git apply -v "$PATCHES/android/pdfium.patch"
+    git -C build apply -v "$PATCHES/android/build.patch"
     ;;
 
   ios)
@@ -44,7 +44,6 @@ esac
 
 case "$TARGET_LIBC" in
   musl)
-    git apply -v "$PATCHES/musl/pdfium.patch"
     git -C build apply -v "$PATCHES/musl/build.patch"
     mkdir -p "build/toolchain/linux/musl"
     cp "$PATCHES/musl/toolchain.gn" "build/toolchain/linux/musl/BUILD.gn"
