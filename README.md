@@ -241,6 +241,7 @@ The following projects use (or recommend using) our PDFium builds:
 | [PDFtoZPL][pdftozpl]     | C#       | A .NET library to convert PDF files (and bitmaps) into Zebra Programming Language code                      |
 | [PDFx][pdfx]             | Dart     | Flutter Render & show PDF documents on Web, MacOs 10.11+, Android 5.0+, iOS and Windows                     |
 | [PyPDFium2][pypdfium2]   | Python   | Python bindings to PDFium                                                                                   |
+| [Spacedrive][spacedrive] | Rust/TS  | Cross-platform file manager, powered by a virtual distributed filesystem                                    |
 | [wxPDFView][wxpdfview]   | C++      | wxWidgets components to display PDF content                                                                 |
 
 *Did we miss a project? Please open a PR!*  
@@ -312,3 +313,4 @@ The following projects use (or recommend using) our PDFium builds:
 [pdflibcore]: https://github.com/jbaarssen/PdfLibCore
 [dtronixpdf]: https://github.com/Dtronix/DtronixPdf
 [pdftozpl]: https://github.com/sungaila/PDFtoZPL
+[spacedrive]: https://github.com/spacedriveapp/spacedrive
