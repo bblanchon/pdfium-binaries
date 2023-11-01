@@ -54,7 +54,7 @@ jobs:
             runner: ubuntu-20.04
     outputs:
       artifact: ${{ steps.init.outputs.artifact }}
-    runs-on: ${{ (inputs.target_os == 'ios' || inputs.target_os == 'mac') && 'macos-latest' || inputs.target_os == 'win' && 'windows-2019' || 'ubuntu-20.04' }}
+    runs-on: ${{ (inputs.target_os == 'ios' || inputs.target_os == 'mac') && 'macos-latest' || inputs.target_os == 'win' && 'windows-2022' || 'ubuntu-20.04' }}
     steps:
       - name: Initialize
         id: init
@@ -95,6 +95,7 @@ jobs:
       - name: Checkout PDFium
         run: steps/02-checkout.sh
         shell: bash
+        timeout-minutes: 15
       - name: Apply patches
         run: steps/03-patch.sh
         shell: bash

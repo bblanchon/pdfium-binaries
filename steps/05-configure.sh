@@ -35,6 +35,7 @@ mkdir -p "$BUILD"
       echo 'use_allocator_shim = false'
       ;;
     mac)
+      echo 'use_allocator_shim = false'
       echo 'mac_deployment_target = "10.13.0"'
       ;;
     wasm)

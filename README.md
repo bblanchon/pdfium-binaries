@@ -9,7 +9,7 @@
 
 [![Latest release](https://img.shields.io/github/v/release/bblanchon/pdfium-binaries?display_name=release&label=github)](https://github.com/bblanchon/pdfium-binaries/releases/latest/)
 [![Nuget](https://img.shields.io/nuget/v/bblanchon.PDFium)](https://www.nuget.org/packages/bblanchon.PDFium/)
-![Conda](https://img.shields.io/conda/v/bblanchon/pdfium-binaries?label=conda)
+[![Conda](https://img.shields.io/conda/v/bblanchon/pdfium-binaries?label=conda)](https://anaconda.org/bblanchon/pdfium-binaries)
 
 
 This project hosts pre-compiled binaries of the [PDFium library](https://pdfium.googlesource.com/pdfium/), an open-source library for PDF manipulation and rendering.
@@ -241,6 +241,7 @@ The following projects use (or recommend using) our PDFium builds:
 | [PDFtoZPL][pdftozpl]     | C#       | A .NET library to convert PDF files (and bitmaps) into Zebra Programming Language code                      |
 | [PDFx][pdfx]             | Dart     | Flutter Render & show PDF documents on Web, MacOs 10.11+, Android 5.0+, iOS and Windows                     |
 | [PyPDFium2][pypdfium2]   | Python   | Python bindings to PDFium                                                                                   |
+| [Spacedrive][spacedrive] | Rust/TS  | Cross-platform file manager, powered by a virtual distributed filesystem                                    |
 | [wxPDFView][wxpdfview]   | C++      | wxWidgets components to display PDF content                                                                 |
 
 *Did we miss a project? Please open a PR!*  
@@ -248,19 +249,56 @@ The following projects use (or recommend using) our PDFium builds:
 
 ## Contributors
 
-David Sungaila, [@sungaila](https://github.com/sungaila):
-
-* NuGet packages
-
-Christoffer Green, [@ChristofferGreen](https://github.com/ChristofferGreen):
-
-* Linux ARM build
-
-Tobias Taschner, [@TcT2k](https://github.com/TcT2k):
-
-* macOS build
-* V8 build
-
+<table>
+  <thead>
+    <tr>
+      <th></th>
+      <th>Username</th>
+      <th>Contributions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><img src="https://avatars.githubusercontent.com/u/5462433?v=4" width="48" height="48" alt="Benoit Blanchon"></td>
+      <td><a href="https://github.com/bblanchon"><code>@bblanchon</code></a></td>
+      <td>Main contributor</td>
+    </tr>
+    <tr>
+      <td><img src="https://avatars.githubusercontent.com/u/248162?v=4" width="48" height="48" alt="Christoffer Green"></td>
+      <td><a href="https://github.com/ChristofferGreen"><code>@ChristofferGreen</code></a></td>
+      <td>Linux ARM build</td>
+    </tr>
+    <tr>
+      <td rowspan="2"><img src="https://avatars.githubusercontent.com/u/1312921?v=4" width="48" height="48" alt="Jeroen Bobbeldijk"></td>
+      <td rowspan="2"><a href="https://github.com/jerbob92"><code>@jerbob92</code></a></td>
+      <td>Musl build</td>
+    </tr>
+    <tr>
+      <td>WebAssembly build</td>
+    </tr>
+    <tr>
+      <td rowspan="2"><img src="https://avatars.githubusercontent.com/u/65915611?v=4" width="48" height="48" alt="mara004"></td>
+      <td rowspan="2"><a href="https://github.com/mara004"><code>@mara004</code></a></td>
+      <td>Conda packages</td>
+    </tr>
+    <tr>
+      <td>Frequent help with many aspects of the project</td>
+    </tr>
+    <tr>
+      <td><img src="https://avatars.githubusercontent.com/u/12021771?v=4" width="48" height="48" alt="David Sungaila"></td>
+      <td><a href="https://github.com/sungaila"><code>@sungaila</code></a></td>
+      <td>NuGet packages</td>
+    </tr>
+    <tr>
+      <td rowspan="2"><img src="https://avatars.githubusercontent.com/u/5075894?v=4" width="48" height="48" alt="Tobias Taschner"></td>
+      <td rowspan="2"><a href="https://github.com/TcT2k"><code>@TcT2k</code></a></td>
+      <td>macOS build</td>
+    </tr>
+    <tr>
+      <td>V8 build</td>
+    </tr>
+  </tbody>
+</table
 
 [dart_pdf]: https://github.com/DavBfr/dart_pdf
 [pdfx]: https://github.com/scerio/packages.flutter/tree/main/packages/pdfx
@@ -275,3 +313,4 @@ Tobias Taschner, [@TcT2k](https://github.com/TcT2k):
 [pdflibcore]: https://github.com/jbaarssen/PdfLibCore
 [dtronixpdf]: https://github.com/Dtronix/DtronixPdf
 [pdftozpl]: https://github.com/sungaila/PDFtoZPL
+[spacedrive]: https://github.com/spacedriveapp/spacedrive

@@ -56,12 +56,20 @@ case "$OS" in
   linux)
     case "$CPU" in
       arm)
-        PREFIX="arm-linux-gnueabihf-"
-        SUFFIX="-9"
+        if [ "$TARGET_LIBC" == "musl" ]; then
+          PREFIX="arm-linux-musleabihf-"
+        else
+          PREFIX="arm-linux-gnueabihf-"
+          SUFFIX="-10"
+        fi
         ;;
       arm64)
-        PREFIX="aarch64-linux-gnu-"
-        SUFFIX="-9"
+        if [ "$TARGET_LIBC" == "musl" ]; then
+          PREFIX="aarch64-linux-musl-"
+        else
+          PREFIX="aarch64-linux-gnu-"
+          SUFFIX="-10"
+        fi
         ;;
       x86)
         if [ "$TARGET_LIBC" == "musl" ]; then
@@ -118,7 +126,7 @@ case "$OS" in
         ;;
     esac
     CMAKE_ARGS+=(
-      -G "Visual Studio 16 2019"
+      -G "Visual Studio 17 2022"
       -A "$ARCH"
     )
     ;;
