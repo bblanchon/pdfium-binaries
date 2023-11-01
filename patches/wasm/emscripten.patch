@@ -128,7 +128,7 @@ index 206b5c3ee..42b891150 100644
 +
 +weak_alias(freopen, freopen64);
 diff --git a/system/lib/standalone/standalone.c b/system/lib/standalone/standalone.c
-index 70452e0f0..7aa2091b2 100644
+index 437e1b21e..0b632f830 100644
 --- a/system/lib/standalone/standalone.c
 +++ b/system/lib/standalone/standalone.c
 @@ -6,6 +6,7 @@
