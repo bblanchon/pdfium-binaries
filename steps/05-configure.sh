@@ -50,7 +50,17 @@ mkdir -p "$BUILD"
       echo 'is_musl = true'
       echo 'is_clang = false'
       echo 'use_custom_libcxx = false'
-      [ "$ENABLE_V8" == "true" ] && echo "v8_snapshot_toolchain = \"//build/toolchain/linux:$TARGET_CPU\""
+      [ "$ENABLE_V8" == "true" ] && case "$TARGET_CPU" in
+        arm)
+            echo "v8_snapshot_toolchain = \"//build/toolchain/linux:clang_x86_v8_arm\""
+            ;;
+        arm64)
+            echo "v8_snapshot_toolchain = \"//build/toolchain/linux:clang_x64_v8_arm64\""
+            ;;
+        *)
+            echo "v8_snapshot_toolchain = \"//build/toolchain/linux:$TARGET_CPU\""
+            ;;
+      esac
       ;;
   esac
 
