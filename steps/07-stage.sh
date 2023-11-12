@@ -38,7 +38,7 @@ case "$OS" in
     mv "$BUILD/pdfium.html" "$STAGING_LIB"
     mv "$BUILD/pdfium.js" "$STAGING_LIB"
     mv "$BUILD/pdfium.wasm" "$STAGING_LIB"
-    mv "$BUILD/obj/libpdfium.a" "$STAGING_OBJ/${emsdk_VERSION:3.1.12}"
+    mv "$BUILD/obj/libpdfium.a" "$STAGING_OBJ/${emsdk_VERSION:3.1.34}"
     rm -rf "$STAGING/include/cpp"
     rm "$STAGING/PDFiumConfig.cmake"
     ;;
