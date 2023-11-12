@@ -31,7 +31,11 @@ mkdir -p "$BUILD"
       echo "use_blink = true"
       [ "$ENABLE_V8" == "true" ] && [ "$TARGET_CPU" == "arm64" ] && echo 'arm_control_flow_integrity = "none"'
       ;;
+    linux)
+      echo 'use_allocator_shim = false'
+      ;;
     mac)
+      echo 'use_allocator_shim = false'
       echo 'mac_deployment_target = "10.13.0"'
       ;;
     wasm)

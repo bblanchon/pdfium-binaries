@@ -1,8 +1,8 @@
 diff --git a/fpdfsdk/fpdf_view.cpp b/fpdfsdk/fpdf_view.cpp
-index 723af28..8088d0c 100644
+index fbe75d9b1..49222a43a 100644
 --- a/fpdfsdk/fpdf_view.cpp
 +++ b/fpdfsdk/fpdf_view.cpp
-@@ -60,6 +60,9 @@
+@@ -57,6 +57,9 @@
  #ifdef PDF_ENABLE_V8
  #include "fxjs/cfx_v8_array_buffer_allocator.h"
  #include "third_party/base/no_destructor.h"
@@ -12,7 +12,7 @@ index 723af28..8088d0c 100644
  #endif
  
  #ifdef PDF_ENABLE_XFA
-@@ -116,6 +119,11 @@ namespace {
+@@ -117,6 +120,11 @@ namespace {
  
  bool g_bLibraryInitialized = false;
  
@@ -21,10 +21,10 @@ index 723af28..8088d0c 100644
 +v8::Isolate* g_isolate = nullptr;
 +#endif
 +
- void UseRendererType(FPDF_RENDERER_TYPE public_type) {
+ void SetRendererType(FPDF_RENDERER_TYPE public_type) {
    // Internal definition of renderer types must stay updated with respect to
    // the public definition, such that all public definitions can be mapped to
-@@ -221,6 +229,22 @@ FPDF_InitLibraryWithConfig(const FPDF_LIBRARY_CONFIG* config) {
+@@ -229,6 +237,22 @@ FPDF_InitLibraryWithConfig(const FPDF_LIBRARY_CONFIG* config) {
    if (g_bLibraryInitialized)
      return;
  
@@ -45,9 +45,9 @@ index 723af28..8088d0c 100644
 +#endif  // PDF_ENABLE_V8
 +
    FX_InitializeMemoryAllocators();
+   CFX_Timer::InitializeGlobals();
    CFX_GEModule::Create(config ? config->m_pUserFontPaths : nullptr);
-   CPDF_PageModule::Create();
-@@ -229,14 +253,13 @@ FPDF_InitLibraryWithConfig(const FPDF_LIBRARY_CONFIG* config) {
+@@ -238,14 +262,13 @@ FPDF_InitLibraryWithConfig(const FPDF_LIBRARY_CONFIG* config) {
    CPDFXFA_ModuleInit();
  #endif  // PDF_ENABLE_XFA
  
@@ -60,17 +60,17 @@ index 723af28..8088d0c 100644
 +#endif  // PDF_ENABLE_V8
 +
 +  if (config && config->version >= 4)
-+    UseRendererType(config->m_RendererType);
++    SetRendererType(config->m_RendererType);
  
 -    if (config->version >= 4)
--      UseRendererType(config->m_RendererType);
+-      SetRendererType(config->m_RendererType);
 -  }
    g_bLibraryInitialized = true;
  }
  
-@@ -252,6 +275,19 @@ FPDF_EXPORT void FPDF_CALLCONV FPDF_DestroyLibrary() {
+@@ -265,6 +288,19 @@ FPDF_EXPORT void FPDF_CALLCONV FPDF_DestroyLibrary() {
    CFX_GEModule::Destroy();
-   IJS_Runtime::Destroy();
+   CFX_Timer::DestroyGlobals();
  
 +#ifdef PDF_ENABLE_XFA
 +  cppgc::ShutdownProcess();

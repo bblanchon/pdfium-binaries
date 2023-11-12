@@ -7,26 +7,27 @@
     <owners>Benoit Blanchon</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <license type="expression">Apache-2.0</license>
-    <licenseUrl>https://licenses.nuget.org/Apache-2.0</licenseUrl>
     <projectUrl>https://github.com/bblanchon/pdfium-binaries</projectUrl>
     <description>This package contains pre-compiled binaries of the PDFium library, an open-source library for PDF manipulation and rendering.</description>
     <releaseNotes>$releaseNotes$</releaseNotes>
-    <copyright>Copyright © Benoit Blanchon 2017-2022</copyright>
+    <copyright>Copyright © Benoit Blanchon 2017-2023</copyright>
     <tags>PDFium PDF binaries library native Chromium wasm webassembly</tags>
     <repository type="git" url="https://github.com/bblanchon/pdfium-binaries.git" branch="$branch$" commit="$commit$" />
     <icon>icon.png</icon>
     <iconUrl>https://raw.githubusercontent.com/bblanchon/pdfium-binaries/master/nuget/bblanchon.PDFium.WebAssembly.png</iconUrl>
-
+    <readme>README.md</readme>
     <dependencies>
+      <group targetFramework="native" />
       <group targetFramework="netstandard1.0" />
     </dependencies>
   </metadata>
 
   <files>
     <file src="bblanchon.PDFium.WebAssembly.png" target="icon.png" />
+    <file src="../README.md" target="README.md" />
 
-    <!-- placeholder file because this package contains native binaries only -->
-    <!-- https://docs.microsoft.com/en-us/nuget/reference/errors-and-warnings/nu5127 -->
+    <!-- https://learn.microsoft.com/en-us/nuget/reference/errors-and-warnings/nu5128 -->
+    <file src="_._" target="lib/native/_._" />
     <file src="_._" target="lib/netstandard1.0/_._" />
 
     <!-- WebAssembly-specific dependencies aren't referenced automatically and must be referenced manually as NativeFileReferences. -->
@@ -35,6 +36,10 @@
     <file src="pdfium-wasm/lib/libpdfium.a" target="build/netstandard1.0/libpdfium.a" />
     <file src="bblanchon.PDFium.WebAssembly.props" target="build/netstandard1.0/bblanchon.PDFium.WebAssembly.props" />
     <file src="bblanchon.PDFium.WebAssembly.props" target="buildTransitive/netstandard1.0/bblanchon.PDFium.WebAssembly.props" />
+
+    <!-- include hearder and lib files for C++ projects -->
+    <file src="bblanchon.PDFium.native.targets" target="build/native/bblanchon.PDFium.WebAssembly.targets" />
+    <file src="include/**/*.h" target="build/native" />
 
     <!-- the native PDFium binaries -->
     <!-- see list of available runtime identifiers -->

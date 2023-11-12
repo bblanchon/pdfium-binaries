@@ -11,7 +11,7 @@ gcc_toolchain("x86") {
   ar = "${toolprefix}ar"
   ld = cxx
 
-  extra_cxxflags = "-D_LIBCPP_HAS_MUSL_LIBC"
+  extra_ldflags = "-static-libgcc -static-libstdc++"
 
   toolchain_args = {
     current_cpu = "x86"
@@ -33,10 +33,54 @@ gcc_toolchain("x64") {
   ar = "${toolprefix}ar"
   ld = cxx
 
-  extra_cxxflags = "-D_LIBCPP_HAS_MUSL_LIBC"
+  extra_ldflags = "-static-libgcc -static-libstdc++"
 
   toolchain_args = {
     current_cpu = "x64"
+    current_os = "linux"
+
+    use_remoteexec = false
+    is_clang = false
+  }
+}
+
+gcc_toolchain("arm") {
+  toolprefix = "arm-linux-musleabihf-"
+
+  cc = "${toolprefix}gcc"
+  cxx = "${toolprefix}g++"
+
+  readelf = "${toolprefix}readelf"
+  nm = "${toolprefix}nm"
+  ar = "${toolprefix}ar"
+  ld = cxx
+
+  extra_ldflags = "-static-libgcc -static-libstdc++"
+
+  toolchain_args = {
+    current_cpu = "arm"
+    current_os = "linux"
+
+    use_remoteexec = false
+    is_clang = false
+  }
+}
+
+gcc_toolchain("arm64") {
+  toolprefix = "aarch64-linux-musl-"
+
+  cc = "${toolprefix}gcc"
+  cxx = "${toolprefix}g++"
+
+  readelf = "${toolprefix}readelf"
+  nm = "${toolprefix}nm"
+  ar = "${toolprefix}ar"
+  ld = cxx
+
+  extra_ldflags = "-static-libgcc -static-libstdc++"
+
+  toolchain_args = {
+    current_cpu = "arm64"
     current_os = "linux"
 
     use_remoteexec = false

@@ -46,6 +46,7 @@ int main(int argc, char *argv[]) {
   }
   fclose(fp);
 
+  FPDFDOC_ExitFormFillEnvironment(form);
   FPDFBitmap_Destroy(bitmap);
   FPDF_ClosePage(page);
   FPDF_CloseDocument(doc);

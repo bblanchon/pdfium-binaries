@@ -1,8 +1,29 @@
+diff --git a/config/BUILDCONFIG.gn b/config/BUILDCONFIG.gn
+index 105e194..beea137 100644
+--- a/config/BUILDCONFIG.gn
++++ b/config/BUILDCONFIG.gn
+@@ -268,6 +268,8 @@ if (target_os == "android") {
+   _default_toolchain = "//build/toolchain/aix:$target_cpu"
+ } else if (target_os == "zos") {
+   _default_toolchain = "//build/toolchain/zos:$target_cpu"
++} else if (target_cpu == "wasm") {
++  _default_toolchain = "//build/toolchain/wasm:emscripten"
+ } else {
+   assert(false, "Unsupported target_os: $target_os")
+ }
+@@ -306,6 +308,7 @@ is_linux = current_os == "linux"
+ is_mac = current_os == "mac"
+ is_nacl = current_os == "nacl"
+ is_win = current_os == "win" || current_os == "winuwp"
++is_wasm = current_os == "wasm"
+ 
+ is_apple = is_ios || is_mac
+ is_posix = !is_win && !is_fuchsia
 diff --git a/config/compiler/BUILD.gn b/config/compiler/BUILD.gn
-index cbf73722e..34f92c793 100644
+index 21683ac..54810f0 100644
 --- a/config/compiler/BUILD.gn
 +++ b/config/compiler/BUILD.gn
-@@ -293,6 +293,8 @@ config("compiler") {
+@@ -310,6 +310,8 @@ config("compiler") {
      configs += [ "//build/config/aix:compiler" ]
    } else if (current_os == "zos") {
      configs += [ "//build/config/zos:compiler" ]
@@ -11,7 +32,7 @@ index cbf73722e..34f92c793 100644
    }
  
    configs += [
-@@ -364,7 +366,7 @@ config("compiler") {
+@@ -377,7 +379,7 @@ config("compiler") {
          # The x86 toolchain currently has problems with stack-protector.
          if (is_android && current_cpu == "x86") {
            cflags += [ "-fno-stack-protector" ]
@@ -21,10 +42,10 @@ index cbf73722e..34f92c793 100644
            cflags += [ "-fstack-protector" ]
          }
 diff --git a/toolchain/toolchain.gni b/toolchain/toolchain.gni
-index 42973fa82..f46dcde12 100644
+index 9170959..3e529fe 100644
 --- a/toolchain/toolchain.gni
 +++ b/toolchain/toolchain.gni
-@@ -52,6 +52,8 @@ if (is_apple) {
+@@ -62,6 +62,8 @@ if (is_apple) {
    shlib_extension = ".so"
  } else if (is_win) {
    shlib_extension = ".dll"

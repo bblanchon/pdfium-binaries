@@ -10,5 +10,6 @@
 /staging/
 /build/
 *.tgz
-/*-musl-cross/
+/*-musl*-cross/
 /android-ndk*
+/conda/out/

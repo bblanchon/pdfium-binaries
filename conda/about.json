@@ -1,0 +1,9 @@
+{
+  "summary": "PDFium binaries",
+  "description": "PDFium is an open-source library for PDF manipulation and rendering.",
+  "license": "Apache-2.0 OR BSD-3-Clause (+ third party licenses)",
+  "home": "https://github.com/bblanchon/pdfium-binaries",
+  "dev_url": "https://github.com/bblanchon/pdfium-binaries",
+  "doc_url": "https://developers.foxit.com/resources/pdf-sdk/c_api_reference_pdfium/index.html",
+  "license_url": "https://pdfium.googlesource.com/pdfium/"
+}

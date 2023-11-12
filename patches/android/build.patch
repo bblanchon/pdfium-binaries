@@ -1,8 +1,8 @@
-diff --git a/build_overrides/BUILDCONFIG.gn b/build_overrides/BUILDCONFIG.gn
-index 768fe60e0..72c510471 100644
---- a/build_overrides/BUILDCONFIG.gn
-+++ b/build_overrides/BUILDCONFIG.gn
-@@ -475,6 +475,9 @@ if (is_android) {
+diff --git a/config/BUILDCONFIG.gn b/config/BUILDCONFIG.gn
+index 105e194..50499f6 100644
+--- a/config/BUILDCONFIG.gn
++++ b/config/BUILDCONFIG.gn
+@@ -479,6 +479,9 @@ if (is_fuchsia) {
  }
  set_defaults("shared_library") {
    configs = default_shared_library_configs
