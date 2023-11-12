@@ -98,8 +98,8 @@ case "$TARGET_OS" in
       git clone https://github.com/emscripten-core/emsdk.git
     fi
     pushd emsdk
-    ./emsdk install ${emsdk_VERSION}
-    ./emsdk activate ${emsdk_VERSION}
+    ./emsdk install ${emsdk_VERSION:-3.1.34}
+    ./emsdk activate ${emsdk_VERSION:-3.1.34}
     echo "$PWD/upstream/emscripten" >> "$PATH_FILE"
     echo "$PWD/upstream/bin" >> "$PATH_FILE"
     popd
