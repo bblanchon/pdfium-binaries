@@ -20,10 +20,10 @@ index 105e194..beea137 100644
  is_apple = is_ios || is_mac
  is_posix = !is_win && !is_fuchsia
 diff --git a/config/compiler/BUILD.gn b/config/compiler/BUILD.gn
-index 21683ac..54810f0 100644
+index f95c417..ff9210e 100644
 --- a/config/compiler/BUILD.gn
 +++ b/config/compiler/BUILD.gn
-@@ -310,6 +310,8 @@ config("compiler") {
+@@ -316,6 +316,8 @@ config("compiler") {
      configs += [ "//build/config/aix:compiler" ]
    } else if (current_os == "zos") {
      configs += [ "//build/config/zos:compiler" ]
@@ -32,7 +32,7 @@ index 21683ac..54810f0 100644
    }
  
    configs += [
-@@ -377,7 +379,7 @@ config("compiler") {
+@@ -383,7 +385,7 @@ config("compiler") {
          # The x86 toolchain currently has problems with stack-protector.
          if (is_android && current_cpu == "x86") {
            cflags += [ "-fno-stack-protector" ]
@@ -41,8 +41,17 @@ index 21683ac..54810f0 100644
            # Not available on aix.
            cflags += [ "-fstack-protector" ]
          }
+@@ -553,7 +555,7 @@ config("compiler") {
+     ldflags += [ "-Wl,--icf=all" ]
+   }
+ 
+-  if (is_linux || is_chromeos) {
++  if (is_linux || is_chromeos || is_wasm) {
+     cflags += [ "-pthread" ]
+     # Do not use the -pthread ldflag here since it becomes a no-op
+     # when using -nodefaultlibs, which would cause an unused argument
 diff --git a/toolchain/toolchain.gni b/toolchain/toolchain.gni
-index 9170959..3e529fe 100644
+index 23ec903..36cbd43 100644
 --- a/toolchain/toolchain.gni
 +++ b/toolchain/toolchain.gni
 @@ -62,6 +62,8 @@ if (is_apple) {

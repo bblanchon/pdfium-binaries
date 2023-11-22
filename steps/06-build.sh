@@ -19,6 +19,7 @@ if [ "$TARGET_CPU" == "wasm" ]; then
     -o "$BUILD_DIR/pdfium.html"
     "$LIBPDFIUMA"
     --no-entry
+    -pthread
   )
   if [[ "$IS_DEBUG" == "true" ]]; then
     EMCC_ARGS+=(
