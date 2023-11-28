@@ -41,6 +41,11 @@ on:
         type: boolean
         required: false
         default: false
+      emsdk_version:
+        description: Emscripten SDK
+        type: string
+        required: false
+        default: 3.1.34
       is_debug:
         description: Is debug
         type: boolean
@@ -59,3 +64,4 @@ jobs:
       target_cpu: ${{ github.event.inputs.target_cpu }}
       target_libc: ${{ github.event.inputs.target_libc }}
       enable_v8: ${{ github.event.inputs.enable_v8 == 'true' }}
+      emsdk_version: ${{ github.event.inputs.emsdk_version }}
