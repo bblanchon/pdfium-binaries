@@ -21,8 +21,18 @@ on:
         type: boolean
         required: false
         default: false
-      publish:
-        description: Publish release
+      release:
+        description: Publish GitHub release
+        type: boolean
+        required: false
+        default: false
+      nuget:
+        description: Publish on nuget.org
+        type: boolean
+        required: false
+        default: false
+      anaconda:
+        description: Publish on anaconda.org
         type: boolean
         required: false
         default: false
@@ -559,7 +569,7 @@ jobs:
           name: NuGet packages
           path: '*.nupkg'
       - name: Push to nuget.org
-        if: env.NUGET_API_KEY && startsWith(github.event.inputs.branch, 'chromium/') && github.event.inputs.version && github.event.inputs.publish == 'true'
+        if: env.NUGET_API_KEY && startsWith(github.event.inputs.branch, 'chromium/') && github.event.inputs.version && github.event.inputs.nuget == 'true'
         run: nuget push -Source nuget.org -ApiKey ${{ secrets.NUGET_API_KEY }} *.nupkg
         env:
           NUGET_API_KEY: ${{ secrets.NUGET_API_KEY  }}
@@ -629,7 +639,7 @@ jobs:
         run: conda install -yq anaconda-client
         shell: bash -l {0}
       - name: Upload to Anaconda
-        if: env.ANACONDA_API_TOKEN && startsWith(github.event.inputs.branch, 'chromium/') && github.event.inputs.version && github.event.inputs.publish == 'true'
+        if: env.ANACONDA_API_TOKEN && startsWith(github.event.inputs.branch, 'chromium/') && github.event.inputs.version && github.event.inputs.anaconda == 'true'
         run: find conda/out -name 'pdfium-binaries-*.tar.bz2' -exec anaconda upload --force {} +
         shell: bash -l {0}
         env:
@@ -637,7 +647,7 @@ jobs:
 
   publish:
     name: Publish Release
-    if: startsWith(github.event.inputs.branch, 'chromium/') && github.event.inputs.version && github.event.inputs.publish == 'true'
+    if: startsWith(github.event.inputs.branch, 'chromium/') && github.event.inputs.version && github.event.inputs.release == 'true'
     runs-on: ubuntu-latest
     needs:
       - android_arm
