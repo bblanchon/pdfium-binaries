@@ -1,13 +1,13 @@
 diff --git a/toolchain/win/toolchain.gni b/toolchain/win/toolchain.gni
-index 968a4a20e..536295050 100644
+index abb7d6228..3b74bda76 100644
 --- a/toolchain/win/toolchain.gni
 +++ b/toolchain/win/toolchain.gni
-@@ -235,7 +235,7 @@ template("single_msvc_toolchain") {
+@@ -259,7 +259,7 @@ template("msvc_toolchain") {
      }
  
      tool("rc") {
 -      command = "\"$python_path\" $_tool_wrapper_path rc-wrapper $env rc.exe /nologo $sys_include_flags{{defines}} {{include_dirs}} /fo{{output}} {{source}}"
-+      command = "rc.exe /nologo $sys_include_flags{{defines}} {{include_dirs}} /fo{{output}} {{source}}"
++      command = "rc.exe /nologo $sys_include_flags{{defines}} {{include_dirs}} /fo{{output}} /dENV=$env {{source}}"
        depsformat = "msvc"
        outputs = [ "$object_subdir/{{source_name_part}}.res" ]
        description = "RC {{output}}"
