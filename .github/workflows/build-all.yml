@@ -1,0 +1,60 @@
+name: Build all
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: PDFium branch
+        required: false
+        default: main
+      version:
+        description: PDFium version
+        required: false
+        default: ""
+      is_debug:
+        description: Is debug
+        type: boolean
+        required: false
+        default: false
+
+jobs:
+  wasm:
+    name: WASM
+    uses: ./.github/workflows/build.yml
+    strategy:
+      matrix:
+        emsdk_version: [3.1.12, 3.1.34]
+    with:
+      branch: ${{ github.event.inputs.branch }}
+      version: ${{ github.event.inputs.version }}
+      is_debug: ${{ github.event.inputs.is_debug == 'true' }}
+      target_os: wasm
+      target_cpu: wasm
+      enable_v8: false
+      emsdk_version: ${{ matrix.emsdk_version }}
+
+  nuget:
+    name: Build NuGet packages
+    runs-on: windows-latest
+    needs:
+      - wasm
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Download artifacts
+        uses: actions/download-artifact@v3
+        with:
+          path: nuget
+      - name: Pack
+        shell: bash
+        run: |
+          for NUSPEC in nuget/*.nuspec; do
+            echo "::group::$NUSPEC"
+            nuget pack "$NUSPEC" -properties "version=${{ github.event.inputs.version || '0.0.0.0' }};branch=${GITHUB_REF#refs/heads/};commit=${GITHUB_SHA}"
+            echo "::endgroup::"
+          done
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: NuGet packages
+          path: '*.nupkg'

@@ -58,31 +58,3 @@ jobs:
       target_libc: ${{ github.event.inputs.target_libc }}
       enable_v8: ${{ github.event.inputs.enable_v8 == 'true' }}
       emsdk_version: ${{ github.event.inputs.emsdk_version }}
-  nuget:
-    name: Build NuGet packages
-    runs-on: windows-latest
-    needs:
-      - build
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Download artifacts
-        uses: actions/download-artifact@v3
-        with:
-          path: nuget
-      - name: Prepare header files
-        shell: bash
-        run: mkdir -p nuget/include/pdfium && cp -r nuget/pdfium-win-x86/include/* nuget/include/pdfium/
-      - name: Pack
-        shell: bash
-        run: |
-          for NUSPEC in nuget/*.nuspec; do
-            echo "::group::$NUSPEC"
-            nuget pack "$NUSPEC" -properties "version=${{ github.event.inputs.version || '0.0.0.0' }};branch=${GITHUB_REF#refs/heads/};commit=${GITHUB_SHA}"
-            echo "::endgroup::"
-          done
-      - name: Upload artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: NuGet packages
-          path: '*.nupkg'

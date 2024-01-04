@@ -32,8 +32,8 @@
     <!-- WebAssembly-specific dependencies aren't referenced automatically and must be referenced manually as NativeFileReferences. -->
     <!-- Package authors can choose to add the native references by including a .props file in the package with the references. -->
     <!-- https://learn.microsoft.com/en-us/aspnet/core/blazor/webassembly-native-dependencies#package-native-dependencies-in-a-nuget-package -->
-    <file src="pdfium-wasm/lib/3.1.12/libpdfium.a" target="build/net7.0/pdfium.a" />
-    <file src="pdfium-wasm/lib/3.1.34/libpdfium.a" target="build/net8.0/pdfium.a" />
+    <file src="pdfium-wasm-3.1.12/lib/libpdfium.a" target="build/net7.0/pdfium.a" />
+    <file src="pdfium-wasm-3.1.34/lib/libpdfium.a" target="build/net8.0/pdfium.a" />
     <file src="Sungaila.PDFium.BlazorWebAssembly.props" target="build/net7.0/Sungaila.PDFium.BlazorWebAssembly.props" />
     <file src="Sungaila.PDFium.BlazorWebAssembly.props" target="build/net8.0/Sungaila.PDFium.BlazorWebAssembly.props" />
     <file src="Sungaila.PDFium.BlazorWebAssembly.props" target="buildTransitive/net7.0/Sungaila.PDFium.BlazorWebAssembly.props" />

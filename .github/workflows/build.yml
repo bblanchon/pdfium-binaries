@@ -62,6 +62,7 @@ jobs:
           [ "${{inputs.target_libc}}" != "" ] && ARTIFACT="$ARTIFACT-${{inputs.target_libc}}"
           [ "${{inputs.target_os}}" != "${{inputs.target_cpu}}" ] && ARTIFACT="$ARTIFACT-${{inputs.target_cpu}}"
           [ "${{inputs.is_debug}}" == "true" ] && ARTIFACT="$ARTIFACT-debug"
+          [ "${{inputs.emsdk_version}}" != "" ] && ARTIFACT="$ARTIFACT-${{inputs.emsdk_version}}"
           echo "artifact=$ARTIFACT" >> $GITHUB_OUTPUT
       - name: Checkout this repo
         uses: actions/checkout@v3
