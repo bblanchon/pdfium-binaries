@@ -7,9 +7,9 @@
    viewBox="0 0 33.866666 33.866668"
    version="1.1"
    id="svg93"
-   inkscape:version="1.2 (dc2aedaf03, 2022-05-15)"
+   inkscape:version="1.3.1 (91b66b0783, 2023-11-16)"
    sodipodi:docname="icon.svg"
-   inkscape:export-filename="bblanchon.PDFium.WebAssembly.png"
+   inkscape:export-filename="Sungaila.PDFium.BlazorWebAssembly.png"
    inkscape:export-xdpi="96"
    inkscape:export-ydpi="96"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
@@ -27,15 +27,15 @@
      inkscape:document-units="mm"
      showgrid="false"
      units="px"
-     inkscape:zoom="2.1022853"
-     inkscape:cx="14.270185"
-     inkscape:cy="116.53984"
+     inkscape:zoom="2.9730804"
+     inkscape:cx="104.26896"
+     inkscape:cy="118.90025"
      inkscape:window-width="3440"
      inkscape:window-height="1334"
      inkscape:window-x="-11"
      inkscape:window-y="-11"
      inkscape:window-maximized="1"
-     inkscape:current-layer="g57"
+     inkscape:current-layer="g2"
      showguides="true"
      inkscape:guide-bbox="true"
      inkscape:showpageshadow="2"
@@ -109,6 +109,18 @@
        width="238.78776"
        height="82.767072"
        id="rect50665" />
+    <rect
+       x="-302.52792"
+       y="-128.43166"
+       width="238.78776"
+       height="82.767072"
+       id="rect2" />
+    <rect
+       x="-302.52792"
+       y="-128.43166"
+       width="238.78776"
+       height="82.767072"
+       id="rect3" />
   </defs>
   <g
      inkscape:label="Icon"
@@ -254,17 +266,17 @@
        xml:space="preserve"
        transform="matrix(0.2281604,0,0,0.2281604,58.906692,54.39993)"
        id="text37882"
-       style="font-style:normal;font-weight:normal;font-size:34.016px;line-height:1.25;font-family:sans-serif;text-align:center;white-space:pre;shape-inside:url(#rect37886);fill:#4d4d4d;fill-opacity:1;stroke:none"
+       style="font-style:normal;font-weight:normal;font-size:34.016px;line-height:1.25;font-family:sans-serif;text-align:center;white-space:pre;shape-inside:url(#rect37886);display:inline;fill:#4d4d4d;fill-opacity:1;stroke:none"
        inkscape:export-filename="bblanchon.PDFium.macOS"
        inkscape:export-xdpi="96"
        inkscape:export-ydpi="96"
        x="59.503082"
        y="0"><tspan
          x="-252.36166"
-         y="-97.481533"
-          id="tspan1077"><tspan
+         y="-97.397814"
+         id="tspan5"><tspan
            style="font-family:'Roboto Black';-inkscape-font-specification:'Roboto Black, '"
-           id="tspan1075">Windows</tspan></tspan></text>
+           id="tspan4">Windows</tspan></tspan></text>
   </g>
   <g
      inkscape:groupmode="layer"
@@ -276,29 +288,29 @@
        xml:space="preserve"
        transform="matrix(0.2281604,0,0,0.2281604,58.906692,54.39993)"
        id="text34111"
-       style="font-style:normal;font-weight:normal;font-size:34.016px;line-height:1.25;font-family:sans-serif;text-align:center;white-space:pre;shape-inside:url(#rect34115);fill:#4d4d4d;fill-opacity:1;stroke:none"
+       style="font-style:normal;font-weight:normal;font-size:34.016px;line-height:1.25;font-family:sans-serif;text-align:center;white-space:pre;shape-inside:url(#rect34115);display:inline;fill:#4d4d4d;fill-opacity:1;stroke:none"
        inkscape:export-filename="bblanchon.PDFium.macOS"
        inkscape:export-xdpi="96"
        inkscape:export-ydpi="96"
        x="59.503082"
        y="0"><tspan
          x="-238.03608"
-         y="-97.481533"
-         id="tspan1081"><tspan
+         y="-97.397814"
+         id="tspan7"><tspan
            style="font-family:'Roboto Black';-inkscape-font-specification:'Roboto Black, '"
-           id="tspan1079">macOS</tspan></tspan></text>
+           id="tspan6">macOS</tspan></tspan></text>
   </g>
   <g
      inkscape:groupmode="layer"
      id="g57"
      inkscape:label="WebAssembly"
-     style="display:inline"
+     style="display:none"
      sodipodi:insensitive="true">
     <text
        xml:space="preserve"
        transform="matrix(0.2281604,0,0,0.2281604,58.906692,54.39993)"
        id="text55"
-       style="font-style:normal;font-weight:normal;font-size:34.016px;line-height:1.25;font-family:sans-serif;text-align:center;white-space:pre;shape-inside:url(#rect34115);fill:#4d4d4d;fill-opacity:1;stroke:none"
+       style="font-style:normal;font-weight:normal;font-size:34.016px;line-height:1.25;font-family:sans-serif;text-align:center;white-space:pre;shape-inside:url(#rect34115);display:inline;fill:#4d4d4d;fill-opacity:1;stroke:none"
        inkscape:export-filename="bblanchon.PDFium.WebAssembly"
        inkscape:export-xdpi="96"
        inkscape:export-ydpi="96"
@@ -306,9 +318,31 @@
        y="0"><tspan
          x="-230.03036"
          y="-97.397814"
-         id="tspan198"><tspan
+         id="tspan9"><tspan
            style="font-family:'Roboto Black';-inkscape-font-specification:'Roboto Black, '"
-           id="tspan196">Wasm</tspan></tspan></text>
+           id="tspan8">Wasm</tspan></tspan></text>
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="g2"
+     inkscape:label="BlazorWebAssembly"
+     style="display:inline"
+     sodipodi:insensitive="true">
+    <text
+       xml:space="preserve"
+       transform="matrix(0.2281604,0,0,0.2281604,58.906693,54.399929)"
+       id="text3"
+       style="font-style:normal;font-weight:normal;font-size:24.7389px;line-height:1.25;font-family:sans-serif;text-align:center;white-space:pre;shape-inside:url(#rect3);display:inline;fill:#4d4d4d;fill-opacity:1;stroke:none"
+       inkscape:export-filename="bblanchon.PDFium.WebAssembly"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       x="59.503082"
+       y="0"><tspan
+         x="-256.16669"
+         y="-105.86159"
+         id="tspan11"><tspan
+           style="font-family:'Roboto Black';-inkscape-font-specification:'Roboto Black, '"
+           id="tspan10">Blazor Wasm</tspan></tspan></text>
   </g>
   <g
      inkscape:groupmode="layer"
@@ -320,17 +354,17 @@
        xml:space="preserve"
        transform="matrix(0.2281604,0,0,0.2281604,58.906692,54.39993)"
        id="text50661"
-       style="font-style:normal;font-weight:normal;font-size:34.016px;line-height:1.25;font-family:sans-serif;text-align:center;white-space:pre;shape-inside:url(#rect50665);fill:#4d4d4d;fill-opacity:1;stroke:none"
+       style="font-style:normal;font-weight:normal;font-size:34.016px;line-height:1.25;font-family:sans-serif;text-align:center;white-space:pre;shape-inside:url(#rect50665);display:inline;fill:#4d4d4d;fill-opacity:1;stroke:none"
        inkscape:export-filename="bblanchon.PDFium.macOS"
        inkscape:export-xdpi="96"
        inkscape:export-ydpi="96"
        x="59.503082"
        y="0"><tspan
          x="-224.9645"
-         y="-97.481533"
-         id="tspan1085"><tspan
+         y="-97.397814"
+         id="tspan13"><tspan
            style="font-family:'Roboto Black';-inkscape-font-specification:'Roboto Black, '"
-           id="tspan1083">Linux</tspan></tspan></text>
+           id="tspan12">Linux</tspan></tspan></text>
   </g>
   <g
      inkscape:groupmode="layer"
@@ -342,17 +376,17 @@
        xml:space="preserve"
        transform="matrix(0.2281604,0,0,0.2281604,58.906692,54.39993)"
        id="text45134"
-       style="font-style:normal;font-weight:normal;font-size:34.016px;line-height:1.25;font-family:sans-serif;text-align:center;white-space:pre;shape-inside:url(#rect45138);fill:#4d4d4d;fill-opacity:1;stroke:none"
+       style="font-style:normal;font-weight:normal;font-size:34.016px;line-height:1.25;font-family:sans-serif;text-align:center;white-space:pre;shape-inside:url(#rect45138);display:inline;fill:#4d4d4d;fill-opacity:1;stroke:none"
        inkscape:export-filename="bblanchon.PDFium.macOS"
        inkscape:export-xdpi="96"
        inkscape:export-ydpi="96"
        x="59.503082"
        y="0"><tspan
          x="-210.19876"
-         y="-97.481533"
-         id="tspan1089"><tspan
+         y="-97.397814"
+         id="tspan15"><tspan
            style="font-family:'Roboto Black';-inkscape-font-specification:'Roboto Black, '"
-           id="tspan1087">iOS</tspan></tspan></text>
+           id="tspan14">iOS</tspan></tspan></text>
   </g>
   <g
      inkscape:groupmode="layer"
@@ -364,16 +398,16 @@
        xml:space="preserve"
        transform="matrix(0.2281604,0,0,0.2281604,58.906692,54.39993)"
        id="text11577"
-       style="font-style:normal;font-weight:normal;font-size:34.016px;line-height:1.25;font-family:sans-serif;text-align:center;white-space:pre;shape-inside:url(#rect11581);fill:#4d4d4d;fill-opacity:1;stroke:none"
+       style="font-style:normal;font-weight:normal;font-size:34.016px;line-height:1.25;font-family:sans-serif;text-align:center;white-space:pre;shape-inside:url(#rect11581);display:inline;fill:#4d4d4d;fill-opacity:1;stroke:none"
        inkscape:export-filename="bblanchon.PDFium.macOS"
        inkscape:export-xdpi="96"
        inkscape:export-ydpi="96"
        x="59.503082"
        y="0"><tspan
          x="-243.41751"
-         y="-97.481533"
-         id="tspan1093"><tspan
+         y="-97.397814"
+         id="tspan17"><tspan
            style="font-family:'Roboto Black';-inkscape-font-specification:'Roboto Black, '"
-           id="tspan1091">Android</tspan></tspan></text>
+           id="tspan16">Android</tspan></tspan></text>
   </g>
 </svg>
