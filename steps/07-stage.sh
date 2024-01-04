@@ -14,6 +14,7 @@ STAGING_LIB="$STAGING/lib"
 
 mkdir -p "$STAGING"
 mkdir -p "$STAGING_LIB"
+mkdir -p "$STAGING_LIB/${EMSDK_VERSION:-3.1.34}"
 
 sed "s/#VERSION#/${VERSION:-0.0.0.0}/" <"$PATCHES/PDFiumConfig.cmake" >"$STAGING/PDFiumConfig.cmake"
 
@@ -37,7 +38,7 @@ case "$OS" in
     mv "$BUILD/pdfium.html" "$STAGING_LIB"
     mv "$BUILD/pdfium.js" "$STAGING_LIB"
     mv "$BUILD/pdfium.wasm" "$STAGING_LIB"
-    mv "$BUILD/obj/libpdfium.a" "$STAGING_LIB"
+    mv "$BUILD/obj/libpdfium.a" "$STAGING_LIB/${EMSDK_VERSION:-3.1.34}"
     rm -rf "$STAGING/include/cpp"
     rm "$STAGING/PDFiumConfig.cmake"
     ;;

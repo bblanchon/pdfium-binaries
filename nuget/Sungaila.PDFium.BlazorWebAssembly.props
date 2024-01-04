@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+    <PropertyGroup>
+        <_PDFiumNativeLibraryCurrPath>$([System.IO.Path]::GetDirectoryName('$(MSBuildThisFileDirectory)'))</_PDFiumNativeLibraryCurrPath>
+        <_PDFiumNativeLibraryDirName>$([System.IO.Path]::GetFileName('$(_PDFiumNativeLibraryCurrPath)'))</_PDFiumNativeLibraryDirName>
+        <_PDFiumNativeLibraryRootDir>$(MSBuildThisFileDirectory)..\..\build\$(_PDFiumNativeLibraryDirName)\</_PDFiumNativeLibraryRootDir>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <NativeFileReference Include="$(_PDFiumNativeLibraryRootDir)pdfium.a" />
+    </PropertyGroup>
+
+</Project>
