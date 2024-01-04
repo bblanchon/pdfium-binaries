@@ -28,7 +28,7 @@
      showgrid="false"
      units="px"
      inkscape:zoom="2.9730804"
-     inkscape:cx="103.93261"
+     inkscape:cx="104.26896"
      inkscape:cy="118.90025"
      inkscape:window-width="3440"
      inkscape:window-height="1334"
@@ -115,6 +115,12 @@
        width="238.78776"
        height="82.767072"
        id="rect2" />
+    <rect
+       x="-302.52792"
+       y="-128.43166"
+       width="238.78776"
+       height="82.767072"
+       id="rect3" />
   </defs>
   <g
      inkscape:label="Icon"
@@ -268,9 +274,9 @@
        y="0"><tspan
          x="-252.36166"
          y="-97.397814"
-         id="tspan18"><tspan
+         id="tspan5"><tspan
            style="font-family:'Roboto Black';-inkscape-font-specification:'Roboto Black, '"
-           id="tspan2">Windows</tspan></tspan></text>
+           id="tspan4">Windows</tspan></tspan></text>
   </g>
   <g
      inkscape:groupmode="layer"
@@ -290,9 +296,9 @@
        y="0"><tspan
          x="-238.03608"
          y="-97.397814"
-         id="tspan20"><tspan
+         id="tspan7"><tspan
            style="font-family:'Roboto Black';-inkscape-font-specification:'Roboto Black, '"
-           id="tspan19">macOS</tspan></tspan></text>
+           id="tspan6">macOS</tspan></tspan></text>
   </g>
   <g
      inkscape:groupmode="layer"
@@ -312,37 +318,31 @@
        y="0"><tspan
          x="-230.03036"
          y="-97.397814"
-         id="tspan22"><tspan
+         id="tspan9"><tspan
            style="font-family:'Roboto Black';-inkscape-font-specification:'Roboto Black, '"
-           id="tspan21">Wasm</tspan></tspan></text>
+           id="tspan8">Wasm</tspan></tspan></text>
   </g>
   <g
      inkscape:groupmode="layer"
      id="g2"
      inkscape:label="BlazorWebAssembly"
-     style="display:inline">
+     style="display:inline"
+     sodipodi:insensitive="true">
     <text
        xml:space="preserve"
-       transform="matrix(0.2281604,0,0,0.2281604,58.906692,55.534591)"
-       id="text2"
-       style="font-style:normal;font-weight:normal;font-size:18.5542px;line-height:0.75;font-family:sans-serif;text-align:center;white-space:pre;shape-inside:url(#rect2);display:inline;fill:#4d4d4d;fill-opacity:1;stroke:none"
+       transform="matrix(0.2281604,0,0,0.2281604,58.906693,54.399929)"
+       id="text3"
+       style="font-style:normal;font-weight:normal;font-size:24.7389px;line-height:1.25;font-family:sans-serif;text-align:center;white-space:pre;shape-inside:url(#rect3);display:inline;fill:#4d4d4d;fill-opacity:1;stroke:none"
        inkscape:export-filename="bblanchon.PDFium.WebAssembly"
        inkscape:export-xdpi="96"
        inkscape:export-ydpi="96"
        x="59.503082"
-       y="0"
-       inkscape:label="text2"><tspan
-         x="-210.01835"
-         y="-116.14263"
-         id="tspan24"><tspan
+       y="0"><tspan
+         x="-256.16669"
+         y="-105.86159"
+         id="tspan11"><tspan
            style="font-family:'Roboto Black';-inkscape-font-specification:'Roboto Black, '"
-           id="tspan23">Blazor
-</tspan></tspan><tspan
-         x="-242.77358"
-         y="-101.53435"
-         id="tspan26"><tspan
-           style="font-family:'Roboto Black';-inkscape-font-specification:'Roboto Black, '"
-           id="tspan25">WebAssembly</tspan></tspan></text>
+           id="tspan10">Blazor Wasm</tspan></tspan></text>
   </g>
   <g
      inkscape:groupmode="layer"
@@ -362,9 +362,9 @@
        y="0"><tspan
          x="-224.9645"
          y="-97.397814"
-         id="tspan28"><tspan
+         id="tspan13"><tspan
            style="font-family:'Roboto Black';-inkscape-font-specification:'Roboto Black, '"
-           id="tspan27">Linux</tspan></tspan></text>
+           id="tspan12">Linux</tspan></tspan></text>
   </g>
   <g
      inkscape:groupmode="layer"
@@ -384,9 +384,9 @@
        y="0"><tspan
          x="-210.19876"
          y="-97.397814"
-         id="tspan30"><tspan
+         id="tspan15"><tspan
            style="font-family:'Roboto Black';-inkscape-font-specification:'Roboto Black, '"
-           id="tspan29">iOS</tspan></tspan></text>
+           id="tspan14">iOS</tspan></tspan></text>
   </g>
   <g
      inkscape:groupmode="layer"
@@ -406,8 +406,8 @@
        y="0"><tspan
          x="-243.41751"
          y="-97.397814"
-         id="tspan32"><tspan
+         id="tspan17"><tspan
            style="font-family:'Roboto Black';-inkscape-font-specification:'Roboto Black, '"
-           id="tspan31">Android</tspan></tspan></text>
+           id="tspan16">Android</tspan></tspan></text>
   </g>
 </svg>
