@@ -11,4 +11,16 @@
         <NativeFileReference Include="$(_PDFiumNativeLibraryRootDir)pdfium.a" />
     </ItemGroup>
 
+    <Choose>
+        <When Condition="'$(TargetFramework)'=='net7.0'">
+            <PropertyGroup>
+            </PropertyGroup>
+        </When>
+        <Otherwise>
+            <PropertyGroup>
+                <WasmEnableExceptionHandling>false</WasmEnableExceptionHandling>
+            </PropertyGroup>
+        </Otherwise>
+    </Choose>
+
 </Project>
