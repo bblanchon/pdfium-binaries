@@ -1,0 +1,116 @@
+name: Build Wasm
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: PDFium branch
+        required: false
+      version:
+        description: PDFium version
+        required: false
+      release:
+        description: Publish GitHub release
+        type: boolean
+        required: false
+        default: false
+
+jobs:
+  query:
+    outputs:
+      branch: ${{ steps.chromium.outputs.branch }}
+      version: ${{ steps.chromium.outputs.version }}
+    name: Query Chromium infos
+    runs-on: ubuntu-latest
+    if: github.event.inputs.branch == '' || github.event.inputs.version == ''
+    steps:
+    - name: Get Chrome version
+      id: chromium
+      timeout-minutes: 5
+      shell: bash
+      run: |
+        VERSION=$(git ls-remote --sort version:refname --tags https://chromium.googlesource.com/chromium/src '*.*.*.0' | grep -oE '[0-9]+\.[0-9]+\.[0-9]+.0' | tail -n1)
+        BUILD=$(echo "$VERSION" | cut -d. -f3)
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+        echo "branch=chromium/$BUILD" >> $GITHUB_OUTPUT
+  wasm:
+    name: WASM
+    uses: ./.github/workflows/build.yml
+    needs:
+      - query
+    if: always() && !cancelled() && !failure()
+    strategy:
+      matrix:
+        emsdk_version: [3.1.12, 3.1.34]
+    with:
+      branch: ${{ github.event.inputs.branch || needs.query.outputs.branch }}
+      version: ${{ github.event.inputs.version || needs.query.outputs.version }}
+      is_debug: false
+      target_os: wasm
+      target_cpu: wasm
+      enable_v8: false
+      emsdk_version: ${{ matrix.emsdk_version }}
+
+  nuget:
+    name: Build NuGet packages
+    runs-on: windows-latest
+    needs:
+      - query
+      - wasm
+    if: always() && !cancelled() && !failure()
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Download artifacts
+        uses: actions/download-artifact@v3
+        with:
+          path: nuget
+      - name: Pack
+        shell: bash
+        run: |
+          for NUSPEC in nuget/*.nuspec; do
+            echo "::group::$NUSPEC"
+            nuget pack "$NUSPEC" -properties "version=${{ github.event.inputs.version || needs.query.outputs.version || '0.0.0.0' }};branch=${GITHUB_REF#refs/heads/};commit=${GITHUB_SHA}"
+            echo "::endgroup::"
+          done
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: NuGet packages
+          path: '*.nupkg'
+
+  publish:
+    name: Publish Release
+    if: always() && !cancelled() && !failure() && (startsWith(github.event.inputs.branch, 'chromium/') || startsWith(needs.query.outputs.branch, 'chromium/')) && (github.event.inputs.version || needs.query.outputs.version) && github.event.inputs.release == 'true'
+    runs-on: ubuntu-latest
+    needs:
+      - query
+      - nuget
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v3
+      - name: Create tarballs
+        run: |
+          for DIR in pdfium-*; do
+            echo "::group::$DIR"
+            (cd $DIR; tar czf ../$DIR.tgz *)
+            echo "::endgroup::"
+          done
+      - name: Write release body
+        run: echo 'This version `${{ github.event.inputs.version || needs.query.outputs.version }}` was built with branch `${{ github.event.inputs.branch || needs.query.outputs.branch }}` of PDFium' > RELEASE.md
+      - name: Get changes
+        continue-on-error: true
+        run: |
+          CURRENT_REV=${{ github.event.inputs.branch|| needs.query.outputs.branch }}
+          PREVIOUS_REV=$(curl --silent "https://api.github.com/repos/${{ github.repository }}/releases/latest" | jq -r ".tag_name")
+          git clone -b "${{ github.event.inputs.branch|| needs.query.outputs.branch }}" https://pdfium.googlesource.com/pdfium.git
+          cat <<END >> RELEASE.md
+          ### Changes
+          Commits between \`$PREVIOUS_REV\` and \`$CURRENT_REV\`:
+          END
+          git -C "pdfium" log origin/${PREVIOUS_REV}.. --pretty=format:'* [%s](https://pdfium.googlesource.com/pdfium/+/%H)' >> RELEASE.md
+      - name: Upload RELEASE.md
+        uses: actions/upload-artifact@v3
+        with:
+          name: RELEASE.md
+          path: 'RELEASE.md'
