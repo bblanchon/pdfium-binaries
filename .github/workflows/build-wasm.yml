@@ -1,4 +1,4 @@
-name: Build all
+name: Build Wasm
 
 on:
   workflow_dispatch:
