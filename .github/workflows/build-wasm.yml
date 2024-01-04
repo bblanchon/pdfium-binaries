@@ -6,7 +6,7 @@ on:
       branch:
         description: PDFium branch
         required: false
-        default: main
+        default: ""
       version:
         description: PDFium version
         required: false
@@ -18,6 +18,20 @@ on:
         default: false
 
 jobs:
+  query:
+    name: Query Chromium infos
+    runs-on: ubuntu-latest
+    if: github.event.inputs.branch == '' || github.event.inputs.version = ''
+    steps:
+    - name: Get Chrome version
+      id: chromium
+      timeout-minutes: 5
+      shell: bash
+      run: |
+        VERSION=$(git ls-remote --sort version:refname --tags https://chromium.googlesource.com/chromium/src '*.*.*.0' | grep -oE '[0-9]+\.[0-9]+\.[0-9]+.0' | tail -n1)
+        BUILD=$(echo "$VERSION" | cut -d. -f3)
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+        echo "branch=chromium/$BUILD" >> $GITHUB_OUTPUT
   wasm:
     name: WASM
     uses: ./.github/workflows/build.yml
@@ -25,8 +39,8 @@ jobs:
       matrix:
         emsdk_version: [3.1.12, 3.1.34]
     with:
-      branch: ${{ github.event.inputs.branch }}
-      version: ${{ github.event.inputs.version }}
+      branch: ${{ github.event.inputs.branch || jobs.query.chromium.outputs.branch }}
+      version: ${{ github.event.inputs.version || jobs.query.chromium.outputs.version }}
       is_debug: ${{ github.event.inputs.is_debug == 'true' }}
       target_os: wasm
       target_cpu: wasm
