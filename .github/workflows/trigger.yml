@@ -19,6 +19,10 @@ jobs:
         BUILD=$(echo "$VERSION" | cut -d. -f3)
         echo "version=$VERSION" >> $GITHUB_OUTPUT
         echo "branch=chromium/$BUILD" >> $GITHUB_OUTPUT
+    - name: Get date
+      id: date
+      run: |
+        echo "day=$(date +%-d)" >> $GITHUB_OUTPUT
     - name: Trigger build
       uses: benc-uk/workflow-dispatch@v1
       with:
@@ -30,5 +34,7 @@ jobs:
             "version": "${{ steps.chromium.outputs.version }}",
             "is_debug": "false",
             "enable_v8": "true",
-            "publish": "true"
+            "release": "true",
+            "nuget": "true",
+            "anaconda": "${{ steps.date.outputs.day <= 7 && 'true' || 'false' }}"
           }

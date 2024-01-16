@@ -21,8 +21,18 @@ on:
         type: boolean
         required: false
         default: false
-      publish:
-        description: Publish release
+      release:
+        description: Publish GitHub release
+        type: boolean
+        required: false
+        default: false
+      nuget:
+        description: Publish on nuget.org
+        type: boolean
+        required: false
+        default: false
+      anaconda:
+        description: Publish on anaconda.org
         type: boolean
         required: false
         default: false
@@ -559,7 +569,7 @@ jobs:
           name: NuGet packages
           path: '*.nupkg'
       - name: Push to nuget.org
-        if: env.NUGET_API_KEY && startsWith(github.event.inputs.branch, 'chromium/') && github.event.inputs.version && github.event.inputs.publish == 'true'
+        if: env.NUGET_API_KEY && startsWith(github.event.inputs.branch, 'chromium/') && github.event.inputs.version && github.event.inputs.nuget == 'true'
         run: nuget push -Source nuget.org -ApiKey ${{ secrets.NUGET_API_KEY }} *.nupkg
         env:
           NUGET_API_KEY: ${{ secrets.NUGET_API_KEY  }}
@@ -569,15 +579,12 @@ jobs:
     if: github.event.inputs.version
     runs-on: ubuntu-latest
     needs:
-      - linux_arm
       - linux_arm64
       - linux_x64
-      - linux_x86
       - mac_arm64
       - mac_x64
       - win_arm64
       - win_x64
-      - win_x86
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -600,20 +607,14 @@ jobs:
           python conda/build.py pdfium-binaries \$PLATFORM \$VERSION --about-file conda/about.json --source-dir \$SOURCE_DIR --output-dir conda/out
           END
           chmod +x conda-build.sh
-      - name: Build for linux-32
-        run: ./conda-build.sh linux-32 pdfium-linux-x86
       - name: Build for linux-64
         run: ./conda-build.sh linux-64 pdfium-linux-x64
       - name: Build for linux-aarch64
         run: ./conda-build.sh linux-aarch64 pdfium-linux-arm64
-      - name: Build for linux-armv7l
-        run: ./conda-build.sh linux-armv7l pdfium-linux-arm
       - name: Build for osx-arm64
         run: ./conda-build.sh osx-arm64 pdfium-mac-arm64
       - name: Build for osx-64
         run: ./conda-build.sh osx-64 pdfium-mac-x64
-      - name: Build for win-32
-        run: ./conda-build.sh win-32 pdfium-win-x86
       - name: Build for win-64
         run: ./conda-build.sh win-64 pdfium-win-x64
       - name: Build for win-arm64
@@ -629,7 +630,7 @@ jobs:
         run: conda install -yq anaconda-client
         shell: bash -l {0}
       - name: Upload to Anaconda
-        if: env.ANACONDA_API_TOKEN && startsWith(github.event.inputs.branch, 'chromium/') && github.event.inputs.version && github.event.inputs.publish == 'true'
+        if: env.ANACONDA_API_TOKEN && startsWith(github.event.inputs.branch, 'chromium/') && github.event.inputs.version && github.event.inputs.anaconda == 'true'
         run: find conda/out -name 'pdfium-binaries-*.tar.bz2' -exec anaconda upload --force {} +
         shell: bash -l {0}
         env:
@@ -637,7 +638,7 @@ jobs:
 
   publish:
     name: Publish Release
-    if: startsWith(github.event.inputs.branch, 'chromium/') && github.event.inputs.version && github.event.inputs.publish == 'true'
+    if: startsWith(github.event.inputs.branch, 'chromium/') && github.event.inputs.version && github.event.inputs.release == 'true'
     runs-on: ubuntu-latest
     needs:
       - android_arm
