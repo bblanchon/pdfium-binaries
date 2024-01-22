@@ -30,6 +30,11 @@
     <file src="_._" target="lib/native/_._" />
     <file src="_._" target="lib/netstandard1.0/_._" />
 
+    <!-- special targets file copies native binaries for Mono -->
+    <!-- .NET (Core) does not need this and handles the runtimes folder on its own -->
+    <file src="bblanchon.PDFium.macOS.targets" target="build/net461/bblanchon.PDFium.macOS.targets" />
+    <file src="bblanchon.PDFium.macOS.targets" target="buildTransitive/net461/bblanchon.PDFium.macOS.targets" />
+
     <!-- include hearder and lib files for C++ projects -->
     <file src="bblanchon.PDFium.native.targets" target="build/native/bblanchon.PDFiumV8.macOS.targets" />
     <file src="include/**/*.h" target="build/native" />
