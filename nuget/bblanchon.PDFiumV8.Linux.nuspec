@@ -41,6 +41,7 @@
     <file src="pdfium-v8-linux-arm64/lib/libpdfium.so" target="runtimes/linux-arm64/native/libpdfium.so" />
     <file src="pdfium-v8-linux-x64/lib/libpdfium.so" target="runtimes/linux-x64/native/libpdfium.so" />
     <file src="pdfium-v8-linux-x86/lib/libpdfium.so" target="runtimes/linux-x86/native/libpdfium.so" />
+    <file src="pdfium-v8-linux-musl-arm64/lib/libpdfium.so" target="runtimes/linux-musl-arm64/native/libpdfium.so" />
     <file src="pdfium-v8-linux-musl-x64/lib/libpdfium.so" target="runtimes/linux-musl-x64/native/libpdfium.so" />
     <file src="pdfium-v8-linux-musl-x86/lib/libpdfium.so" target="runtimes/linux-musl-x86/native/libpdfium.so" />
   </files>

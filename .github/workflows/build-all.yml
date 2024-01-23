@@ -530,6 +530,8 @@ jobs:
       - linux_x64_v8
       - linux_x86
       - linux_x86_v8
+      - linux_musl_arm64
+      - linux_musl_arm64_v8
       - linux_musl_x64
       - linux_musl_x64_v8
       - linux_musl_x86
