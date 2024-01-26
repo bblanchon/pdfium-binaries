@@ -68,11 +68,11 @@ jobs:
       - name: Define properties
         shell: bash
         run: |
-          VERSION="${{ github.event.inputs.version || '0.0.0.0' }}"
+          VERSION="${{ github.event.inputs.version || needs.query.outputs.version || '0.0.0.0' }}"
           BRANCH="${GITHUB_REF#refs/heads/}"
           COMMIT="${GITHUB_SHA}"
           RELEASE_NOTES="${{github.server_url}}/${{github.repository}}/releases/"
-          ${{ github.event.inputs.release }} && RELEASE_NOTES+="/tag/${{ github.event.inputs.branch }}"
+          ${{ github.event.inputs.release }} && RELEASE_NOTES+="tag/${{ github.event.inputs.branch || needs.query.outputs.branch }}"
           echo "NUSPEC_PROPERTIES=version=$VERSION;branch=$BRANCH;commit=$COMMIT;releaseNotes=$RELEASE_NOTES" >> "$GITHUB_ENV"
       - name: Pack
         shell: bash
