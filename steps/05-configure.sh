@@ -13,6 +13,7 @@ mkdir -p "$BUILD"
 (
   echo "is_debug = $IS_DEBUG"
   echo "pdf_is_standalone = true"
+  echo "pdf_use_partition_alloc = false"
   echo "target_cpu = \"$TARGET_CPU\""
   echo "target_os = \"$OS\""
   echo "pdf_enable_v8 = $ENABLE_V8"
@@ -40,7 +41,6 @@ mkdir -p "$BUILD"
       ;;
     wasm)
       echo 'pdf_is_complete_lib = true'
-      echo 'pdf_use_partition_alloc = false'
       echo 'is_clang = false'
       ;;
   esac
