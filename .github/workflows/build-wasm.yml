@@ -65,12 +65,21 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           path: nuget
+      - name: Define properties
+        shell: bash
+        run: |
+          VERSION="${{ github.event.inputs.version || '0.0.0.0' }}"
+          BRANCH="${GITHUB_REF#refs/heads/}"
+          COMMIT="${GITHUB_SHA}"
+          RELEASE_NOTES="${{github.server_url}}/${{github.repository}}/releases/"
+          ${{ github.event.inputs.release }} && RELEASE_NOTES+="/tag/${{ github.event.inputs.branch }}"
+          echo "NUSPEC_PROPERTIES=version=$VERSION;branch=$BRANCH;commit=$COMMIT;releaseNotes=$RELEASE_NOTES" >> "$GITHUB_ENV"
       - name: Pack
         shell: bash
         run: |
           for NUSPEC in nuget/*.nuspec; do
             echo "::group::$NUSPEC"
-            nuget pack "$NUSPEC" -properties "version=${{ github.event.inputs.version || needs.query.outputs.version || '0.0.0.0' }};branch=${GITHUB_REF#refs/heads/};commit=${GITHUB_SHA}"
+            nuget pack "$NUSPEC" -p "$NUSPEC_PROPERTIES"
             echo "::endgroup::"
           done
       - name: Upload artifact
