@@ -30,6 +30,11 @@
     <file src="_._" target="lib/native/_._" />
     <file src="_._" target="lib/netstandard1.0/_._" />
 
+    <!-- special targets file copies native binaries for Mono -->
+    <!-- .NET (Core) does not need this and handles the runtimes folder on its own -->
+    <file src="bblanchon.PDFium.Linux.targets" target="build/net461/bblanchon.PDFium.Linux.targets" />
+    <file src="bblanchon.PDFium.Linux.targets" target="buildTransitive/net461/bblanchon.PDFium.Linux.targets" />
+
     <!-- include hearder and lib files for C++ projects -->
     <file src="bblanchon.PDFium.native.targets" target="build/native/bblanchon.PDFiumV8.Linux.targets" />
     <file src="include/**/*.h" target="build/native" />
@@ -41,6 +46,7 @@
     <file src="pdfium-v8-linux-arm64/lib/libpdfium.so" target="runtimes/linux-arm64/native/libpdfium.so" />
     <file src="pdfium-v8-linux-x64/lib/libpdfium.so" target="runtimes/linux-x64/native/libpdfium.so" />
     <file src="pdfium-v8-linux-x86/lib/libpdfium.so" target="runtimes/linux-x86/native/libpdfium.so" />
+    <file src="pdfium-v8-linux-musl-arm64/lib/libpdfium.so" target="runtimes/linux-musl-arm64/native/libpdfium.so" />
     <file src="pdfium-v8-linux-musl-x64/lib/libpdfium.so" target="runtimes/linux-musl-x64/native/libpdfium.so" />
     <file src="pdfium-v8-linux-musl-x86/lib/libpdfium.so" target="runtimes/linux-musl-x86/native/libpdfium.so" />
   </files>

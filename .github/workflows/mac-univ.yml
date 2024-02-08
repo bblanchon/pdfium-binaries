@@ -26,12 +26,12 @@ jobs:
         run: |
           echo "artifact=${{inputs.artifact_x64}}" | sed "s/x64/univ/g" >> $GITHUB_OUTPUT
       - name: Download ${{ inputs.artifact_x64 }}
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: ${{ inputs.artifact_x64 }}
           path: ${{ inputs.artifact_x64 }}
       - name: Download ${{ inputs.artifact_arm64 }}
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: ${{ inputs.artifact_arm64 }}
           path: ${{ inputs.artifact_arm64 }}
@@ -45,7 +45,7 @@ jobs:
             ${{ inputs.artifact_x64 }}/lib/libpdfium.dylib \
             -output ${{ steps.init.outputs.artifact }}/lib/libpdfium.dylib
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ steps.init.outputs.artifact }}
           path: ${{ steps.init.outputs.artifact }}
