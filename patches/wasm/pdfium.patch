@@ -1,26 +1,26 @@
 diff --git a/core/fxcrt/BUILD.gn b/core/fxcrt/BUILD.gn
-index 1b3f6e4..ac8c65f 100644
+index 90b9ec7..1e9be68 100644
 --- a/core/fxcrt/BUILD.gn
 +++ b/core/fxcrt/BUILD.gn
-@@ -140,7 +140,7 @@ source_set("fxcrt") {
+@@ -150,7 +150,7 @@ source_set("fxcrt") {
    } else {
      sources += [ "fx_memory_malloc.cpp" ]
    }
--  if (is_posix || is_fuchsia) {
-+  if (is_posix || is_fuchsia || is_wasm) {
+-  if (is_posix) {
++  if (is_posix || is_wasm) {
      sources += [
        "cfx_fileaccess_posix.cpp",
        "cfx_fileaccess_posix.h",
 diff --git a/core/fxge/BUILD.gn b/core/fxge/BUILD.gn
-index a3d2b0e..bcfd1be 100644
+index 215a63b..e52e9b6 100644
 --- a/core/fxge/BUILD.gn
 +++ b/core/fxge/BUILD.gn
-@@ -157,7 +157,7 @@ source_set("fxge") {
+@@ -160,7 +160,7 @@ source_set("fxge") {
      ]
    }
  
--  if (is_linux || is_chromeos || is_fuchsia) {
-+  if (is_linux || is_chromeos || is_fuchsia || is_wasm) {
+-  if (is_linux || is_chromeos) {
++  if (is_linux || is_chromeos || is_wasm) {
      sources += [ "linux/fx_linux_impl.cpp" ]
    }
  
