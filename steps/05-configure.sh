@@ -27,17 +27,23 @@ mkdir -p "$BUILD"
   fi
 
   case "$OS" in
+    android)
+      echo "clang_use_chrome_plugins = false"
+      ;;
     ios)
       echo "ios_enable_code_signing = false"
       echo "use_blink = true"
       [ "$ENABLE_V8" == "true" ] && [ "$TARGET_CPU" == "arm64" ] && echo 'arm_control_flow_integrity = "none"'
+      echo "clang_use_chrome_plugins = false"
       ;;
     linux)
       echo 'use_allocator_shim = false'
+      echo "clang_use_chrome_plugins = false"
       ;;
     mac)
       echo 'use_allocator_shim = false'
       echo 'mac_deployment_target = "10.13.0"'
+      echo "clang_use_chrome_plugins = false"
       ;;
     wasm)
       echo 'pdf_is_complete_lib = true'
