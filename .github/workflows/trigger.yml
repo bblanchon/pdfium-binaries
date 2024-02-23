@@ -14,3 +14,4 @@ jobs:
       uses: benc-uk/workflow-dispatch@master
       with:
         workflow: Build Wasm
+        token: "${{ secrets.PERSONAL_ACCESS_TOKEN }}"
