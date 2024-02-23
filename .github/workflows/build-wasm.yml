@@ -13,7 +13,7 @@ on:
         description: Publish GitHub release
         type: boolean
         required: false
-        default: false
+        default: true
 
 jobs:
   query:

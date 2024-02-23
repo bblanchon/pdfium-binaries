@@ -1,0 +1,16 @@
+name: Weekly schedule
+
+on:
+  schedule:
+    - cron:  '0 4 * * 1'
+  workflow_dispatch:
+
+jobs:
+  trigger:
+    name: Trigger build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Trigger build
+      uses: benc-uk/workflow-dispatch@master
+      with:
+        workflow: Build Wasm
