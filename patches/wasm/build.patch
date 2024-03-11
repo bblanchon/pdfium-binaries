@@ -1,5 +1,5 @@
 diff --git a/config/BUILDCONFIG.gn b/config/BUILDCONFIG.gn
-index 105e194..beea137 100644
+index 894e82b45..abce54b59 100644
 --- a/config/BUILDCONFIG.gn
 +++ b/config/BUILDCONFIG.gn
 @@ -268,6 +268,8 @@ if (target_os == "android") {
@@ -20,10 +20,10 @@ index 105e194..beea137 100644
  is_apple = is_ios || is_mac
  is_posix = !is_win && !is_fuchsia
 diff --git a/config/compiler/BUILD.gn b/config/compiler/BUILD.gn
-index 21683ac..54810f0 100644
+index 3c7b4d82d..da0d72cc1 100644
 --- a/config/compiler/BUILD.gn
 +++ b/config/compiler/BUILD.gn
-@@ -310,6 +310,8 @@ config("compiler") {
+@@ -318,6 +318,8 @@ config("compiler") {
      configs += [ "//build/config/aix:compiler" ]
    } else if (current_os == "zos") {
      configs += [ "//build/config/zos:compiler" ]
@@ -32,20 +32,20 @@ index 21683ac..54810f0 100644
    }
  
    configs += [
-@@ -377,7 +379,7 @@ config("compiler") {
-         # The x86 toolchain currently has problems with stack-protector.
-         if (is_android && current_cpu == "x86") {
-           cflags += [ "-fno-stack-protector" ]
--        } else if (current_os != "aix") {
-+        } else if (current_os != "aix" && current_os != "wasm") {
+@@ -380,7 +382,7 @@ config("compiler") {
+           cflags += [ "-fstack-protector" ]
+         }
+       } else if ((is_posix && !is_chromeos && !is_nacl) || is_fuchsia) {
+-        if (current_os != "aix") {
++        if (current_os != "aix" && current_os != "wasm") {
            # Not available on aix.
            cflags += [ "-fstack-protector" ]
          }
 diff --git a/toolchain/toolchain.gni b/toolchain/toolchain.gni
-index 9170959..3e529fe 100644
+index 14aa5f76d..b4af1af50 100644
 --- a/toolchain/toolchain.gni
 +++ b/toolchain/toolchain.gni
-@@ -62,6 +62,8 @@ if (is_apple) {
+@@ -58,6 +58,8 @@ if (is_apple) {
    shlib_extension = ".so"
  } else if (is_win) {
    shlib_extension = ".dll"
