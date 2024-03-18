@@ -17,6 +17,7 @@ find_path(PDFium_INCLUDE_DIR
 )
 
 set(PDFium_VERSION "#VERSION#")
+set(PDFium_LIBRARY_NAME "#LIBRARY_NAME#")
 
 if(WIN32)
   find_file(PDFium_LIBRARY
@@ -43,7 +44,7 @@ if(WIN32)
   )
 else()
   find_library(PDFium_LIBRARY
-        NAMES "pdfium"
+        NAMES "${PDFium_LIBRARY_NAME}"
         PATHS "${CMAKE_CURRENT_LIST_DIR}"
         PATH_SUFFIXES "lib")
 

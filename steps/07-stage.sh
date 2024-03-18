@@ -3,6 +3,7 @@
 IS_DEBUG=${PDFium_IS_DEBUG:-false}
 OS=${PDFium_TARGET_OS:?}
 VERSION=${PDFium_VERSION:-}
+LIBRARY_NAME="pdfium"
 PATCHES="$PWD/patches"
 
 SOURCE=${PDFium_SOURCE_DIR:-pdfium}
@@ -12,10 +13,9 @@ STAGING="$PWD/staging"
 STAGING_BIN="$STAGING/bin"
 STAGING_LIB="$STAGING/lib"
 
+rm -rf "$STAGING"
 mkdir -p "$STAGING"
 mkdir -p "$STAGING_LIB"
-
-sed "s/#VERSION#/${VERSION:-0.0.0.0}/" <"$PATCHES/PDFiumConfig.cmake" >"$STAGING/PDFiumConfig.cmake"
 
 cp "$SOURCE/LICENSES" "$STAGING/LICENSE"
 cp "$BUILD/args.gn" "$STAGING"
@@ -25,7 +25,12 @@ rm -f "$STAGING/include/README"
 rm -f "$STAGING/include/PRESUBMIT.py"
 
 case "$OS" in
-  android|linux)
+  android)
+    mv "$BUILD/libpdfium.cr.so" "$STAGING_LIB"
+    LIBRARY_NAME="pdfium.cr"
+    ;;
+
+  linux)
     mv "$BUILD/libpdfium.so" "$STAGING_LIB"
     ;;
 
@@ -48,6 +53,8 @@ case "$OS" in
     [ "$IS_DEBUG" == "true" ] && mv "$BUILD/pdfium.dll.pdb" "$STAGING_BIN"
     ;;
 esac
+
+cat "$PATCHES/PDFiumConfig.cmake" | sed "s/#VERSION#/${VERSION:-0.0.0.0}/" | sed "s/#LIBRARY_NAME#/${LIBRARY_NAME}/" > "$STAGING/PDFiumConfig.cmake"
 
 if [ -n "$VERSION" ]; then
   cat >"$STAGING/VERSION" <<END
