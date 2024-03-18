@@ -293,6 +293,7 @@ jobs:
   linux_musl_arm64_v8:
     name: Linux musl ARM64 V8
     if: github.event.inputs.enable_v8 == 'true'
+    needs: linux_musl_arm64
     uses: ./.github/workflows/build.yml
     with:
       branch: ${{ github.event.inputs.branch }}
