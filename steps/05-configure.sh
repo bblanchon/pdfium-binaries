@@ -29,6 +29,7 @@ mkdir -p "$BUILD"
   case "$OS" in
     android)
       echo "clang_use_chrome_plugins = false"
+      echo "default_min_sdk_version = 21"
       ;;
     ios)
       echo "ios_enable_code_signing = false"
