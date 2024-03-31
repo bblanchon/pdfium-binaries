@@ -1,5 +1,5 @@
 diff --git a/config/BUILDCONFIG.gn b/config/BUILDCONFIG.gn
-index 1ed842b77..b41d3e293 100644
+index 26a23e459..666d775c3 100644
 --- a/config/BUILDCONFIG.gn
 +++ b/config/BUILDCONFIG.gn
 @@ -135,6 +135,9 @@ declare_args() {
@@ -23,21 +23,8 @@ index 1ed842b77..b41d3e293 100644
      _default_toolchain = "//build/toolchain/linux:clang_$target_cpu"
    } else {
      _default_toolchain = "//build/toolchain/linux:$target_cpu"
-diff --git a/config/c++/c++.gni b/config/c++/c++.gni
-index bd8e7118e..87d38bb12 100644
---- a/config/c++/c++.gni
-+++ b/config/c++/c++.gni
-@@ -61,7 +61,7 @@ use_safe_libcxx = (use_custom_libcxx && enable_safe_libcxx) || is_nacl_saigo
- 
- # libstdc++ has its own hardening assertions that we want to enable by default
- # in Chromium builds.
--use_safe_libstdcxx = is_linux && !use_custom_libcxx && enable_safe_libstdcxx
-+use_safe_libstdcxx = is_linux && !use_custom_libcxx
- 
- # libc++abi needs to be exported from executables to be picked up by shared
- # libraries on certain instrumented builds.
 diff --git a/config/compiler/BUILD.gn b/config/compiler/BUILD.gn
-index 24e059596..ba91b474c 100644
+index f991e525c..ff42e2799 100644
 --- a/config/compiler/BUILD.gn
 +++ b/config/compiler/BUILD.gn
 @@ -379,7 +379,7 @@ config("compiler") {
