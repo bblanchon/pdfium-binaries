@@ -20,6 +20,9 @@ echo "$DepotTools_DIR" >> "$PATH_FILE"
 
 case "$TARGET_OS" in
   android)
+    sudo apt-get update
+    sudo apt-get install -y unzip
+
     # pdfium installs its version of the NDK, but we need one for compiling the example
     ANDROID_NDK_VERSION="r25c"
     ANDROID_NDK_FOLDER="android-ndk-$ANDROID_NDK_VERSION"

@@ -1,5 +1,5 @@
 diff --git a/config/BUILDCONFIG.gn b/config/BUILDCONFIG.gn
-index 105e194..53dd476 100644
+index 26a23e459..666d775c3 100644
 --- a/config/BUILDCONFIG.gn
 +++ b/config/BUILDCONFIG.gn
 @@ -135,6 +135,9 @@ declare_args() {
@@ -24,15 +24,15 @@ index 105e194..53dd476 100644
    } else {
      _default_toolchain = "//build/toolchain/linux:$target_cpu"
 diff --git a/config/compiler/BUILD.gn b/config/compiler/BUILD.gn
-index 21683ac..fbf9764 100644
+index f991e525c..ff42e2799 100644
 --- a/config/compiler/BUILD.gn
 +++ b/config/compiler/BUILD.gn
-@@ -375,7 +375,7 @@ config("compiler") {
-         # TODO(phajdan.jr): Use -fstack-protector-strong when our gcc supports it.
-         # See also https://crbug.com/533294
-         # The x86 toolchain currently has problems with stack-protector.
--        if (is_android && current_cpu == "x86") {
-+        if ((is_android || is_musl) && current_cpu == "x86") {
-           cflags += [ "-fno-stack-protector" ]
-         } else if (current_os != "aix") {
+@@ -379,7 +379,7 @@ config("compiler") {
+         } else {
+           cflags += [ "-fstack-protector" ]
+         }
+-      } else if ((is_posix && !is_chromeos && !is_nacl) || is_fuchsia) {
++      } else if ((is_posix && !is_chromeos && !is_nacl && !is_musl) || is_fuchsia) {
+         if (current_os != "aix") {
            # Not available on aix.
+           cflags += [ "-fstack-protector" ]

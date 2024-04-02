@@ -1,11 +1,11 @@
 diff --git a/fpdfsdk/fpdf_view.cpp b/fpdfsdk/fpdf_view.cpp
-index fbe75d9b1..49222a43a 100644
+index 6b0a1c161..7a8788676 100644
 --- a/fpdfsdk/fpdf_view.cpp
 +++ b/fpdfsdk/fpdf_view.cpp
 @@ -57,6 +57,9 @@
+ 
  #ifdef PDF_ENABLE_V8
  #include "fxjs/cfx_v8_array_buffer_allocator.h"
- #include "third_party/base/no_destructor.h"
 +#include "v8/include/libplatform/libplatform.h"
 +#include "v8/include/v8-array-buffer.h"
 +#include "v8/include/v8-initialization.h"
@@ -47,7 +47,7 @@ index fbe75d9b1..49222a43a 100644
    FX_InitializeMemoryAllocators();
    CFX_Timer::InitializeGlobals();
    CFX_GEModule::Create(config ? config->m_pUserFontPaths : nullptr);
-@@ -238,14 +262,13 @@ FPDF_InitLibraryWithConfig(const FPDF_LIBRARY_CONFIG* config) {
+@@ -242,14 +266,13 @@ FPDF_InitLibraryWithConfig(const FPDF_LIBRARY_CONFIG* config) {
    CPDFXFA_ModuleInit();
  #endif  // PDF_ENABLE_XFA
  
@@ -68,9 +68,9 @@ index fbe75d9b1..49222a43a 100644
    g_bLibraryInitialized = true;
  }
  
-@@ -265,6 +288,19 @@ FPDF_EXPORT void FPDF_CALLCONV FPDF_DestroyLibrary() {
-   CFX_GEModule::Destroy();
+@@ -275,6 +298,19 @@ FPDF_EXPORT void FPDF_CALLCONV FPDF_DestroyLibrary() {
    CFX_Timer::DestroyGlobals();
+   FX_DestroyMemoryAllocators();
  
 +#ifdef PDF_ENABLE_XFA
 +  cppgc::ShutdownProcess();
