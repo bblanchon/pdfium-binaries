@@ -15,7 +15,6 @@ case "$OS" in
     sudo apt-get update
     sudo apt-get remove -y php7.4-common
     build/install-build-deps.sh --android
-    gclient runhooks
     ;;
 esac
 
