@@ -8,11 +8,13 @@ pushd "$SOURCE"
 
 case "$OS" in
   linux)
-    build/linux/sysroot_scripts/install-sysroot.py "--arch=$CPU"
+    build/install-build-deps.sh
+    gclient runhooks
     ;;
 
   android)
     build/install-build-deps.sh --android
+    gclient runhooks
     ;;
 esac
 
