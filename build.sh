@@ -1,7 +1,7 @@
 #!/bin/bash -eu
 
 OS_NAMES="android|ios|linux|mac|wasm|win"
-CPU_NAMES="arm|arm64|x64|x86|wasm"
+CPU_NAMES="arm|arm64|s390x|x64|x86|wasm"
 STEP_REGEX="[0-9]"
 
 START_STEP=0
