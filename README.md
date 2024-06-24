@@ -104,7 +104,7 @@ Here are the download links for latest release:
   </tr>
 
   <tr>
-    <td rowspan="3">macOS</td>
+    <td rowspan="3">macOS / Mac Catalyst</td>
     <td>arm64</td>
     <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-mac-arm64.tgz">pdfium-mac-arm64.tgz</a></td>
     <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-v8-mac-arm64.tgz">pdfium-v8-mac-arm64.tgz</a></td>
@@ -187,6 +187,12 @@ The following NuGet packages are available:
     <td>macOS</td>
     <td><a href="https://www.nuget.org/packages/bblanchon.PDFium.macOS/">bblanchon.PDFium.macOS</a></td>
     <td><a href="https://www.nuget.org/packages/bblanchon.PDFiumV8.macOS/">bblanchon.PDFiumV8.macOS</a></td>
+  </tr>
+
+  <tr>
+    <td>Mac Catalyst</td>
+    <td><a href="https://www.nuget.org/packages/bblanchon.PDFium.MacCatalyst/">bblanchon.PDFium.MacCatalyst</a></td>
+    <td><a href="https://www.nuget.org/packages/bblanchon.PDFiumV8.MacCatalyst/">bblanchon.PDFiumV8.MacCatalyst</a></td>
   </tr>
 
   <tr>
