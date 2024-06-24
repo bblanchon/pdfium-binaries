@@ -17,8 +17,7 @@
     <iconUrl>https://raw.githubusercontent.com/bblanchon/pdfium-binaries/master/nuget/bblanchon.PDFiumV8.MacCatalyst.png</iconUrl>
     <readme>README.md</readme>
     <dependencies>
-      <group targetFramework="native" />
-      <group targetFramework="netstandard1.0" />
+      <group targetFramework="net6.0-maccatalyst13.5" />
     </dependencies>
   </metadata>
 
@@ -27,12 +26,7 @@
     <file src="../README.md" target="README.md" />
 
     <!-- https://learn.microsoft.com/en-us/nuget/reference/errors-and-warnings/nu5128 -->
-    <file src="_._" target="lib/native/_._" />
-    <file src="_._" target="lib/netstandard1.0/_._" />
-
-    <!-- include hearder and lib files for C++ projects -->
-    <file src="bblanchon.PDFium.native.targets" target="build/native/bblanchon.PDFiumV8.MacCatalyst.targets" />
-    <file src="include/**/*.h" target="build/native" />
+    <file src="_._" target="lib/net6.0-maccatalyst13.5/_._" />
 
     <!-- the native PDFium binaries -->
     <!-- see list of available runtime identifiers -->
