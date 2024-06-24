@@ -1,5 +1,6 @@
 #!/bin/bash -eux
 
+OS=${PDFium_TARGET_OS:?}
 SOURCE=${PDFium_SOURCE_DIR:-pdfium}
 BUILD_DIR=${PDFium_BUILD_DIR:-$SOURCE/out}
 TARGET_CPU=${PDFium_TARGET_CPU:?}
@@ -32,4 +33,6 @@ if [ "$TARGET_CPU" == "wasm" ]; then
     )
   fi
   em++ "${EMCC_ARGS[@]}"
+elif [[ "$OS" == "mac" ]]; then
+  vtool -set-build-version "maccatalyst" 11.0.0 14.0.0 -set-build-tool "maccatalyst" 4 19.0.0 -output "$BUILD_DIR/lib/libpdfium.dylib" "$BUILD_DIR/lib/libpdfium.dylib"
 fi

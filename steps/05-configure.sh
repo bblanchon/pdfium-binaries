@@ -41,7 +41,7 @@ mkdir -p "$BUILD"
       echo "clang_use_chrome_plugins = false"
       ;;
     mac)
-      echo 'mac_deployment_target = "10.13.0"'
+      echo 'mac_deployment_target = "10.15.0"'
       echo "clang_use_chrome_plugins = false"
       ;;
     wasm)
