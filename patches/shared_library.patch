@@ -11,7 +11,7 @@ index 62210c2f6..053fbff6d 100644
    output_name = "pdfium"
    libs = []
    configs += [ ":pdfium_strict_config" ]
-@@ -380,8 +380,9 @@ component("pdfium") {
+@@ -380,7 +380,8 @@ component("pdfium") {
 -      "advapi32.lib",
 -      "gdi32.lib",
 -      "user32.lib",
