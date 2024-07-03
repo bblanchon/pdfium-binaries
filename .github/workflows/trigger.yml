@@ -10,8 +10,13 @@ jobs:
     name: Trigger build
     runs-on: ubuntu-latest
     steps:
-    - name: Trigger build
+    - name: Trigger wasm build
       uses: benc-uk/workflow-dispatch@master
       with:
         workflow: Build Wasm
+        token: "${{ secrets.PERSONAL_ACCESS_TOKEN }}"
+    - name: Trigger onecore build
+      uses: benc-uk/workflow-dispatch@master
+      with:
+        workflow: Build OneCore
         token: "${{ secrets.PERSONAL_ACCESS_TOKEN }}"
