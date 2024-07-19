@@ -128,7 +128,7 @@ index 206b5c3ee..42b891150 100644
 +
 +weak_alias(freopen, freopen64);
 diff --git a/system/lib/standalone/standalone.c b/system/lib/standalone/standalone.c
-index 437e1b21e..0b632f830 100644
+index 12e9b9bec..19afd7984 100644
 --- a/system/lib/standalone/standalone.c
 +++ b/system/lib/standalone/standalone.c
 @@ -6,6 +6,7 @@
@@ -164,10 +164,10 @@ index 437e1b21e..0b632f830 100644
 +  emscripten_console_error("the program tried to " #action ", this is not supported in standalone mode");
 +#endif
 +
- void abort() {
-   _Exit(1);
- }
-@@ -85,59 +100,1009 @@ weak int _munmap_js(
+ void _abort_js(void) {
+   __builtin_trap();
+   /* Beyond this point should be unreachable. */
+@@ -87,59 +102,1009 @@ weak int _munmap_js(
    return -ENOSYS;
  }
  
@@ -1196,7 +1196,7 @@ index 437e1b21e..0b632f830 100644
  }
  
  // Emscripten additions
-@@ -190,6 +1155,7 @@ weak double emscripten_date_now(void) {
+@@ -192,6 +1157,7 @@ weak double emscripten_date_now(void) {
  // When exception catching is disabled, we stub out calls to `__cxa_throw`.
  // Otherwise, `__cxa_throw` will be imported from the host.
  void __cxa_throw(void* ptr, void* type, void* destructor) {
@@ -1204,7 +1204,7 @@ index 437e1b21e..0b632f830 100644
    abort();
  }
  #endif
-@@ -292,6 +1258,21 @@ int _setitimer_js(int which, double timeout) {
+@@ -294,6 +1260,21 @@ int _setitimer_js(int which, double timeout) {
    return -1;
  }
  
