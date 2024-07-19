@@ -128,7 +128,7 @@ index 206b5c3ee..42b891150 100644
 +
 +weak_alias(freopen, freopen64);
 diff --git a/system/lib/standalone/standalone.c b/system/lib/standalone/standalone.c
-index 12e9b9bec..19afd7984 100644
+index 12e9b9bec..a5335906d 100644
 --- a/system/lib/standalone/standalone.c
 +++ b/system/lib/standalone/standalone.c
 @@ -6,6 +6,7 @@
@@ -1196,7 +1196,21 @@ index 12e9b9bec..19afd7984 100644
  }
  
  // Emscripten additions
-@@ -192,6 +1157,7 @@ weak double emscripten_date_now(void) {
+@@ -186,12 +1151,21 @@ weak double emscripten_date_now(void) {
+   return clock_gettime_ms(CLOCK_REALTIME);
+ }
+ 
++weak void __secs_to_zone(long long t, int local, int *isdst, long *offset, long *oppoff, const char **zonename) {
++  REPORT_UNSUPPORTED(__secs_to_zone);
++}
++
++weak void _tzset_js(long* timezone, int* daylight, char* std_name, char* dst_name) {
++  REPORT_UNSUPPORTED(_tzset_js);
++}
++
+ // C++ ABI
+ 
+ #if EMSCRIPTEN_NOCATCH
  // When exception catching is disabled, we stub out calls to `__cxa_throw`.
  // Otherwise, `__cxa_throw` will be imported from the host.
  void __cxa_throw(void* ptr, void* type, void* destructor) {
@@ -1204,7 +1218,7 @@ index 12e9b9bec..19afd7984 100644
    abort();
  }
  #endif
-@@ -294,6 +1260,21 @@ int _setitimer_js(int which, double timeout) {
+@@ -294,6 +1268,21 @@ int _setitimer_js(int which, double timeout) {
    return -1;
  }
  
