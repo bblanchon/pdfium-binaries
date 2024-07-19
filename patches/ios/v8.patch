@@ -1,0 +1,14 @@
+diff --git a/BUILD.gn b/BUILD.gn
+index d905b219a22..1610f1adae9 100644
+--- a/BUILD.gn
++++ b/BUILD.gn
+@@ -4753,9 +4753,6 @@ v8_header_set("v8_internal_headers") {
+   }
+ 
+   frameworks = []
+-  if (is_ios) {
+-    frameworks += [ "BrowserEngineKit.framework" ]
+-  }
+ 
+   public_deps = [
+     ":torque_runtime_support",

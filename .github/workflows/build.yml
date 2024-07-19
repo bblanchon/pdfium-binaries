@@ -59,7 +59,7 @@ jobs:
             runner: ubuntu-20.04
     outputs:
       artifact: ${{ steps.init.outputs.artifact }}
-    runs-on: ${{ (inputs.target_os == 'ios' || inputs.target_os == 'mac') && 'macos-latest' || inputs.target_os == 'win' && 'windows-2022' || 'ubuntu-20.04' }}
+    runs-on: ${{ (inputs.target_os == 'ios' || inputs.target_os == 'mac') && 'macos-latest' || inputs.target_os == 'win' && 'windows-2022' || 'ubuntu-22.04' }}
     steps:
       - name: Initialize
         id: init
@@ -74,12 +74,6 @@ jobs:
           echo "artifact=$ARTIFACT" >> $GITHUB_OUTPUT
       - name: Checkout this repo
         uses: actions/checkout@v4
-      - name: Workaround for libpcre2 i386 # https://github.com/actions/virtual-environments/issues/4589#issuecomment-1100899313
-        if: inputs.target_os == 'android'
-        run: |
-          sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
-          sudo apt-get update -qq
-          sudo apt-get install -yqq --allow-downgrades libpcre2-8-0/focal libpcre2-16-0/focal libpcre2-32-0/focal libpcre2-posix2/focal
       - name: Set environment variables
         run: |
           cat >>$GITHUB_ENV <<END
