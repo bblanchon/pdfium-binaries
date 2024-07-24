@@ -45,6 +45,7 @@ esac
 case "$TARGET_LIBC" in
   musl)
     git -C build apply -v "$PATCHES/musl/build.patch"
+    git -C third_party/zlib apply -v "$PATCHES/musl/zlib.patch"
     mkdir -p "build/toolchain/linux/musl"
     cp "$PATCHES/musl/toolchain.gn" "build/toolchain/linux/musl/BUILD.gn"
     ;;
