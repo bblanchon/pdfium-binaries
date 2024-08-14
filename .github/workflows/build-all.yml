@@ -715,6 +715,8 @@ jobs:
           Commits between \`$PREVIOUS_REV\` and \`$CURRENT_REV\`:
           END
           git -C "pdfium" log origin/${PREVIOUS_REV}.. --pretty=format:'* [%s](https://pdfium.googlesource.com/pdfium/+/%H)' >> RELEASE.md
+      - name: Generate artifacts checksums
+        run: sha256sum pdfium-*.tgz > pdfium-sha256sum.txt
       - name: Publish Release
         uses: ncipollo/release-action@v1
         with:
@@ -723,4 +725,4 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           name: PDFium ${{ github.event.inputs.version }}
           tag: ${{ github.event.inputs.branch }}
-          artifacts: "pdfium-*.tgz"
+          artifacts: "pdfium-*.tgz,pdfium-sha256sum.txt"
