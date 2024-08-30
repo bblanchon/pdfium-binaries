@@ -181,9 +181,9 @@ jobs:
       target_os: ios
       target_cpu: x64
       enable_v8: true
-
+  
   maccatalyst_x64:
-    name: MacCatalyst x64
+    name: Mac Catalyst x64
     uses: ./.github/workflows/build.yml
     with:
       branch: ${{ github.event.inputs.branch }}
@@ -193,8 +193,9 @@ jobs:
       target_cpu: x64
       enable_v8: false
 
-  maccatalyst_x64_v8:
-    name: MacCatalyst x64 V8
+  maccatalyst_x64_V8:
+    name: Mac Catalyst x64 V8
+    if: github.event.inputs.enable_v8 == 'true'
     uses: ./.github/workflows/build.yml
     with:
       branch: ${{ github.event.inputs.branch }}
@@ -205,7 +206,7 @@ jobs:
       enable_v8: true
 
   maccatalyst_arm64:
-    name: MacCatalyst ARM64
+    name: Mac Catalyst ARM64
     uses: ./.github/workflows/build.yml
     with:
       branch: ${{ github.event.inputs.branch }}
@@ -215,8 +216,9 @@ jobs:
       target_cpu: arm64
       enable_v8: false
 
-  maccatalyst_arm64_v8:
-    name: MacCatalyst ARM64 V8
+  maccatalyst_arm64_V8:
+    name: Mac Catalyst ARM64 V8
+    if: github.event.inputs.enable_v8 == 'true'
     uses: ./.github/workflows/build.yml
     with:
       branch: ${{ github.event.inputs.branch }}
@@ -225,6 +227,7 @@ jobs:
       target_os: maccatalyst
       target_cpu: arm64
       enable_v8: true
+
   linux_arm:
     name: Linux ARM
     uses: ./.github/workflows/build.yml
@@ -566,10 +569,6 @@ jobs:
       - ios_arm64_v8
       - ios_x64
       - ios_x64_v8
-      - maccatalyst_x64
-      - maccatalyst_x64_v8
-      - maccatalyst_arm64
-      - maccatalyst_arm64_v8
       - linux_arm
       - linux_arm_v8
       - linux_arm64
@@ -588,6 +587,10 @@ jobs:
       - mac_arm64_v8
       - mac_x64
       - mac_x64_v8
+      - maccatalyst_x64
+      - maccatalyst_x64_v8
+      - maccatalyst_arm64
+      - maccatalyst_arm64_v8
       - wasm
       - win_arm64
       - win_arm64_v8
@@ -712,10 +715,6 @@ jobs:
       - ios_arm64_v8
       - ios_x64
       - ios_x64_v8
-      - maccatalyst_x64
-      - maccatalyst_x64_v8
-      - maccatalyst_arm64
-      - maccatalyst_arm64_v8
       - linux_arm
       - linux_arm_v8
       - linux_arm64
@@ -736,6 +735,10 @@ jobs:
       - mac_univ_v8
       - mac_x64
       - mac_x64_v8
+      - maccatalyst_x64
+      - maccatalyst_x64_v8
+      - maccatalyst_arm64
+      - maccatalyst_arm64_v8
       - wasm
       - win_arm64
       - win_arm64_v8
