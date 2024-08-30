@@ -170,24 +170,24 @@ jobs:
       enable_v8: false
   
   catalyst_x64:
-    name: Catalyst x64
+    name: maccatalyst x64
     uses: ./.github/workflows/build.yml
     with:
       branch: ${{ github.event.inputs.branch }}
       version: ${{ github.event.inputs.version }}
       is_debug: ${{ github.event.inputs.is_debug == 'true' }}
-      target_os: catalyst
+      target_os: maccatalyst
       target_cpu: x64
       enable_v8: false
 
   catalyst_arm64:
-    name: Catalyst arm64
+    name: maccatalyst arm64
     uses: ./.github/workflows/build.yml
     with:
       branch: ${{ github.event.inputs.branch }}
       version: ${{ github.event.inputs.version }}
       is_debug: ${{ github.event.inputs.is_debug == 'true' }}
-      target_os: catalyst
+      target_os: maccatalyst
       target_cpu: arm64
       enable_v8: false
 
