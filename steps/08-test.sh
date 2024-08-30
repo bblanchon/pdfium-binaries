@@ -135,7 +135,7 @@ case "$OS" in
     # TODO: add test for Wasm
     exit
     ;;
-  catalyst)
+  maccatalyst)
     # TODO: add test for Catalyst
     exit
     ;;

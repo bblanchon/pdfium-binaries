@@ -29,7 +29,7 @@ case "$OS" in
     mv "$BUILD/libpdfium.so" "$STAGING_LIB"
     ;;
 
-  mac|ios|catalyst)
+  mac|ios|maccatalyst)
     mv "$BUILD/libpdfium.dylib" "$STAGING_LIB"
     ;;
 

@@ -545,6 +545,8 @@ jobs:
       - ios_arm64_v8
       - ios_x64
       - ios_x64_v8
+      - catalyst_x64
+      - catalyst_arm64
       - linux_arm
       - linux_arm_v8
       - linux_arm64

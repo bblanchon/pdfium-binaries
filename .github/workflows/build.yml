@@ -50,7 +50,7 @@ jobs:
   build:
     outputs:
       artifact: ${{ steps.init.outputs.artifact }}
-    runs-on: ${{ (inputs.target_os == 'ios' || inputs.target_os == 'catalyst' || inputs.target_os == 'mac') && 'macos-latest' || inputs.target_os == 'win' && 'windows-2022' || 'ubuntu-22.04' }}
+    runs-on: ${{ (inputs.target_os == 'ios' || inputs.target_os == 'maccatalyst' || inputs.target_os == 'mac') && 'macos-latest' || inputs.target_os == 'win' && 'windows-2022' || 'ubuntu-22.04' }}
     steps:
       - name: Initialize
         id: init

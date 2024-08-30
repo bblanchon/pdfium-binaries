@@ -17,7 +17,7 @@ case "$OS" in
     git -C build apply -v "$PATCHES/android/build.patch"
     ;;
 
-  ios|catalyst)
+  ios|maccatalyst)
     git apply -v "$PATCHES/ios/pdfium.patch"
     [ "${PDFium_ENABLE_V8:-}" == "true" ] && git -C v8 apply -v "$PATCHES/ios/v8.patch"
     ;;
