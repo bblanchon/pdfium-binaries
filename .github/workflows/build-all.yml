@@ -168,6 +168,19 @@ jobs:
       target_os: ios
       target_cpu: x64
       enable_v8: false
+
+  ios_x64_v8:
+    name: iOS x64 V8
+    if: github.event.inputs.enable_v8 == 'true'
+    needs: ios_x64
+    uses: ./.github/workflows/build.yml
+    with:
+      branch: ${{ github.event.inputs.branch }}
+      version: ${{ github.event.inputs.version }}
+      is_debug: ${{ github.event.inputs.is_debug == 'true' }}
+      target_os: ios
+      target_cpu: x64
+      enable_v8: true
   
   maccatalyst_x64:
     name: Mac Catalyst x64
@@ -213,19 +226,6 @@ jobs:
       is_debug: ${{ github.event.inputs.is_debug == 'true' }}
       target_os: maccatalyst
       target_cpu: arm64
-      enable_v8: true
-
-  ios_x64_v8:
-    name: iOS x64 V8
-    if: github.event.inputs.enable_v8 == 'true'
-    needs: ios_x64
-    uses: ./.github/workflows/build.yml
-    with:
-      branch: ${{ github.event.inputs.branch }}
-      version: ${{ github.event.inputs.version }}
-      is_debug: ${{ github.event.inputs.is_debug == 'true' }}
-      target_os: ios
-      target_cpu: x64
       enable_v8: true
 
   linux_arm:
