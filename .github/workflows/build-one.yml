@@ -19,7 +19,7 @@ on:
           - ios
           - linux
           - mac
-          - maccatalyst
+          - catalyst
           - wasm
           - win
       target_cpu:

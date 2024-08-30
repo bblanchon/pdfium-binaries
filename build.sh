@@ -1,6 +1,6 @@
 #!/bin/bash -eu
 
-OS_NAMES="android|ios|linux|mac|wasm|win|maccatalyst"
+OS_NAMES="android|ios|linux|mac|wasm|win|catalyst"
 CPU_NAMES="arm|arm64|x64|x86|wasm"
 STEP_REGEX="[0-9]"
 
