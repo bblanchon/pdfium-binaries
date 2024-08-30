@@ -15,7 +15,6 @@ mkdir -p "$BUILD"
   echo "pdf_is_standalone = true"
   echo "pdf_use_partition_alloc = false"
   echo "target_cpu = \"$TARGET_CPU\""
-  echo "target_os = \"$OS\""
   echo "pdf_enable_v8 = $ENABLE_V8"
   echo "pdf_enable_xfa = $ENABLE_V8"
   echo "treat_warnings_as_errors = false"
@@ -28,10 +27,12 @@ mkdir -p "$BUILD"
 
   case "$OS" in
     android)
+      echo "target_os = \"$OS\""
       echo "clang_use_chrome_plugins = false"
       echo "default_min_sdk_version = 21"
       ;;
     ios)
+      echo "target_os = \"$OS\""
       echo "ios_enable_code_signing = false"
       echo "use_blink = true"
       [ "$ENABLE_V8" == "true" ] && [ "$TARGET_CPU" == "arm64" ] && echo 'arm_control_flow_integrity = "none"'
@@ -47,13 +48,16 @@ mkdir -p "$BUILD"
       echo "clang_use_chrome_plugins = false"
       ;;
     linux)
+      echo "target_os = \"$OS\""
       echo "clang_use_chrome_plugins = false"
       ;;
     mac)
+      echo "target_os = \"$OS\""
       echo 'mac_deployment_target = "10.13.0"'
       echo "clang_use_chrome_plugins = false"
       ;;
     wasm)
+      echo "target_os = \"$OS\""
       echo 'pdf_is_complete_lib = true'
       echo 'is_clang = false'
       ;;
