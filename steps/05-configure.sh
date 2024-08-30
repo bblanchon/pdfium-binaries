@@ -37,6 +37,13 @@ mkdir -p "$BUILD"
       [ "$ENABLE_V8" == "true" ] && [ "$TARGET_CPU" == "arm64" ] && echo 'arm_control_flow_integrity = "none"'
       echo "clang_use_chrome_plugins = false"
       ;;
+    maccatalyst)
+      echo 'mac_deployment_target = "10.15.0"'
+      echo "ios_enable_code_signing = false"
+      echo "use_blink = true"
+      [ "$ENABLE_V8" == "true" ] && [ "$TARGET_CPU" == "arm64" ] && echo 'arm_control_flow_integrity = "none"'
+      echo "clang_use_chrome_plugins = false"
+      ;;
     linux)
       echo "clang_use_chrome_plugins = false"
       ;;

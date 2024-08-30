@@ -135,6 +135,10 @@ case "$OS" in
     # TODO: add test for Wasm
     exit
     ;;
+  maccatalyst)
+    # TODO: add test for Wasm
+    exit
+    ;;
 esac
 
 CMAKE_ARGS+=("$SOURCE_DIR")
