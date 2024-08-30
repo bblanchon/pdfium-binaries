@@ -168,28 +168,6 @@ jobs:
       target_os: ios
       target_cpu: x64
       enable_v8: false
-  
-  catalyst_x64:
-    name: maccatalyst x64
-    uses: ./.github/workflows/build.yml
-    with:
-      branch: ${{ github.event.inputs.branch }}
-      version: ${{ github.event.inputs.version }}
-      is_debug: ${{ github.event.inputs.is_debug == 'true' }}
-      target_os: maccatalyst
-      target_cpu: x64
-      enable_v8: false
-
-  catalyst_arm64:
-    name: maccatalyst arm64
-    uses: ./.github/workflows/build.yml
-    with:
-      branch: ${{ github.event.inputs.branch }}
-      version: ${{ github.event.inputs.version }}
-      is_debug: ${{ github.event.inputs.is_debug == 'true' }}
-      target_os: maccatalyst
-      target_cpu: arm64
-      enable_v8: false
 
   ios_x64_v8:
     name: iOS x64 V8
@@ -204,6 +182,49 @@ jobs:
       target_cpu: x64
       enable_v8: true
 
+  maccatalyst_x64:
+    name: MacCatalyst x64
+    uses: ./.github/workflows/build.yml
+    with:
+      branch: ${{ github.event.inputs.branch }}
+      version: ${{ github.event.inputs.version }}
+      is_debug: ${{ github.event.inputs.is_debug == 'true' }}
+      target_os: maccatalyst
+      target_cpu: x64
+      enable_v8: false
+
+  maccatalyst_x64_v8:
+    name: MacCatalyst x64 V8
+    uses: ./.github/workflows/build.yml
+    with:
+      branch: ${{ github.event.inputs.branch }}
+      version: ${{ github.event.inputs.version }}
+      is_debug: ${{ github.event.inputs.is_debug == 'true' }}
+      target_os: maccatalyst
+      target_cpu: x64
+      enable_v8: true
+
+  maccatalyst_arm64:
+    name: MacCatalyst ARM64
+    uses: ./.github/workflows/build.yml
+    with:
+      branch: ${{ github.event.inputs.branch }}
+      version: ${{ github.event.inputs.version }}
+      is_debug: ${{ github.event.inputs.is_debug == 'true' }}
+      target_os: maccatalyst
+      target_cpu: arm64
+      enable_v8: false
+
+  maccatalyst_arm64_v8:
+    name: MacCatalyst ARM64 V8
+    uses: ./.github/workflows/build.yml
+    with:
+      branch: ${{ github.event.inputs.branch }}
+      version: ${{ github.event.inputs.version }}
+      is_debug: ${{ github.event.inputs.is_debug == 'true' }}
+      target_os: maccatalyst
+      target_cpu: arm64
+      enable_v8: true
   linux_arm:
     name: Linux ARM
     uses: ./.github/workflows/build.yml
@@ -545,8 +566,10 @@ jobs:
       - ios_arm64_v8
       - ios_x64
       - ios_x64_v8
-      - catalyst_x64
-      - catalyst_arm64
+      - maccatalyst_x64
+      - maccatalyst_x64_v8
+      - maccatalyst_arm64
+      - maccatalyst_arm64_v8
       - linux_arm
       - linux_arm_v8
       - linux_arm64
@@ -689,6 +712,10 @@ jobs:
       - ios_arm64_v8
       - ios_x64
       - ios_x64_v8
+      - maccatalyst_x64
+      - maccatalyst_x64_v8
+      - maccatalyst_arm64
+      - maccatalyst_arm64_v8
       - linux_arm
       - linux_arm_v8
       - linux_arm64
