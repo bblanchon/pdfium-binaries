@@ -41,7 +41,6 @@ mkdir -p "$BUILD"
       echo 'target_os = "ios"'
       echo 'mac_deployment_target = "10.15.0"'
       echo "ios_enable_code_signing = false"
-      echo "ios_automatically_manage_certs = false"
       echo 'target_environment = "catalyst"'
       echo "use_blink = true"
       [ "$ENABLE_V8" == "true" ] && [ "$TARGET_CPU" == "arm64" ] && echo 'arm_control_flow_integrity = "none"'
