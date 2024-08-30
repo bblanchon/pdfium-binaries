@@ -206,7 +206,7 @@ jobs:
       enable_v8: true
 
   maccatalyst_arm64:
-    name: Mac Catalyst arm64
+    name: Mac Catalyst ARM64
     uses: ./.github/workflows/build.yml
     with:
       branch: ${{ github.event.inputs.branch }}
@@ -217,7 +217,7 @@ jobs:
       enable_v8: false
 
   maccatalyst_arm64_V8:
-    name: Mac Catalyst arm64
+    name: Mac Catalyst ARM64 V8
     if: github.event.inputs.enable_v8 == 'true'
     uses: ./.github/workflows/build.yml
     with:
