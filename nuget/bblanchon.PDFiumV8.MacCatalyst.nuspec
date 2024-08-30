@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
   <metadata>
-    <id>bblanchon.PDFium</id>
+    <id>bblanchon.PDFiumV8.MacCatalyst</id>
     <version>$version$</version>
     <authors>Benoit Blanchon</authors>
     <owners>Benoit Blanchon</owners>
@@ -14,24 +14,24 @@
     <tags>PDFium PDF binaries library native Chromium</tags>
     <repository type="git" url="https://github.com/bblanchon/pdfium-binaries.git" branch="$branch$" commit="$commit$" />
     <icon>icon.png</icon>
-    <iconUrl>https://raw.githubusercontent.com/bblanchon/pdfium-binaries/master/nuget/bblanchon.PDFium.png</iconUrl>
+    <iconUrl>https://raw.githubusercontent.com/bblanchon/pdfium-binaries/master/nuget/bblanchon.PDFiumV8.MacCatalyst.png</iconUrl>
     <readme>README.md</readme>
     <dependencies>
-      <group>
-        <dependency id="bblanchon.PDFium.Android" version="$version$" />
-        <dependency id="bblanchon.PDFium.iOS" version="$version$" />
-        <dependency id="bblanchon.PDFium.Linux" version="$version$" />
-        <dependency id="bblanchon.PDFium.macOS" version="$version$" />
-        <dependency id="bblanchon.PDFium.MacCatalyst" version="$version$" />
-        <dependency id="bblanchon.PDFium.WebAssembly" version="$version$" />
-        <dependency id="bblanchon.PDFium.Win32" version="$version$" />
-      </group>
+      <group targetFramework="net6.0-maccatalyst13.5" />
     </dependencies>
   </metadata>
 
-  <!-- just a meta package without content -->
   <files>
-    <file src="bblanchon.PDFium.png" target="icon.png" />
+    <file src="bblanchon.PDFiumV8.MacCatalyst.png" target="icon.png" />
     <file src="../README.md" target="README.md" />
+
+    <!-- https://learn.microsoft.com/en-us/nuget/reference/errors-and-warnings/nu5128 -->
+    <file src="_._" target="lib/net6.0-maccatalyst13.5/_._" />
+
+    <!-- the native PDFium binaries -->
+    <!-- see list of available runtime identifiers -->
+    <!-- https://docs.microsoft.com/en-us/dotnet/core/rid-catalog -->
+    <file src="pdfium-v8-maccatalyst-arm64/lib/libpdfium.dylib" target="runtimes/maccatalyst-arm64/native/libpdfium.dylib" />
+    <file src="pdfium-v8-maccatalyst-x64/lib/libpdfium.dylib" target="runtimes/maccatalyst-x64/native/libpdfium.dylib" />
   </files>
 </package>

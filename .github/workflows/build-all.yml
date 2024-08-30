@@ -169,8 +169,8 @@ jobs:
       target_cpu: x64
       enable_v8: false
   
-  catalyst_x64:
-    name: maccatalyst x64
+  maccatalyst_x64:
+    name: Mac Catalyst x64
     uses: ./.github/workflows/build.yml
     with:
       branch: ${{ github.event.inputs.branch }}
@@ -180,8 +180,20 @@ jobs:
       target_cpu: x64
       enable_v8: false
 
-  catalyst_arm64:
-    name: maccatalyst arm64
+  maccatalyst_x64_V8:
+    name: Mac Catalyst x64 V8
+    if: github.event.inputs.enable_v8 == 'true'
+    uses: ./.github/workflows/build.yml
+    with:
+      branch: ${{ github.event.inputs.branch }}
+      version: ${{ github.event.inputs.version }}
+      is_debug: ${{ github.event.inputs.is_debug == 'true' }}
+      target_os: maccatalyst
+      target_cpu: x64
+      enable_v8: true
+
+  maccatalyst_arm64:
+    name: Mac Catalyst arm64
     uses: ./.github/workflows/build.yml
     with:
       branch: ${{ github.event.inputs.branch }}
@@ -190,6 +202,18 @@ jobs:
       target_os: maccatalyst
       target_cpu: arm64
       enable_v8: false
+
+  maccatalyst_arm64_V8:
+    name: Mac Catalyst arm64
+    if: github.event.inputs.enable_v8 == 'true'
+    uses: ./.github/workflows/build.yml
+    with:
+      branch: ${{ github.event.inputs.branch }}
+      version: ${{ github.event.inputs.version }}
+      is_debug: ${{ github.event.inputs.is_debug == 'true' }}
+      target_os: maccatalyst
+      target_cpu: arm64
+      enable_v8: true
 
   ios_x64_v8:
     name: iOS x64 V8
@@ -545,8 +569,6 @@ jobs:
       - ios_arm64_v8
       - ios_x64
       - ios_x64_v8
-      - catalyst_x64
-      - catalyst_arm64
       - linux_arm
       - linux_arm_v8
       - linux_arm64
@@ -565,6 +587,10 @@ jobs:
       - mac_arm64_v8
       - mac_x64
       - mac_x64_v8
+      - maccatalyst_x64
+      - maccatalyst_x64_v8
+      - maccatalyst_arm64
+      - maccatalyst_arm64_v8
       - wasm
       - win_arm64
       - win_arm64_v8
@@ -709,6 +735,10 @@ jobs:
       - mac_univ_v8
       - mac_x64
       - mac_x64_v8
+      - maccatalyst_x64
+      - maccatalyst_x64_v8
+      - maccatalyst_arm64
+      - maccatalyst_arm64_v8
       - wasm
       - win_arm64
       - win_arm64_v8
