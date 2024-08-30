@@ -115,6 +115,6 @@ case "$TARGET_OS" in
   ios|maccatalyst)
     # Xcode 15.4 produces the following error when targeting ARM64 with V8:
     # undefined symbol: be_memory_inline_jit_restrict_rwx_to_rx_with_witness_impl
-    sudo xcode-select -s "/Applications/Xcode.15.2.0.app"
+    sudo xcode-select -s "/Applications/Xcode_15.0.1.app"
     ;;
 esac
