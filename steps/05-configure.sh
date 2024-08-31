@@ -40,7 +40,7 @@ mkdir -p "$BUILD"
       ;;
     maccatalyst)
       echo 'target_os = "ios"'
-      echo 'ios_deployment_target = "10.15.0"'
+      echo 'ios_deployment_target = "13.0"'
       echo "ios_enable_code_signing = false"
       echo 'target_environment = "catalyst"'
       echo "use_blink = true"
