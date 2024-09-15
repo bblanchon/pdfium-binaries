@@ -248,6 +248,7 @@ The following projects use (or recommend using) our PDFium builds:
 | [PyPDFium2][pypdfium2]   | Python   | Python bindings to PDFium                                                                                   |
 | [Spacedrive][spacedrive] | Rust/TS  | Cross-platform file manager, powered by a virtual distributed filesystem                                    |
 | [wxPDFView][wxpdfview]   | C++      | wxWidgets components to display PDF content                                                                 |
+| [pdfium-vfp][pdfium-vfp] | VFP      | PDF Viewer component for Visual FoxPro                                                                  |
 
 *Did we miss a project? Please open a PR!*  
 
@@ -305,6 +306,8 @@ The following projects use (or recommend using) our PDFium builds:
   </tbody>
 </table
 
+[pdfium-vfp]:
+https://github.com/dmitriychunikhin/pdfium-vfp
 [dart_pdf]: https://github.com/DavBfr/dart_pdf
 [pdfx]: https://github.com/scerio/packages.flutter/tree/main/packages/pdfx
 [go-pdfium]: https://github.com/klippa-app/go-pdfium
