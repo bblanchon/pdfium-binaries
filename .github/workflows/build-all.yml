@@ -287,7 +287,7 @@ jobs:
       is_debug: ${{ github.event.inputs.is_debug == 'true' }}
       target_os: linux
       target_cpu: arm64
-      target_libc: musl
+      target_environment: musl
       enable_v8: false
 
   linux_musl_arm64_v8:
@@ -301,7 +301,7 @@ jobs:
       is_debug: ${{ github.event.inputs.is_debug == 'true' }}
       target_os: linux
       target_cpu: arm64
-      target_libc: musl
+      target_environment: musl
       enable_v8: true
 
   linux_musl_x64:
@@ -313,7 +313,7 @@ jobs:
       is_debug: ${{ github.event.inputs.is_debug == 'true' }}
       target_os: linux
       target_cpu: x64
-      target_libc: musl
+      target_environment: musl
       enable_v8: false
 
   linux_musl_x64_v8:
@@ -327,7 +327,7 @@ jobs:
       is_debug: ${{ github.event.inputs.is_debug == 'true' }}
       target_os: linux
       target_cpu: x64
-      target_libc: musl
+      target_environment: musl
       enable_v8: true
 
   linux_musl_x86:
@@ -339,7 +339,7 @@ jobs:
       is_debug: ${{ github.event.inputs.is_debug == 'true' }}
       target_os: linux
       target_cpu: x86
-      target_libc: musl
+      target_environment: musl
       enable_v8: false
 
   linux_musl_x86_v8:
@@ -353,7 +353,7 @@ jobs:
       is_debug: ${{ github.event.inputs.is_debug == 'true' }}
       target_os: linux
       target_cpu: x86
-      target_libc: musl
+      target_environment: musl
       enable_v8: true
 
   mac_arm64:

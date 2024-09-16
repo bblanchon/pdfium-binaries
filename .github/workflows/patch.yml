@@ -86,4 +86,4 @@ jobs:
       if: always() && steps.checkout.outcome == 'success'
       env:
         PDFium_TARGET_OS: linux
-        PDFium_TARGET_LIBC: musl
+        PDFium_TARGET_ENVIRONMENT: musl

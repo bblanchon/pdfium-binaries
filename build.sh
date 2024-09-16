@@ -2,6 +2,8 @@
 
 OS_NAMES="android|ios|linux|mac|wasm|win"
 CPU_NAMES="arm|arm64|x64|x86|wasm"
+ENV_NAMES="catalyst|device|musl|simulator"
+OS_ENV_COMBINATIONS="linux musl|ios (catalyst|device|simulator)"
 STEP_REGEX="[0-9]"
 
 START_STEP=0
@@ -11,18 +13,18 @@ then
   echo "PDFium build script.
 https://github.com/bblanchon/pdfium-binaries
 
-Usage $0 [options] os cpu
+Usage $0 [options] os cpu [env]
 
 Arguments:
    os       = Target OS ($OS_NAMES)
    cpu      = Target CPU ($CPU_NAMES)
+   env      = Target environment ($ENV_NAMES)
 
 Options:
   -b branch = Chromium branch (default=main)
   -s 0-9    = Set start step (default=0)
   -d        = debug build
-  -j        = enable v8
-  -m        = build fo musl"
+  -j        = enable v8"
   exit
 fi
 
@@ -39,10 +41,6 @@ do
 
     j)
       export PDFium_ENABLE_V8=true
-      ;;
-
-    m)
-      export PDFium_TARGET_LIBC=musl
       ;;
 
     s)
@@ -62,7 +60,7 @@ then
   exit 1
 fi
 
-if [[ $# -gt 2 ]]
+if [[ $# -gt 3 ]]
 then
   echo "Too many arguments"
   exit 1
@@ -80,6 +78,21 @@ then
   exit 1
 fi
 
+if [[ $# -eq 3 ]]
+then
+  if  [[ ! $3 =~ ^($ENV_NAMES)$ ]]
+  then
+    echo "Unknown environment: $3"
+    exit 1
+  fi
+
+  if  [[ ! "$1 $3" =~ ^($OS_ENV_COMBINATIONS)$ ]]
+  then
+    echo "OS $1 doesn't support environment $3"
+    exit 1
+  fi
+fi
+
 if [[ ! $START_STEP =~ ^($STEP_REGEX)$ ]]
 then
   echo "Invalid step number: $START_STEP"
@@ -88,6 +101,7 @@ fi
 
 export PDFium_TARGET_OS=$1
 export PDFium_TARGET_CPU=$2
+export PDFium_TARGET_ENVIRONMENT=${3:-}
 
 set -x
 
