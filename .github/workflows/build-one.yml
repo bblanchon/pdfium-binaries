@@ -30,12 +30,16 @@ on:
           - x64
           - x86
           - wasm
-      target_libc:
-        description: Target libc
+      target_environment:
+        description: Target environment
         type: choice
+        default: ''
         options:
-          - default
+          - ''
+          - device
+          - catalyst
           - musl
+          - simulator
       enable_v8:
         description: Enable V8
         type: boolean
@@ -62,6 +66,6 @@ jobs:
       is_debug: ${{ github.event.inputs.is_debug == 'true' }}
       target_os: ${{ github.event.inputs.target_os }}
       target_cpu: ${{ github.event.inputs.target_cpu }}
-      target_libc: ${{ github.event.inputs.target_libc }}
+      target_environment: ${{ github.event.inputs.target_environment }}
       enable_v8: ${{ github.event.inputs.enable_v8 == 'true' }}
       emsdk_version: ${{ github.event.inputs.emsdk_version }}

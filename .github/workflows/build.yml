@@ -31,8 +31,8 @@ on:
         description: Target (CPU arm|arm64|x64|x86|wasm)
         type: string
         required: true
-      target_libc:
-        description: Target libc (empty string or "musl")
+      target_environment:
+        description: Target environment (device|catalyst|musl|simulator)
         type: string
         required: false
         default: ''
@@ -68,7 +68,7 @@ jobs:
           ARTIFACT="pdfium"
           [ "${{inputs.enable_v8}}" == "true" ] && ARTIFACT="$ARTIFACT-v8"
           ARTIFACT="$ARTIFACT-${{inputs.target_os}}"
-          [ "${{inputs.target_libc}}" != "" ] && ARTIFACT="$ARTIFACT-${{inputs.target_libc}}"
+          [ "${{inputs.target_environment}}" != "" ] && ARTIFACT="$ARTIFACT-${{inputs.target_environment}}"
           [ "${{inputs.target_os}}" != "${{inputs.target_cpu}}" ] && ARTIFACT="$ARTIFACT-${{inputs.target_cpu}}"
           [ "${{inputs.is_debug}}" == "true" ] && ARTIFACT="$ARTIFACT-debug"
           echo "artifact=$ARTIFACT" >> $GITHUB_OUTPUT
@@ -81,7 +81,7 @@ jobs:
           PDFium_IS_DEBUG=${{ inputs.is_debug }}
           PDFium_TARGET_CPU=${{ inputs.target_cpu }}
           PDFium_TARGET_OS=${{ inputs.target_os }}
-          PDFium_TARGET_LIBC=${{ inputs.target_libc }}
+          PDFium_TARGET_ENVIRONMENT=${{ inputs.target_environment }}
           PDFium_ENABLE_V8=${{ inputs.enable_v8 }}
           PDFium_VERSION=${{ inputs.version }}
           EMSDK_VERSION=${{ inputs.emsdk_version }}

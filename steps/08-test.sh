@@ -2,7 +2,7 @@
 
 OS=${PDFium_TARGET_OS:?}
 CPU="${PDFium_TARGET_CPU:?}"
-TARGET_LIBC="${PDFium_TARGET_LIBC:-default}"
+TARGET_ENVIRONMENT="${PDFium_TARGET_ENVIRONMENT:-}"
 SOURCE_DIR="$PWD/example"
 CMAKE_ARGS=()
 CAN_RUN_ON_HOST=false
@@ -56,7 +56,7 @@ case "$OS" in
   linux)
     case "$CPU" in
       arm)
-        if [ "$TARGET_LIBC" == "musl" ]; then
+        if [ "$TARGET_ENVIRONMENT" == "musl" ]; then
           PREFIX="arm-linux-musleabihf-"
         else
           PREFIX="arm-linux-gnueabihf-"
@@ -64,7 +64,7 @@ case "$OS" in
         fi
         ;;
       arm64)
-        if [ "$TARGET_LIBC" == "musl" ]; then
+        if [ "$TARGET_ENVIRONMENT" == "musl" ]; then
           PREFIX="aarch64-linux-musl-"
         else
           PREFIX="aarch64-linux-gnu-"
@@ -72,7 +72,7 @@ case "$OS" in
         fi
         ;;
       x86)
-        if [ "$TARGET_LIBC" == "musl" ]; then
+        if [ "$TARGET_ENVIRONMENT" == "musl" ]; then
           PREFIX="i686-linux-musl-"
         else
           CAN_RUN_ON_HOST=true
@@ -83,7 +83,7 @@ case "$OS" in
         )
         ;;
       x64)
-        if [ "$TARGET_LIBC" == "musl" ]; then
+        if [ "$TARGET_ENVIRONMENT" == "musl" ]; then
           PREFIX="x86_64-linux-musl-"
         else
           CAN_RUN_ON_HOST=true

@@ -3,7 +3,7 @@
 PATCHES="$PWD/patches"
 SOURCE="${PDFium_SOURCE_DIR:-pdfium}"
 OS="${PDFium_TARGET_OS:?}"
-TARGET_LIBC="${PDFium_TARGET_LIBC:-default}"
+TARGET_ENVIRONMENT="${PDFium_TARGET_ENVIRONMENT:-}"
 
 pushd "${SOURCE}"
 
@@ -37,7 +37,6 @@ case "$OS" in
     ;;
 
   win)
-    git apply -v "$PATCHES/win/pdfium.patch"
     git -C build apply -v "$PATCHES/win/build.patch"
 
     VERSION=${PDFium_VERSION:-0.0.0.0}
@@ -48,7 +47,7 @@ case "$OS" in
     ;;
 esac
 
-case "$TARGET_LIBC" in
+case "$TARGET_ENVIRONMENT" in
   musl)
     git -C build apply -v "$PATCHES/musl/build.patch"
     mkdir -p "build/toolchain/linux/musl"

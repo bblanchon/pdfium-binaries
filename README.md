@@ -239,6 +239,7 @@ The following projects use (or recommend using) our PDFium builds:
 | [go-pdfium][go-pdfium]   | Go       | Go wrapper around PDFium with helper functions for various methods like image rendering and text extraction |
 | [libvips][libvips]       | C        | A performant image processing library                                                                       |
 | [PDFium RS][pdfium_rs]   | Rust     | Rust wrapper around PDFium                                                                                  |
+| [pdfium-vfp][pdfium-vfp] | VFP      | PDF Viewer component for Visual FoxPro                                                                      |
 | [PDFiumCore][pdfiumcore] | C#       | .NET Standard P/Invoke bindings for PDFium                                                                  |
 | [PdfiumLib][pdfiumlib]   | Pascal   | An interface to libpdfium for Delphi                                                                        |
 | [PdfLibCore][pdflibcore] | C#       | A fast PDF editing and reading library for modern .NET Core applications                                    |
@@ -305,6 +306,8 @@ The following projects use (or recommend using) our PDFium builds:
   </tbody>
 </table
 
+[pdfium-vfp]:
+https://github.com/dmitriychunikhin/pdfium-vfp
 [dart_pdf]: https://github.com/DavBfr/dart_pdf
 [pdfx]: https://github.com/scerio/packages.flutter/tree/main/packages/pdfx
 [go-pdfium]: https://github.com/klippa-app/go-pdfium

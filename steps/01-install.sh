@@ -2,7 +2,7 @@
 
 PATH_FILE=${GITHUB_PATH:-$PWD/.path}
 TARGET_OS=${PDFium_TARGET_OS:?}
-TARGET_LIBC=${PDFium_TARGET_LIBC:-default}
+TARGET_ENVIRONMENT=${PDFium_TARGET_ENVIRONMENT:-}
 TARGET_CPU=${PDFium_TARGET_CPU:?}
 CURRENT_CPU=${PDFium_CURRENT_CPU:-x64}
 MUSL_URL=${MUSL_URL:-https://musl.cc}
@@ -40,7 +40,7 @@ case "$TARGET_OS" in
     sudo apt-get update
     sudo apt-get install -y cmake pkg-config
 
-    if [ "$TARGET_LIBC" == "musl" ]; then
+    if [ "$TARGET_ENVIRONMENT" == "musl" ]; then
 
       case "$TARGET_CPU" in
         x86)
@@ -110,5 +110,11 @@ case "$TARGET_OS" in
 
   win)
     echo "$WindowsSDK_DIR/$CURRENT_CPU" >> "$PATH_FILE"
+    ;;
+
+  ios)
+    # Xcode 15.4 produces the following error when targeting ARM64 with V8:
+    # undefined symbol: be_memory_inline_jit_restrict_rwx_to_rx_with_witness_impl
+    sudo xcode-select -s "/Applications/Xcode_15.0.1.app"
     ;;
 esac
