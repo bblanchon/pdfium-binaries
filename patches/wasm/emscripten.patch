@@ -128,7 +128,7 @@ index 206b5c3ee..42b891150 100644
 +
 +weak_alias(freopen, freopen64);
 diff --git a/system/lib/standalone/standalone.c b/system/lib/standalone/standalone.c
-index 12e9b9bec..a5335906d 100644
+index 52c3eb336..81171746c 100644
 --- a/system/lib/standalone/standalone.c
 +++ b/system/lib/standalone/standalone.c
 @@ -6,6 +6,7 @@
@@ -167,7 +167,7 @@ index 12e9b9bec..a5335906d 100644
  void _abort_js(void) {
    __builtin_trap();
    /* Beyond this point should be unreachable. */
-@@ -87,59 +102,1009 @@ weak int _munmap_js(
+@@ -87,53 +102,1009 @@ weak int _munmap_js(
    return -ENOSYS;
  }
  
@@ -1133,12 +1133,8 @@ index 12e9b9bec..a5335906d 100644
  weak int __syscall_lstat64(intptr_t path, intptr_t buf) {
 -  return -ENOSYS;
 +  return __syscall_newfstatat(AT_FDCWD, path, buf, AT_SYMLINK_NOFOLLOW);
- }
- 
--// There is no good source of entropy without an import. Make this weak so that
--// it can be replaced with a pRNG or a proper import.
--weak int getentropy(void* buffer, size_t length) {
--  abort();
++}
++
 +weak int getentropy(void *buffer, size_t length) {
 +  return __wasi_syscall_ret(__wasi_random_get(buffer, length));
 +}
@@ -1196,7 +1192,7 @@ index 12e9b9bec..a5335906d 100644
  }
  
  // Emscripten additions
-@@ -186,12 +1151,21 @@ weak double emscripten_date_now(void) {
+@@ -179,12 +1150,21 @@ weak double emscripten_date_now(void) {
    return clock_gettime_ms(CLOCK_REALTIME);
  }
  
@@ -1218,7 +1214,7 @@ index 12e9b9bec..a5335906d 100644
    abort();
  }
  #endif
-@@ -294,6 +1268,21 @@ int _setitimer_js(int which, double timeout) {
+@@ -287,6 +1267,21 @@ int _setitimer_js(int which, double timeout) {
    return -1;
  }
  
