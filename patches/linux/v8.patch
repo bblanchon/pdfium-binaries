@@ -1,0 +1,12 @@
+diff --git a/BUILD.gn b/BUILD.gn
+index 6a4efbb03ee..9c0a45df4a5 100644
+--- a/BUILD.gn
++++ b/BUILD.gn
+@@ -1096,6 +1096,7 @@ config("features") {
+ 
+   defines =
+       [ "V8_TYPED_ARRAY_MAX_SIZE_IN_HEAP=${v8_typed_array_max_size_in_heap}" ]
++  defines += ["V8_TLS_USED_IN_LIBRARY"]
+ 
+   configs = [
+     ":v8_header_features",

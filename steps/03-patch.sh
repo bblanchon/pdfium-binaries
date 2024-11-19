@@ -22,6 +22,10 @@ case "$OS" in
     [ "${PDFium_ENABLE_V8:-}" == "true" ] && git -C v8 apply -v "$PATCHES/ios/v8.patch"
     ;;
 
+  linux)
+    [ "${PDFium_ENABLE_V8:-}" == "true" ] && git -C v8 apply -v "$PATCHES/linux/v8.patch"
+    ;;
+
   wasm)
     git apply -v "$PATCHES/wasm/pdfium.patch"
     git -C build apply -v "$PATCHES/wasm/build.patch"
