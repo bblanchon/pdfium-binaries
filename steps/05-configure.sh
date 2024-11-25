@@ -48,6 +48,7 @@ mkdir -p "$BUILD"
     wasm)
       echo 'pdf_is_complete_lib = true'
       echo 'is_clang = false'
+      echo 'use_custom_libcxx = false'
       ;;
   esac
 
