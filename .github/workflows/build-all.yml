@@ -143,6 +143,7 @@ jobs:
       is_debug: ${{ github.event.inputs.is_debug == 'true' }}
       target_os: ios
       target_cpu: arm64
+      target_environment: device
       enable_v8: false
 
   ios_arm64_v8:
@@ -156,6 +157,7 @@ jobs:
       is_debug: ${{ github.event.inputs.is_debug == 'true' }}
       target_os: ios
       target_cpu: arm64
+      target_environment: device
       enable_v8: true
 
   ios_x64:
@@ -167,6 +169,7 @@ jobs:
       is_debug: ${{ github.event.inputs.is_debug == 'true' }}
       target_os: ios
       target_cpu: x64
+      target_environment: simulator
       enable_v8: false
 
   ios_x64_v8:
@@ -180,6 +183,7 @@ jobs:
       is_debug: ${{ github.event.inputs.is_debug == 'true' }}
       target_os: ios
       target_cpu: x64
+      target_environment: simulator
       enable_v8: true
 
   linux_arm:
