@@ -35,10 +35,19 @@ case "$OS" in
     case "$CPU" in
       arm64)
         ARCH="arm64"
-        SDK="iphoneos"
         ;;
       x64)
         ARCH="x86_64"
+        ;;
+    esac
+    case "$TARGET_ENVIRONMENT" in
+      catalyst)
+        SDK="macosx"
+        ;;
+      device)
+        SDK="iphoneos"
+        ;;
+      simulator)
         SDK="iphonesimulator"
         ;;
     esac
