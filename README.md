@@ -53,10 +53,17 @@ Here are the download links for latest release:
   </tr>
 
   <tr>
-    <td rowspan="2">iOS</td>
+    <td>iOS device</td>
     <td>arm64</td>
     <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-ios-device-arm64.tgz">pdfium-ios-device-arm64.tgz</a></td>
     <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-v8-ios-device-arm64.tgz">pdfium-v8-ios-device-arm64.tgz</a></td>
+  </tr>
+
+  <tr>
+    <td rowspan="2">iOS simulator</td>
+    <td>arm64</td>
+    <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-ios-simulator-arm64.tgz">pdfium-ios-simulator-arm64.tgz</a></td>
+    <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-v8-ios-simulator-arm64.tgz">pdfium-v8-ios-simulator-arm64.tgz</a></td>
   </tr>
   <tr>
     <td>x64</td>

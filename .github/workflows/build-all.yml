@@ -160,6 +160,32 @@ jobs:
       target_environment: device
       enable_v8: true
 
+  ios_simulator_arm64:
+    name: iOS simulator ARM64
+    uses: ./.github/workflows/build.yml
+    with:
+      branch: ${{ github.event.inputs.branch }}
+      version: ${{ github.event.inputs.version }}
+      is_debug: ${{ github.event.inputs.is_debug == 'true' }}
+      target_os: ios
+      target_cpu: arm64
+      target_environment: simulator
+      enable_v8: false
+
+  ios_simulator_arm64_v8:
+    name: iOS simulator ARM64 V8
+    if: github.event.inputs.enable_v8 == 'true'
+    needs: ios_simulator_arm64
+    uses: ./.github/workflows/build.yml
+    with:
+      branch: ${{ github.event.inputs.branch }}
+      version: ${{ github.event.inputs.version }}
+      is_debug: ${{ github.event.inputs.is_debug == 'true' }}
+      target_os: ios
+      target_cpu: arm64
+      target_environment: simulator
+      enable_v8: true
+
   ios_simulator_x64:
     name: iOS simulator x64
     uses: ./.github/workflows/build.yml
@@ -525,6 +551,8 @@ jobs:
       - android_x86_v8
       - ios_device_arm64
       - ios_device_arm64_v8
+      - ios_simulator_arm64
+      - ios_simulator_arm64_v8
       - ios_simulator_x64
       - ios_simulator_x64_v8
       - linux_arm

@@ -38,6 +38,7 @@
     <!-- see list of available runtime identifiers -->
     <!-- https://docs.microsoft.com/en-us/dotnet/core/rid-catalog -->
     <file src="pdfium-ios-device-arm64/lib/libpdfium.dylib" target="runtimes/ios-device-arm64/native/libpdfium.dylib" />
+    <file src="pdfium-ios-simulator-arm64/lib/libpdfium.dylib" target="runtimes/ios-simulator-arm64/native/libpdfium.dylib" />
     <file src="pdfium-ios-simulator-x64/lib/libpdfium.dylib" target="runtimes/ios-simulator-x64/native/libpdfium.dylib" />
   </files>
 </package>
