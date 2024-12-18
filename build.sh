@@ -91,6 +91,9 @@ then
     echo "OS $1 doesn't support environment $3"
     exit 1
   fi
+elif [[ $1 == 'ios' ]]; then
+  echo "You must specify environment for ios builds"
+  exit 1
 fi
 
 if [[ ! $START_STEP =~ ^($STEP_REGEX)$ ]]
