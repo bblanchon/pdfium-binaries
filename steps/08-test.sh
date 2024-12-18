@@ -151,7 +151,7 @@ CMAKE_ARGS+=("$SOURCE_DIR")
 mkdir -p build
 pushd build
 
-cmake "${CMAKE_ARGS[@]}"
+cmake --trace-expand "${CMAKE_ARGS[@]}"
 cmake --build . -v
 
 if [ "$OS" == "win" ]; then
