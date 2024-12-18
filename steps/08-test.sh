@@ -55,6 +55,7 @@ case "$OS" in
       -D CMAKE_SYSTEM_NAME="iOS"
       -D CMAKE_OSX_SYSROOT="$SDK"
       -D CMAKE_OSX_ARCHITECTURES="$ARCH"
+      -D CMAKE_OSX_DEPLOYMENT_TARGET="14.0"
       # https://discourse.cmake.org/t/find-package-stops-working-when-cmake-system-name-ios/4609/7
       -D CMAKE_FIND_ROOT_PATH_MODE_PACKAGE="BOTH"
       -D CMAKE_FIND_ROOT_PATH_MODE_INCLUDE="BOTH"
