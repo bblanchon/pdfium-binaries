@@ -152,7 +152,7 @@ mkdir -p build
 pushd build
 
 cmake "${CMAKE_ARGS[@]}"
-cmake --build .
+cmake --build . -v
 
 if [ "$OS" == "win" ]; then
   EXAMPLE="Debug/example.exe"
