@@ -6,6 +6,7 @@ TARGET_ENVIRONMENT="${PDFium_TARGET_ENVIRONMENT:-}"
 SOURCE_DIR="$PWD/example"
 CMAKE_ARGS=()
 CAN_RUN_ON_HOST=false
+EXAMPLE="./example"
 
 export PDFium_DIR="$PWD/staging"
 
@@ -61,6 +62,7 @@ case "$OS" in
       -D CMAKE_FIND_ROOT_PATH_MODE_INCLUDE="BOTH"
       -D CMAKE_FIND_ROOT_PATH_MODE_LIBRARY="BOTH"
     )
+    EXAMPLE="example.app/example"
     ;;
 
   linux)
@@ -139,6 +141,7 @@ case "$OS" in
       -G "Visual Studio 17 2022"
       -A "$ARCH"
     )
+    EXAMPLE="Debug/example.exe"
     ;;
 
   wasm)
@@ -154,12 +157,6 @@ pushd build
 
 cmake "${CMAKE_ARGS[@]}"
 cmake --build .
-
-if [ "$OS" == "win" ]; then
-  EXAMPLE="Debug/example.exe"
-else
-  EXAMPLE="./example"
-fi
 
 file $EXAMPLE
 
