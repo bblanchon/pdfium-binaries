@@ -44,12 +44,15 @@ case "$OS" in
     case "$TARGET_ENVIRONMENT" in
       catalyst)
         SDK="macosx"
+        EXAMPLE="example.app/Contents/MacOS/example"
         ;;
       device)
         SDK="iphoneos"
+        EXAMPLE="example.app/example"
         ;;
       simulator)
         SDK="iphonesimulator"
+        EXAMPLE="example.app/example"
         ;;
     esac
     CMAKE_ARGS+=(
@@ -62,7 +65,6 @@ case "$OS" in
       -D CMAKE_FIND_ROOT_PATH_MODE_INCLUDE="BOTH"
       -D CMAKE_FIND_ROOT_PATH_MODE_LIBRARY="BOTH"
     )
-    EXAMPLE="example.app/example"
     ;;
 
   linux)
