@@ -53,6 +53,18 @@ Here are the download links for latest release:
   </tr>
 
   <tr>
+    <td rowspan="2">iOS catalyst</td>
+    <td>arm64</td>
+    <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-ios-catalyst-arm64.tgz">pdfium-ios-catalyst-arm64.tgz</a></td>
+    <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-v8-ios-catalyst-arm64.tgz">pdfium-v8-ios-catalyst-arm64.tgz</a></td>
+  </tr>
+  <tr>
+    <td>x64</td>
+    <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-ios-catalyst-x64.tgz">pdfium-ios-catalyst-x64.tgz</a></td>
+    <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-v8-ios-catalyst-x64.tgz">pdfium-v8-ios-catalyst-x64.tgz</a></td>
+  </tr>
+
+  <tr>
     <td>iOS device</td>
     <td>arm64</td>
     <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-ios-device-arm64.tgz">pdfium-ios-device-arm64.tgz</a></td>
@@ -94,7 +106,7 @@ Here are the download links for latest release:
   </tr>
 
   <tr>
-    <td rowspan="3">Linux<br>musl</td>
+    <td rowspan="3">Linux musl</td>
     <td>arm64</td>
     <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-linux-musl-arm64.tgz">pdfium-linux-musl-arm64.tgz</a></td>
     <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-v8-linux-musl-arm64.tgz">pdfium-v8-linux-musl-arm64.tgz</a></td>
