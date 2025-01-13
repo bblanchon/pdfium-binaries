@@ -1,0 +1,13 @@
+diff --git a/third_party/highway/BUILD.gn b/third_party/highway/BUILD.gn
+index a975b0b..e5c424a 100644
+--- a/third_party/highway/BUILD.gn
++++ b/third_party/highway/BUILD.gn
+@@ -11,7 +11,7 @@ config("libhwy_external_config") {
+     # 32-bit mode due to bugs in the generated code. However, when doing so it
+     # prints a warning (#pragma message). This flag silences that warning by
+     # explicitly disabling AVX2 and AVX3 targets.
+-    defines += [ "HWY_BROKEN_TARGETS=(HWY_AVX2|HWY_AVX3)" ]
++    defines += [ "HWY_BROKEN_TARGETS=(HWY_AVX2|HWY_AVX3|HWY_AVX3_SPR)" ]
+   }
+   if (target_cpu == "arm64") {
+     # There are Chrome targets that use HWY_ALIGN on absl::uint128. This breaks
