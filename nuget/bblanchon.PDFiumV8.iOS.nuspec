@@ -10,7 +10,7 @@
     <projectUrl>https://github.com/bblanchon/pdfium-binaries</projectUrl>
     <description>This package contains pre-compiled binaries of the PDFium library, an open-source library for PDF manipulation and rendering.</description>
     <releaseNotes>$releaseNotes$</releaseNotes>
-    <copyright>Copyright © Benoit Blanchon 2017-2024</copyright>
+    <copyright>Copyright © Benoit Blanchon 2017-2025</copyright>
     <tags>PDFium PDF binaries library native Chromium</tags>
     <repository type="git" url="https://github.com/bblanchon/pdfium-binaries.git" branch="$branch$" commit="$commit$" />
     <icon>icon.png</icon>
@@ -37,8 +37,8 @@
     <!-- the native PDFium binaries -->
     <!-- see list of available runtime identifiers -->
     <!-- https://docs.microsoft.com/en-us/dotnet/core/rid-catalog -->
-    <file src="pdfium-v8-ios-device-arm64/lib/libpdfium.dylib" target="runtimes/ios-device-arm64/native/libpdfium.dylib" />
-    <file src="pdfium-v8-ios-simulator-arm64/lib/libpdfium.dylib" target="runtimes/ios-simulator-arm64/native/libpdfium.dylib" />
-    <file src="pdfium-v8-ios-simulator-x64/lib/libpdfium.dylib" target="runtimes/ios-simulator-x64/native/libpdfium.dylib" />
+    <file src="pdfium-v8-ios-device-arm64/lib/libpdfium.dylib" target="runtimes/ios-arm64/native/libpdfium.dylib" />
+    <file src="pdfium-v8-ios-simulator-arm64/lib/libpdfium.dylib" target="runtimes/iossimulator-arm64/native/libpdfium.dylib" />
+    <file src="pdfium-v8-ios-simulator-x64/lib/libpdfium.dylib" target="runtimes/iossimulator-x64/native/libpdfium.dylib" />
   </files>
 </package>
