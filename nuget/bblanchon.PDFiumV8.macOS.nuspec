@@ -19,6 +19,8 @@
     <dependencies>
       <group targetFramework="native" />
       <group targetFramework="netstandard1.0" />
+      <group targetFramework="Xamarin.Mac2.0" />
+      <group targetFramework="net6.0-macos10.15" />
     </dependencies>
   </metadata>
 

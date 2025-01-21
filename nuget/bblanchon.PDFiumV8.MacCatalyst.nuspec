@@ -19,6 +19,7 @@
     <dependencies>
       <group targetFramework="native" />
       <group targetFramework="netstandard1.0" />
+      <group targetFramework="net6.0-maccatalyst13.5" />
     </dependencies>
   </metadata>
 
