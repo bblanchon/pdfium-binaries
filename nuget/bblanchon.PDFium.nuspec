@@ -21,7 +21,6 @@
         <dependency id="bblanchon.PDFium.Android" version="$version$" />
         <dependency id="bblanchon.PDFium.iOS" version="$version$" />
         <dependency id="bblanchon.PDFium.Linux" version="$version$" />
-        <dependency id="bblanchon.PDFium.MacCatalyst" version="$version$" />
         <dependency id="bblanchon.PDFium.macOS" version="$version$" />
         <dependency id="bblanchon.PDFium.WebAssembly" version="$version$" />
         <dependency id="bblanchon.PDFium.Win32" version="$version$" />

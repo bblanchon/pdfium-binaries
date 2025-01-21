@@ -32,8 +32,8 @@
 
     <!-- special targets file copies native binaries for Mono -->
     <!-- .NET (Core) does not need this and handles the runtimes folder on its own -->
-    <file src="bblanchon.PDFium.Linux.targets" target="build/net461/bblanchon.PDFium.Linux.targets" />
-    <file src="bblanchon.PDFium.Linux.targets" target="buildTransitive/net461/bblanchon.PDFium.Linux.targets" />
+    <file src="bblanchon.PDFium.Linux.targets" target="build/net461/bblanchon.PDFiumV8.Linux.targets" />
+    <file src="bblanchon.PDFium.Linux.targets" target="buildTransitive/net461/bblanchon.PDFiumV8.Linux.targets" />
 
     <!-- include hearder and lib files for C++ projects -->
     <file src="bblanchon.PDFium.native.targets" target="build/native/bblanchon.PDFiumV8.Linux.targets" />

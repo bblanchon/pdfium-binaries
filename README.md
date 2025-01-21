@@ -206,12 +206,6 @@ The following NuGet packages are available:
   </tr>
 
   <tr>
-    <td>Mac Catalyst</td>
-    <td><a href="https://www.nuget.org/packages/bblanchon.PDFium.MacCatalyst/">bblanchon.PDFium.MacCatalyst</a></td>
-    <td><a href="https://www.nuget.org/packages/bblanchon.PDFiumV8.MacCatalyst/">bblanchon.PDFiumV8.MacCatalyst</a></td>
-  </tr>
-
-  <tr>
     <td>macOS</td>
     <td><a href="https://www.nuget.org/packages/bblanchon.PDFium.macOS/">bblanchon.PDFium.macOS</a></td>
     <td><a href="https://www.nuget.org/packages/bblanchon.PDFiumV8.macOS/">bblanchon.PDFiumV8.macOS</a></td>

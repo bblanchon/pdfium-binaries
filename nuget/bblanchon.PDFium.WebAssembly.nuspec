@@ -28,6 +28,7 @@
 
     <!-- https://learn.microsoft.com/en-us/nuget/reference/errors-and-warnings/nu5128 -->
     <file src="_._" target="lib/native/_._" />
+    <file src="_._" target="lib/netstandard1.0/_._" />
 
     <!-- include hearder and lib files for C++ projects -->
     <file src="bblanchon.PDFium.native.targets" target="build/native/bblanchon.PDFium.WebAssembly.targets" />
