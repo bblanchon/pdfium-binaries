@@ -18,6 +18,7 @@
     <readme>README.md</readme>
     <dependencies>
       <group targetFramework="native" />
+      <group targetFramework="netstandard1.0" />
     </dependencies>
   </metadata>
 

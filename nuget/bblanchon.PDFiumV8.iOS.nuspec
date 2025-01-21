@@ -19,6 +19,8 @@
     <dependencies>
       <group targetFramework="native" />
       <group targetFramework="netstandard1.0" />
+      <group targetFramework="Xamarin.iOS1.0" />
+      <group targetFramework="net6.0-ios13.6" />
     </dependencies>
   </metadata>
 
