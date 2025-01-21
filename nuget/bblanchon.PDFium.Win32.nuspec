@@ -10,7 +10,7 @@
     <projectUrl>https://github.com/bblanchon/pdfium-binaries</projectUrl>
     <description>This package contains pre-compiled binaries of the PDFium library, an open-source library for PDF manipulation and rendering.</description>
     <releaseNotes>$releaseNotes$</releaseNotes>
-    <copyright>Copyright © Benoit Blanchon 2017-2024</copyright>
+    <copyright>Copyright © Benoit Blanchon 2017-2025</copyright>
     <tags>PDFium PDF binaries library native Chromium</tags>
     <repository type="git" url="https://github.com/bblanchon/pdfium-binaries.git" branch="$branch$" commit="$commit$" />
     <icon>icon.png</icon>
