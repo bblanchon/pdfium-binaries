@@ -21,6 +21,7 @@
       <group targetFramework="netstandard1.0" />
       <group targetFramework="Xamarin.iOS1.0" />
       <group targetFramework="net6.0-ios13.6" />
+      <group targetFramework="net6.0-maccatalyst13.5" />
     </dependencies>
   </metadata>
 
@@ -33,6 +34,7 @@
     <file src="_._" target="lib/netstandard1.0/_._" />
     <file src="_._" target="lib/Xamarin.iOS1.0/_._" />
     <file src="_._" target="lib/net6.0-ios13.6/_._" />
+    <file src="_._" target="lib/net6.0-maccatalyst13.5/_._" />
 
     <!-- include hearder and lib files for C++ projects -->
     <file src="bblanchon.PDFium.native.targets" target="build/native/bblanchon.PDFiumV8.iOS.targets" />
@@ -44,5 +46,7 @@
     <file src="pdfium-v8-ios-device-arm64/lib/libpdfium.dylib" target="runtimes/ios-arm64/native/libpdfium.dylib" />
     <file src="pdfium-v8-ios-simulator-arm64/lib/libpdfium.dylib" target="runtimes/iossimulator-arm64/native/libpdfium.dylib" />
     <file src="pdfium-v8-ios-simulator-x64/lib/libpdfium.dylib" target="runtimes/iossimulator-x64/native/libpdfium.dylib" />
+    <file src="pdfium-v8-ios-catalyst-arm64/lib/libpdfium.dylib" target="runtimes/maccatalyst-arm64/native/libpdfium.dylib" />
+    <file src="pdfium-v8-ios-catalyst-x64/lib/libpdfium.dylib" target="runtimes/maccatalyst-x64/native/libpdfium.dylib" />
   </files>
 </package>
