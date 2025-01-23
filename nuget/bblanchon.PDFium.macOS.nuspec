@@ -32,6 +32,11 @@
     <file src="_._" target="lib/native/_._" />
     <file src="_._" target="lib/netstandard1.0/_._" />
 
+    <!-- placeholder files because this package contains native binaries only -->
+    <!-- https://docs.microsoft.com/en-us/nuget/reference/errors-and-warnings/nu5127 -->
+    <file src="_._" target="lib/Xamarin.Mac2.0/_._" />
+    <file src="_._" target="lib/net6.0-macos10.15/_._" />
+
     <!-- special targets file copies native binaries for Mono -->
     <!-- .NET (Core) does not need this and handles the runtimes folder on its own -->
     <file src="bblanchon.PDFium.macOS.targets" target="build/net461/bblanchon.PDFium.macOS.targets" />
