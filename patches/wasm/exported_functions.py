@@ -1,12 +1,15 @@
-import subprocess
+import re
 import sys
+from pathlib import Path
 
-def enumerate_symbols(files: list[str]):
-    result = subprocess.run(["llvm-nm", "--format=just-symbols"] + files, capture_output=True, text=True)
-    for symbol in result.stdout.splitlines():
-        if symbol.startswith(("FPDF", "FSDK", "FORM", "IFSDK")):
-            yield f"_{symbol}"
+function_pattern = re.compile(r'^FPDF_EXPORT\s+.*?(\w+)\s*\(', re.MULTILINE|re.DOTALL)
 
+def enumerate_functions(folder: Path):
+    for file in folder.glob('*.h'):
+        content = file.read_text()
+        for match in function_pattern.finditer(content):
+            yield "_" + match.group(1)
 
 if __name__ == "__main__":
-    print(",".join(enumerate_symbols(sys.argv[1:])))
+    folder = Path(sys.argv[1])
+    print(",".join(enumerate_functions(folder)))

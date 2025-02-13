@@ -1,45 +1,42 @@
 diff --git a/BUILD.gn b/BUILD.gn
-index 4edba9f43..71ae5c7e7 100644
+index 4edba9f43..5e72f721b 100644
 --- a/BUILD.gn
 +++ b/BUILD.gn
-@@ -441,3 +441,37 @@ group("gn_check") {
-     deps += [ "//skia" ]
+@@ -271,6 +271,34 @@ component("pdfium") {
+     complete_static_lib = true
+     configs -= [ "//build/config/compiler:thin_archive" ]
    }
- }
 +
-+executable("pdfium_wasm") {
-+  deps = [
-+    ":pdfium",
-+  ]
++  if (is_wasm) {
++    exported_functions = exec_script(
++      "//build/toolchain/wasm/exported_functions.py",
++      [rebase_path("public")],
++      "trim string"
++    )
 +
-+  exported_functions = exec_script(
-+    "//build/toolchain/wasm/exported_functions.py",
-+    [
-+      rebase_path("obj/libpdfium.a", root_build_dir),
-+    ],
-+    "trim string"
-+  )
-+
-+  ldflags = [
-+    "-s", "EXPORTED_FUNCTIONS=\"$exported_functions\"",
-+    "-s", "LLD_REPORT_UNDEFINED",
-+    "-s", "WASM=1",
-+    "-s", "ALLOW_MEMORY_GROWTH=1",
-+    "-s", "EXPORTED_RUNTIME_METHODS=['ccall', 'cwrap']",
-+    "--no-entry",
-+  ]
-+
-+  if (is_debug) {
-+    ldflags += [
-+      "--profile",
-+      "-g",
++    ldflags = [
++      "-s", "EXPORTED_FUNCTIONS=\"$exported_functions\"",
++      "-s", "LLD_REPORT_UNDEFINED",
++      "-s", "WASM=1",
++      "-s", "ALLOW_MEMORY_GROWTH=1",
++      "-s", "EXPORTED_RUNTIME_METHODS=['ccall', 'cwrap']",
++      "--no-entry",
 +    ]
-+  } else {
-+    ldflags += [
-+      "-O2",
-+    ]
++
++    if (is_debug) {
++      ldflags += [
++        "--profile",
++        "-g",
++      ]
++    } else {
++      ldflags += [
++        "-O2",
++      ]
++    }
 +  }
-+}
+ }
+ 
+ # Targets below this are only visible within this file.
 diff --git a/core/fxcrt/BUILD.gn b/core/fxcrt/BUILD.gn
 index 21060a47b..0bb732909 100644
 --- a/core/fxcrt/BUILD.gn
