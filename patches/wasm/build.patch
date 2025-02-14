@@ -1,8 +1,8 @@
 diff --git a/config/BUILDCONFIG.gn b/config/BUILDCONFIG.gn
-index 8e0c3761f..ab6a9afb1 100644
+index c2212c73c..c0375bd95 100644
 --- a/config/BUILDCONFIG.gn
 +++ b/config/BUILDCONFIG.gn
-@@ -278,6 +278,8 @@ if (target_os == "android") {
+@@ -280,6 +280,8 @@ if (target_os == "android") {
    _default_toolchain = "//build/toolchain/aix:$target_cpu"
  } else if (target_os == "zos") {
    _default_toolchain = "//build/toolchain/zos:$target_cpu"
@@ -11,19 +11,19 @@ index 8e0c3761f..ab6a9afb1 100644
  } else {
    assert(false, "Unsupported target_os: $target_os")
  }
-@@ -317,6 +319,7 @@ is_mac = current_os == "mac"
- is_nacl = current_os == "nacl"
+@@ -320,6 +322,7 @@ is_nacl = current_os == "nacl"
+ is_tvos = current_os == "tvos"
  is_watchos = current_os == "watchos"
  is_win = current_os == "win" || current_os == "winuwp"
 +is_wasm = current_os == "wasm"
  
- is_apple = is_ios || is_mac || is_watchos
+ is_apple = is_ios || is_mac || is_tvos || is_watchos
  is_posix = !is_win && !is_fuchsia
 diff --git a/config/compiler/BUILD.gn b/config/compiler/BUILD.gn
-index f58320b88..b3ca0efb0 100644
+index ae6cbc24e..88ee77096 100644
 --- a/config/compiler/BUILD.gn
 +++ b/config/compiler/BUILD.gn
-@@ -305,6 +305,8 @@ config("compiler") {
+@@ -304,6 +304,8 @@ config("compiler") {
      configs += [ "//build/config/aix:compiler" ]
    } else if (current_os == "zos") {
      configs += [ "//build/config/zos:compiler" ]
@@ -32,7 +32,7 @@ index f58320b88..b3ca0efb0 100644
    }
  
    configs += [
-@@ -370,7 +372,7 @@ config("compiler") {
+@@ -380,7 +382,7 @@ config("compiler") {
        } else if (is_chromeos) {
          cflags += [ "-fstack-protector-strong" ]
        } else if ((is_posix && !is_nacl) || is_fuchsia) {
@@ -42,7 +42,7 @@ index f58320b88..b3ca0efb0 100644
            cflags += [ "-fstack-protector" ]
          }
 diff --git a/toolchain/toolchain.gni b/toolchain/toolchain.gni
-index 4e18accf1..34951eede 100644
+index 580da7b0d..0d305ff3f 100644
 --- a/toolchain/toolchain.gni
 +++ b/toolchain/toolchain.gni
 @@ -62,6 +62,8 @@ if (is_apple) {
