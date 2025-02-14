@@ -1,5 +1,5 @@
 diff --git a/config/BUILDCONFIG.gn b/config/BUILDCONFIG.gn
-index 8e0c3761f..ab6a9afb1 100644
+index 9164ee0..3b33fe8 100644
 --- a/config/BUILDCONFIG.gn
 +++ b/config/BUILDCONFIG.gn
 @@ -278,6 +278,8 @@ if (target_os == "android") {
@@ -20,10 +20,10 @@ index 8e0c3761f..ab6a9afb1 100644
  is_apple = is_ios || is_mac || is_watchos
  is_posix = !is_win && !is_fuchsia
 diff --git a/config/compiler/BUILD.gn b/config/compiler/BUILD.gn
-index f58320b88..b3ca0efb0 100644
+index 8810926..91e9c82 100644
 --- a/config/compiler/BUILD.gn
 +++ b/config/compiler/BUILD.gn
-@@ -305,6 +305,8 @@ config("compiler") {
+@@ -304,6 +304,8 @@ config("compiler") {
      configs += [ "//build/config/aix:compiler" ]
    } else if (current_os == "zos") {
      configs += [ "//build/config/zos:compiler" ]
@@ -32,7 +32,7 @@ index f58320b88..b3ca0efb0 100644
    }
  
    configs += [
-@@ -370,7 +372,7 @@ config("compiler") {
+@@ -380,7 +382,7 @@ config("compiler") {
        } else if (is_chromeos) {
          cflags += [ "-fstack-protector-strong" ]
        } else if ((is_posix && !is_nacl) || is_fuchsia) {
@@ -41,8 +41,17 @@ index f58320b88..b3ca0efb0 100644
            # Not available on aix.
            cflags += [ "-fstack-protector" ]
          }
+@@ -2474,7 +2476,7 @@ if (is_win) {
+         "-Wl,-no_function_starts",
+       ]
+     }
+-  } else if (current_os != "aix" && current_os != "zos") {
++  } else if (current_os != "aix" && current_os != "zos" && !is_wasm) {
+     # Non-Mac Posix flags.
+     # Aix does not support these.
+ 
 diff --git a/toolchain/toolchain.gni b/toolchain/toolchain.gni
-index 4e18accf1..34951eede 100644
+index 4e18acc..34951ee 100644
 --- a/toolchain/toolchain.gni
 +++ b/toolchain/toolchain.gni
 @@ -62,6 +62,8 @@ if (is_apple) {

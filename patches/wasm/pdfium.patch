@@ -1,5 +1,5 @@
 diff --git a/BUILD.gn b/BUILD.gn
-index 4edba9f43..5e72f721b 100644
+index 4edba9f43..8625eb233 100644
 --- a/BUILD.gn
 +++ b/BUILD.gn
 @@ -271,6 +271,34 @@ component("pdfium") {
@@ -15,11 +15,11 @@ index 4edba9f43..5e72f721b 100644
 +    )
 +
 +    ldflags = [
-+      "-s", "EXPORTED_FUNCTIONS=\"$exported_functions\"",
-+      "-s", "LLD_REPORT_UNDEFINED",
-+      "-s", "WASM=1",
-+      "-s", "ALLOW_MEMORY_GROWTH=1",
-+      "-s", "EXPORTED_RUNTIME_METHODS=['ccall', 'cwrap']",
++      "-sEXPORTED_FUNCTIONS=$exported_functions",
++      "-sLLD_REPORT_UNDEFINED",
++      "-sWASM=1",
++      "-sALLOW_MEMORY_GROWTH=1",
++      "-sEXPORTED_RUNTIME_METHODS=ccall,cwrap",
 +      "--no-entry",
 +    ]
 +
