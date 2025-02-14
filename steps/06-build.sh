@@ -12,6 +12,7 @@ if [ "$TARGET_CPU" == "wasm" ]; then
   EXPORTED_FUNCTIONS=$(llvm-nm $LIBPDFIUMA --format=just-symbols | grep "^FPDF\|^FSDK\|^FORM\|^IFSDK" | sed 's/^/_/' | paste -sd "," -)
   EMCC_ARGS=(
     -s ALLOW_MEMORY_GROWTH=1
+    -s ALLOW_TABLE_GROWTH=1
     -s EXPORTED_FUNCTIONS="$EXPORTED_FUNCTIONS,_free,_malloc,_calloc,_realloc"
     -s EXPORTED_RUNTIME_METHODS="ccall,cwrap,addFunction,removeFunction"
     -s LLD_REPORT_UNDEFINED
