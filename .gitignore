@@ -13,3 +13,4 @@
 /*-musl*-cross/
 /android-ndk*
 /conda/out/
+/.gcs_entries
