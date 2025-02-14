@@ -1,8 +1,16 @@
 diff --git a/BUILD.gn b/BUILD.gn
-index 4edba9f43..8625eb233 100644
+index 4edba9f43..0b3e773ca 100644
 --- a/BUILD.gn
 +++ b/BUILD.gn
-@@ -271,6 +271,34 @@ component("pdfium") {
+@@ -221,6 +221,7 @@ group("pdfium_public_headers") {
+ 
+ component("pdfium") {
+   output_name = "pdfium"
++  output_extension = "html"
+   libs = []
+   configs += [ ":pdfium_strict_config" ]
+   public_configs = [ ":pdfium_public_config" ]
+@@ -271,6 +272,34 @@ component("pdfium") {
      complete_static_lib = true
      configs -= [ "//build/config/compiler:thin_archive" ]
    }
