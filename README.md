@@ -112,17 +112,17 @@ Here are the download links for latest release:
     <td rowspan="3">musl</td>
     <td>arm64</td>
     <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-linux-musl-arm64.tgz">pdfium-linux-musl-arm64.tgz</a></td>
-    <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-v8-linux-musl-arm64.tgz">pdfium-v8-linux-musl-arm64.tgz</a></td>
+    <td>failing (#192)</td>
   </tr>
   <tr>
     <td>x64</td>
     <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-linux-musl-x64.tgz">pdfium-linux-musl-x64.tgz</a></td>
-    <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-v8-linux-musl-x64.tgz">pdfium-v8-linux-musl-x64.tgz</a></td>
+    <td>failing (#191)</td>
   </tr>
   <tr>
     <td>x86</td>
     <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-linux-musl-x86.tgz">pdfium-linux-musl-x86.tgz</a></td>
-    <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-v8-linux-musl-x86.tgz">pdfium-v8-linux-musl-x86.tgz</a></td>
+    <td>failing (#193)</td>
   </tr>
 
   <tr>
