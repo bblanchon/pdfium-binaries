@@ -1,8 +1,8 @@
 diff --git a/config/BUILDCONFIG.gn b/config/BUILDCONFIG.gn
-index c2212c73c..c0375bd95 100644
+index 632de0278..f07843295 100644
 --- a/config/BUILDCONFIG.gn
 +++ b/config/BUILDCONFIG.gn
-@@ -280,6 +280,8 @@ if (target_os == "android") {
+@@ -278,6 +278,8 @@ if (target_os == "android") {
    _default_toolchain = "//build/toolchain/aix:$target_cpu"
  } else if (target_os == "zos") {
    _default_toolchain = "//build/toolchain/zos:$target_cpu"
@@ -11,16 +11,16 @@ index c2212c73c..c0375bd95 100644
  } else {
    assert(false, "Unsupported target_os: $target_os")
  }
-@@ -320,6 +322,7 @@ is_nacl = current_os == "nacl"
- is_tvos = current_os == "tvos"
+@@ -317,6 +319,7 @@ is_mac = current_os == "mac"
+ is_nacl = current_os == "nacl"
  is_watchos = current_os == "watchos"
  is_win = current_os == "win" || current_os == "winuwp"
 +is_wasm = current_os == "wasm"
  
- is_apple = is_ios || is_mac || is_tvos || is_watchos
+ is_apple = is_ios || is_mac || is_watchos
  is_posix = !is_win && !is_fuchsia
 diff --git a/config/compiler/BUILD.gn b/config/compiler/BUILD.gn
-index ae6cbc24e..88ee77096 100644
+index 151412543..e16bed1a9 100644
 --- a/config/compiler/BUILD.gn
 +++ b/config/compiler/BUILD.gn
 @@ -304,6 +304,8 @@ config("compiler") {
