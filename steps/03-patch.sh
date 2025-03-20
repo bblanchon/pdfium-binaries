@@ -29,8 +29,6 @@ case "$OS" in
   emscripten)
     git apply -v "$PATCHES/wasm/pdfium.patch"
     git -C build apply -v "$PATCHES/wasm/build.patch"
-    mkdir -p "build/toolchain/wasm"
-    cp "$PATCHES/wasm/toolchain.gn" "build/toolchain/wasm/BUILD.gn"
     mkdir -p "build/config/wasm"
     cp "$PATCHES/wasm/config.gn" "build/config/wasm/BUILD.gn"
     ;;

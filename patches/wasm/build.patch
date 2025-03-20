@@ -1,5 +1,5 @@
 diff --git a/config/BUILDCONFIG.gn b/config/BUILDCONFIG.gn
-index 3f3ea354f..300dff416 100644
+index 3f3ea354f..0c881c1fc 100644
 --- a/config/BUILDCONFIG.gn
 +++ b/config/BUILDCONFIG.gn
 @@ -278,6 +278,8 @@ if (target_os == "android") {
@@ -33,3 +33,17 @@ index 273318ebf..d0bc3efa0 100644
            # Not available on aix.
            cflags += [ "-fstack-protector" ]
          }
+diff --git a/toolchain/wasm/BUILD.gn b/toolchain/wasm/BUILD.gn
+index 38298f349..1e4ba36b8 100644
+--- a/toolchain/wasm/BUILD.gn
++++ b/toolchain/wasm/BUILD.gn
+@@ -21,6 +21,9 @@ gcc_toolchain("wasm") {
+   nm = cc
+   ld = cxx
+ 
++  extra_cflags = "-Wno-unknown-warning-option"
++  extra_cxxflags = "-Wno-unknown-warning-option"
++
+   toolchain_args = {
+     current_cpu = "wasm"
+     current_os = "emscripten"
