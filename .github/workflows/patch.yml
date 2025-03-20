@@ -66,7 +66,7 @@ jobs:
       run: ./patch.sh
       if: always() && steps.checkout.outcome == 'success'
       env:
-        PDFium_TARGET_OS: wasm
+        PDFium_TARGET_OS: emscripten
 
     - name: Apply patches for Windows
       run: ./patch.sh

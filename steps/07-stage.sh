@@ -33,7 +33,7 @@ case "$OS" in
     mv "$BUILD/libpdfium.dylib" "$STAGING_LIB"
     ;;
 
-  wasm)
+  emscripten)
     mv "$BUILD/pdfium.html" "$STAGING_LIB"
     mv "$BUILD/pdfium.js" "$STAGING_LIB"
     mv "$BUILD/pdfium.wasm" "$STAGING_LIB"

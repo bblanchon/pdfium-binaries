@@ -16,10 +16,10 @@ on:
         type: choice
         options:
           - android
+          - emscripten
           - ios
           - linux
           - mac
-          - wasm
           - win
       target_cpu:
         description: Target CPU

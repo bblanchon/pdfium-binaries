@@ -523,7 +523,7 @@ jobs:
       branch: ${{ github.event.inputs.branch }}
       version: ${{ github.event.inputs.version }}
       is_debug: ${{ github.event.inputs.is_debug == 'true' }}
-      target_os: wasm
+      target_os: emscripten
       target_cpu: wasm
       enable_v8: false
 

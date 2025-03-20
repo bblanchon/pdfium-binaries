@@ -7,7 +7,7 @@ TARGET_ENVIRONMENT="${PDFium_TARGET_ENVIRONMENT:-}"
 
 pushd "${SOURCE}"
 
-[ "$OS" != "wasm" ] && git apply -v "$PATCHES/shared_library.patch"
+[ "$OS" != "emscripten" ] && git apply -v "$PATCHES/shared_library.patch"
 git apply -v "$PATCHES/public_headers.patch"
 
 [ "${PDFium_ENABLE_V8:-}" == "true" ] && git apply -v "$PATCHES/v8/pdfium.patch"
@@ -26,7 +26,7 @@ case "$OS" in
     [ "${PDFium_ENABLE_V8:-}" == "true" ] && git -C v8 apply -v "$PATCHES/linux/v8.patch"
     ;;
 
-  wasm)
+  emscripten)
     git apply -v "$PATCHES/wasm/pdfium.patch"
     git -C build apply -v "$PATCHES/wasm/build.patch"
     mkdir -p "build/toolchain/wasm"

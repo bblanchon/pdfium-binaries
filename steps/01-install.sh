@@ -92,7 +92,7 @@ case "$TARGET_OS" in
     fi
     ;;
 
-  wasm)
+  emscripten)
     if [ -e "emsdk" ]; then
       git -C "emsdk" pull
     else

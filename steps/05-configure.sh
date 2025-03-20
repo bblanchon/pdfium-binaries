@@ -45,7 +45,7 @@ mkdir -p "$BUILD"
       echo 'mac_deployment_target = "10.13.0"'
       echo "clang_use_chrome_plugins = false"
       ;;
-    wasm)
+    emscripten)
       echo 'pdf_is_complete_lib = true'
       echo 'is_clang = false'
       echo 'use_custom_libcxx = false'

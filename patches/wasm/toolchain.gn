@@ -13,7 +13,7 @@ gcc_toolchain("emscripten") {
   extra_cxxflags = "-Wno-unknown-warning-option"
 
   toolchain_args = {
-    current_cpu = "wasm"
+    current_cpu = "emscripten"
     current_os = "wasm"
   }
 }

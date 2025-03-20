@@ -24,7 +24,7 @@ on:
         required: false
         default: false
       target_os:
-        description: Target OS (android|ios|linux|mac|wasm|win)
+        description: Target OS (android|emscripten|ios|linux|mac|win)
         type: string
         required: true
       target_cpu:
@@ -58,9 +58,9 @@ jobs:
         run: |
           ARTIFACT="pdfium"
           [ "${{inputs.enable_v8}}" == "true" ] && ARTIFACT="$ARTIFACT-v8"
-          ARTIFACT="$ARTIFACT-${{inputs.target_os}}"
+          [ "${{inputs.target_os}}" != "emscripten" ] && ARTIFACT="$ARTIFACT-${{inputs.target_os}}"
           [ "${{inputs.target_environment}}" != "" ] && ARTIFACT="$ARTIFACT-${{inputs.target_environment}}"
-          [ "${{inputs.target_os}}" != "${{inputs.target_cpu}}" ] && ARTIFACT="$ARTIFACT-${{inputs.target_cpu}}"
+          ARTIFACT="$ARTIFACT-${{inputs.target_cpu}}"
           [ "${{inputs.is_debug}}" == "true" ] && ARTIFACT="$ARTIFACT-debug"
           echo "artifact=$ARTIFACT" >> $GITHUB_OUTPUT
       - name: Checkout this repo

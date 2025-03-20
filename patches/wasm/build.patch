@@ -15,7 +15,7 @@ index 632de0278..f07843295 100644
  is_nacl = current_os == "nacl"
  is_watchos = current_os == "watchos"
  is_win = current_os == "win" || current_os == "winuwp"
-+is_wasm = current_os == "wasm"
++is_wasm = current_os == "emscripten"
  
  is_apple = is_ios || is_mac || is_watchos
  is_posix = !is_win && !is_fuchsia
@@ -27,7 +27,7 @@ index 151412543..e16bed1a9 100644
      configs += [ "//build/config/aix:compiler" ]
    } else if (current_os == "zos") {
      configs += [ "//build/config/zos:compiler" ]
-+  } else if (current_os == "wasm") {
++  } else if (current_os == "emscripten") {
 +    configs += [ "//build/config/wasm:compiler" ]
    }
  
@@ -37,7 +37,7 @@ index 151412543..e16bed1a9 100644
          cflags += [ "-fstack-protector-strong" ]
        } else if ((is_posix && !is_nacl) || is_fuchsia) {
 -        if (current_os != "aix") {
-+        if (current_os != "aix" && current_os != "wasm") {
++        if (current_os != "aix" && current_os != "emscripten") {
            # Not available on aix.
            cflags += [ "-fstack-protector" ]
          }

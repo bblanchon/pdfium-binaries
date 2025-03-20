@@ -146,7 +146,7 @@ case "$OS" in
     EXAMPLE="Debug/example.exe"
     ;;
 
-  wasm)
+  emscripten)
     # TODO: add test for Wasm
     exit
     ;;
