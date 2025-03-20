@@ -92,20 +92,6 @@ case "$TARGET_OS" in
     fi
     ;;
 
-  emscripten)
-    if [ -e "emsdk" ]; then
-      git -C "emsdk" pull
-    else
-      git clone https://github.com/emscripten-core/emsdk.git
-    fi
-    pushd emsdk
-    ./emsdk install ${EMSDK_VERSION:-3.1.72}
-    ./emsdk activate ${EMSDK_VERSION:-3.1.72}
-    echo "$PWD/upstream/emscripten" >> "$PATH_FILE"
-    echo "$PWD/upstream/bin" >> "$PATH_FILE"
-    popd
-    ;;
-
   win)
     echo "$WindowsSDK_DIR/$CURRENT_CPU" >> "$PATH_FILE"
     ;;
