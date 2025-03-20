@@ -1,5 +1,5 @@
 diff --git a/config/BUILDCONFIG.gn b/config/BUILDCONFIG.gn
-index 632de0278..f07843295 100644
+index 3f3ea354f..300dff416 100644
 --- a/config/BUILDCONFIG.gn
 +++ b/config/BUILDCONFIG.gn
 @@ -278,6 +278,8 @@ if (target_os == "android") {
@@ -11,19 +11,11 @@ index 632de0278..f07843295 100644
  } else {
    assert(false, "Unsupported target_os: $target_os")
  }
-@@ -317,6 +319,7 @@ is_mac = current_os == "mac"
- is_nacl = current_os == "nacl"
- is_watchos = current_os == "watchos"
- is_win = current_os == "win" || current_os == "winuwp"
-+is_wasm = current_os == "emscripten"
- 
- is_apple = is_ios || is_mac || is_watchos
- is_posix = !is_win && !is_fuchsia
 diff --git a/config/compiler/BUILD.gn b/config/compiler/BUILD.gn
-index 151412543..e16bed1a9 100644
+index 273318ebf..d0bc3efa0 100644
 --- a/config/compiler/BUILD.gn
 +++ b/config/compiler/BUILD.gn
-@@ -304,6 +304,8 @@ config("compiler") {
+@@ -303,6 +303,8 @@ config("compiler") {
      configs += [ "//build/config/aix:compiler" ]
    } else if (current_os == "zos") {
      configs += [ "//build/config/zos:compiler" ]
@@ -32,7 +24,7 @@ index 151412543..e16bed1a9 100644
    }
  
    configs += [
-@@ -380,7 +382,7 @@ config("compiler") {
+@@ -379,7 +381,7 @@ config("compiler") {
        } else if (is_chromeos) {
          cflags += [ "-fstack-protector-strong" ]
        } else if ((is_posix && !is_nacl) || is_fuchsia) {
@@ -41,16 +33,3 @@ index 151412543..e16bed1a9 100644
            # Not available on aix.
            cflags += [ "-fstack-protector" ]
          }
-diff --git a/toolchain/toolchain.gni b/toolchain/toolchain.gni
-index 580da7b0d..0d305ff3f 100644
---- a/toolchain/toolchain.gni
-+++ b/toolchain/toolchain.gni
-@@ -62,6 +62,8 @@ if (is_apple) {
-   shlib_extension = ".so"
- } else if (is_win) {
-   shlib_extension = ".dll"
-+} if (is_wasm) {
-+  shlib_extension = ".so"
- } else {
-   assert(false, "Platform not supported")
- }
