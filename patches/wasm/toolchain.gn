@@ -1,6 +1,6 @@
 import("//build/toolchain/gcc_toolchain.gni")
 
-gcc_toolchain("emscripten") {
+gcc_toolchain("wasm") {
   cc = "emcc"
   cxx = "em++"
 

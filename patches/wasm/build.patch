@@ -7,7 +7,7 @@ index 3f3ea354f..300dff416 100644
  } else if (target_os == "zos") {
    _default_toolchain = "//build/toolchain/zos:$target_cpu"
 +} else if (target_cpu == "wasm") {
-+  _default_toolchain = "//build/toolchain/wasm:emscripten"
++  _default_toolchain = "//build/toolchain/wasm:$target_cpu"
  } else {
    assert(false, "Unsupported target_os: $target_os")
  }
