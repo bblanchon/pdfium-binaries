@@ -53,6 +53,4 @@ case "$TARGET_ENVIRONMENT" in
     ;;
 esac
 
-"$PATCHES/aggregate_licenses.sh"
-
 popd
