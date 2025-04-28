@@ -1,14 +1,17 @@
 diff --git a/BUILD.gn b/BUILD.gn
-index d905b219a22..1610f1adae9 100644
+index 1e3f0181dfb..977ff43a9f6 100644
 --- a/BUILD.gn
 +++ b/BUILD.gn
-@@ -4753,9 +4753,6 @@ v8_header_set("v8_internal_headers") {
-   }
+@@ -4939,12 +4939,6 @@ v8_header_set("v8_internal_headers") {
  
    frameworks = []
--  if (is_ios) {
+ 
+-  # BrowserEngineKit only exists on iOS itself, not on tvOS and other
+-  # iOS-derived platforms, so we need to check `target_platform` here.
+-  if (is_ios && target_platform == "iphoneos") {
 -    frameworks += [ "BrowserEngineKit.framework" ]
 -  }
- 
+-
    public_deps = [
      ":torque_runtime_support",
+     ":v8_flags",
