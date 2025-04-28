@@ -2,88 +2,84 @@ name: Patches
 
 on:
   schedule:
-    - cron:  '0 14 * * *'
+    - cron: "0 14 * * *"
   workflow_dispatch:
   push:
 
 jobs:
-  verify:
-    name: Verify patches
+  checkout:
+    name: Checkout PDFium
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout this repo
-      uses: actions/checkout@v4
+      - name: Install depot_tools
+        run: |
+          git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
+          echo "$PWD/depot_tools" >> $GITHUB_PATH
 
-    - name: Install depot_tools
-      run: |
-        git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
-        echo "$PWD/depot_tools" >> $GITHUB_PATH
+      - name: Checkout PDFium
+        run: |
+          PDFium_BRANCH=$(git ls-remote --sort version:refname --refs https://pdfium.googlesource.com/pdfium.git 'chromium/*' | tail -n 1 | cut -d/ -f3-4)
+          echo "Checking out branch $PDFium_BRANCH"
+          gclient config --unmanaged "https://pdfium.googlesource.com/pdfium.git"
+          gclient sync -r "origin/${PDFium_BRANCH}" --no-history --shallow
 
-    - name: Checkout PDFium
-      id: checkout
-      timeout-minutes: 15
-      run: |
-        PDFium_BRANCH=$(git ls-remote --sort version:refname --refs https://pdfium.googlesource.com/pdfium.git 'chromium/*' | tail -n 1 | cut -d/ -f3-4)
-        echo "Checking out branch $PDFium_BRANCH"
-        gclient config --unmanaged "https://pdfium.googlesource.com/pdfium.git" --custom-var "checkout_configuration=minimal"
-        gclient sync -r "origin/${PDFium_BRANCH}" --no-history --shallow
+      - name: Upload PDFium artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: pdfium
+          path: |
+            pdfium/**/*.h
+            pdfium/**/*.cpp
+            pdfium/**/*.gn
+            pdfium/**/*.gni
+          retention-days: 1
 
-    - name: Create patch script
-      run: |
-        cat >patch.sh <<END
-        set -eux
-        git -C pdfium reset --hard
-        gclient sync -R
-        steps/03-patch.sh
-        END
-        chmod +x patch.sh
+  apply-patches:
+    name: Apply patches
+    runs-on: ubuntu-latest
+    needs: checkout
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - android
+          - ios
+          - linux
+          - macos
+          - win
+        v8:
+          - false
+          - true
+        include:
+          - os: linux
+            environment: musl
+          - os: emscripten
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
-    - name: Apply patches for Android
-      run: ./patch.sh
-      if: always() && steps.checkout.outcome == 'success'
-      env:
-        PDFium_TARGET_OS: android
+      - name: Download PDFium artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: pdfium
+          path: pdfium
 
-    - name: Apply patches for iOS
-      run: ./patch.sh
-      if: always() && steps.checkout.outcome == 'success'
-      env:
-        PDFium_TARGET_OS: ios
+      - name: Apply patches
+        run: steps/03-patch.sh
+        env:
+          PDFium_TARGET_OS: ${{ matrix.os }}
+          PDFium_ENABLE_V8: ${{ matrix.v8 || 'false' }}
+          PDFium_TARGET_ENVIRONMENT: ${{ matrix.environment || '' }}
 
-    - name: Apply patches for Linux
-      run: ./patch.sh
-      if: always() && steps.checkout.outcome == 'success'
-      env:
-        PDFium_TARGET_OS: linux
-
-    - name: Apply patches for macOS
-      run: ./patch.sh
-      if: always() && steps.checkout.outcome == 'success'
-      env:
-        PDFium_TARGET_OS: macos
-
-    - name: Apply patches for WASM
-      run: ./patch.sh
-      if: always() && steps.checkout.outcome == 'success'
-      env:
-        PDFium_TARGET_OS: emscripten
-
-    - name: Apply patches for Windows
-      run: ./patch.sh
-      if: always() && steps.checkout.outcome == 'success'
-      env:
-        PDFium_TARGET_OS: win
-
-    - name: Apply patches for V8
-      run: ./patch.sh
-      if: always() && steps.checkout.outcome == 'success'
-      env:
-        PDFium_TARGET_OS: dummy
-        PDFium_ENABLE_V8: true
-
-    - name: Apply patches for musl
-      run: ./patch.sh
-      if: always() && steps.checkout.outcome == 'success'
-      env:
-        PDFium_TARGET_OS: linux
-        PDFium_TARGET_ENVIRONMENT: musl
+      - name: Print .rej files to build summary
+        if: failure()
+        run: |
+          {
+            echo "## Rejected patches";
+            echo "The following patches for the configuration ${{ matrix.os }} ${{ matrix.v8 && 'v8' || '' }} ${{ matrix.environment || '' }} were rejected:";
+            find pdfium -name '*.rej' -type f \
+              -printf '### `%P`\n```patch\n' \
+              -exec cat {} \; \
+              -printf '```\n' || \
+              echo 'No .rej files found';
+          } >> $GITHUB_STEP_SUMMARY
