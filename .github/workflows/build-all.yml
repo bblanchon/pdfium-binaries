@@ -599,7 +599,7 @@ jobs:
         run: mkdir -p nuget/include/pdfium && cp -r nuget/pdfium-win-x86/include/* nuget/include/pdfium/
       - name: Copy license file
         shell: bash
-        run: cp nuget/pdfium-win-x86/LICENSE nuget/include/LICENSE
+        run: cp nuget/pdfium-win-x86/LICENSE nuget/include/LICENSE.txt
       - name: Define properties
         shell: bash
         run: |
