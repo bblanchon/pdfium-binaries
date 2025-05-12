@@ -1,5 +1,6 @@
 /*.nupkg
 /nuget/pdfium-*/
+/nuget/include/
 /.env
 /.path
 /.gclient*

@@ -29,6 +29,12 @@
     <!-- the custom license file must be plain text or markdown -->
     <!-- https://learn.microsoft.com/en-us/nuget/reference/nuspec#license -->
     <file src="include/LICENSE.txt" target="LICENSE.txt" />
+
+    <file src="pdfium-ios-device-arm64/licenses/**/*" target="licenses" />
+    <file src="pdfium-ios-simulator-arm64/licenses/**/*" target="licenses" />
+    <file src="pdfium-ios-simulator-x64/licenses/**/*" target="licenses" />
+    <file src="pdfium-ios-catalyst-arm64/licenses/**/*" target="licenses" />
+    <file src="pdfium-ios-catalyst-x64/licenses/**/*" target="licenses" />
     
     <file src="bblanchon.PDFium.iOS.png" target="icon.png" />
     <file src="../README.md" target="README.md" />

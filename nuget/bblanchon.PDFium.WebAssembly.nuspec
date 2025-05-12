@@ -26,7 +26,9 @@
     <!-- the custom license file must be plain text or markdown -->
     <!-- https://learn.microsoft.com/en-us/nuget/reference/nuspec#license -->
     <file src="include/LICENSE.txt" target="LICENSE.txt" />
-    
+
+    <file src="pdfium-wasm/licenses/**/*" target="licenses" />
+
     <file src="bblanchon.PDFium.WebAssembly.png" target="icon.png" />
     <file src="../README.md" target="README.md" />
 
