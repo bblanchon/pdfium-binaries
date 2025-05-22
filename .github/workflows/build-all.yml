@@ -762,3 +762,8 @@ jobs:
           name: PDFium ${{ github.event.inputs.version }}
           tag: ${{ github.event.inputs.branch }}
           artifacts: "pdfium-*.tgz,pdfium-sha256sum.txt"
+      - name: Add checksums to the build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: pdfium-checksums
+          path: pdfium-sha256sum.txt
