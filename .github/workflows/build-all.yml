@@ -689,6 +689,9 @@ jobs:
 
   publish:
     name: Publish Release
+    outputs:
+      hashes: ${{ steps.hash.outputs.hashes }}
+      tagname: ${{ github.event.inputs.branch }}
     if: startsWith(github.event.inputs.branch, 'chromium/') && github.event.inputs.version && github.event.inputs.release == 'true'
     runs-on: ubuntu-latest
     needs:
@@ -752,7 +755,8 @@ jobs:
           END
           git -C "pdfium" log origin/${PREVIOUS_REV}.. --pretty=format:'* [%s](https://pdfium.googlesource.com/pdfium/+/%H)' >> RELEASE.md
       - name: Generate artifacts checksums
-        run: sha256sum pdfium-*.tgz > pdfium-sha256sum.txt
+        id: hash
+        run: echo "hashes=$(sha256sum pdfium-*.tgz | base64 -w0)" >> "$GITHUB_OUTPUT"
       - name: Publish Release
         uses: ncipollo/release-action@v1
         with:
@@ -761,9 +765,16 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           name: PDFium ${{ github.event.inputs.version }}
           tag: ${{ github.event.inputs.branch }}
-          artifacts: "pdfium-*.tgz,pdfium-sha256sum.txt"
-      - name: Add checksums to the build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: pdfium-checksums
-          path: pdfium-sha256sum.txt
+          artifacts: pdfium-*.tgz
+
+  provenance:
+    needs: [publish]
+    permissions:
+      actions: read # To read the workflow path.
+      id-token: write # To sign the provenance.
+      contents: write # To add assets to a release.
+    uses: slsa-framework/slsa-github-generator/.github/workflows/generator_generic_slsa3.yml@v2.1.0
+    with:
+      base64-subjects: ${{ needs.publish.outputs.hashes }}
+      upload-assets: true
+      upload-tag-name: ${{ needs.publish.outputs.tagname }}
