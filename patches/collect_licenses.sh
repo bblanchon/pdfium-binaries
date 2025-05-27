@@ -2,6 +2,7 @@
 
 SOURCE_DIR=${PDFium_SOURCE_DIR:-pdfium}
 BUILD_DIR=${PDFium_BUILD_DIR:-pdfium/out}
+TARGET_ENVIRONMENT=${PDFium_TARGET_ENVIRONMENT:-}
 OUTPUT_DIR=${1:?output directory is required}
 
 set -eu
@@ -85,3 +86,8 @@ while read -r LIBRARY; do
       ;;
   esac
 done <<< "$THIRD_PARTY_LIBRARIES"
+
+
+if [ "$TARGET_ENVIRONMENT" == "musl" ]; then
+  curl -s -o "$OUTPUT_DIR/musl.txt" https://git.musl-libc.org/cgit/musl/plain/COPYRIGHT
+fi
