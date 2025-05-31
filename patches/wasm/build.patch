@@ -1,21 +1,24 @@
 diff --git a/config/BUILDCONFIG.gn b/config/BUILDCONFIG.gn
-index 3f3ea354f..0c881c1fc 100644
+index 7831109..ae41e37 100644
 --- a/config/BUILDCONFIG.gn
 +++ b/config/BUILDCONFIG.gn
-@@ -278,6 +278,8 @@ if (target_os == "android") {
-   _default_toolchain = "//build/toolchain/aix:$target_cpu"
+@@ -280,10 +280,7 @@ if (target_os == "android") {
  } else if (target_os == "zos") {
    _default_toolchain = "//build/toolchain/zos:$target_cpu"
-+} else if (target_cpu == "wasm") {
+ } else if (target_os == "emscripten") {
+-  # Because it's too hard to remove all targets from //BUILD.gn that do not work with it.
+-  assert(
+-      false,
+-      "emscripten is not a supported target_os. It is available only as secondary toolchain.")
 +  _default_toolchain = "//build/toolchain/wasm:$target_cpu"
  } else {
    assert(false, "Unsupported target_os: $target_os")
  }
 diff --git a/config/compiler/BUILD.gn b/config/compiler/BUILD.gn
-index 273318ebf..d0bc3efa0 100644
+index 59942a3..fb6a067 100644
 --- a/config/compiler/BUILD.gn
 +++ b/config/compiler/BUILD.gn
-@@ -303,6 +303,8 @@ config("compiler") {
+@@ -306,6 +306,8 @@ config("compiler") {
      configs += [ "//build/config/aix:compiler" ]
    } else if (current_os == "zos") {
      configs += [ "//build/config/zos:compiler" ]
@@ -24,7 +27,7 @@ index 273318ebf..d0bc3efa0 100644
    }
  
    configs += [
-@@ -379,7 +381,7 @@ config("compiler") {
+@@ -393,7 +395,7 @@ config("compiler") {
        } else if (is_chromeos) {
          cflags += [ "-fstack-protector-strong" ]
        } else if ((is_posix && !is_nacl) || is_fuchsia) {
@@ -34,10 +37,10 @@ index 273318ebf..d0bc3efa0 100644
            cflags += [ "-fstack-protector" ]
          }
 diff --git a/toolchain/wasm/BUILD.gn b/toolchain/wasm/BUILD.gn
-index 38298f349..1e4ba36b8 100644
+index 4b4d65c..08612bf 100644
 --- a/toolchain/wasm/BUILD.gn
 +++ b/toolchain/wasm/BUILD.gn
-@@ -21,6 +21,9 @@ gcc_toolchain("wasm") {
+@@ -25,6 +25,9 @@ gcc_toolchain("wasm") {
    nm = cc
    ld = cxx
  
