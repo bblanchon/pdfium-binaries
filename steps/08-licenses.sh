@@ -1,13 +1,10 @@
-#!/usr/bin/env bash
+#!/bin/bash -eux
 
 SOURCE_DIR=${PDFium_SOURCE_DIR:-pdfium}
 BUILD_DIR=${PDFium_BUILD_DIR:-pdfium/out}
 TARGET_ENVIRONMENT=${PDFium_TARGET_ENVIRONMENT:-}
 ENABLE_V8=${PDFium_ENABLE_V8:-false}
-OUTPUT_DIR=${1:?output directory is required}
-
-set -eu
-
+OUTPUT_DIR="$PWD/staging/licenses"
 
 # Extract third-party library names and store in a variable
 THIRD_PARTY_LIBRARIES=$(sed -n 's/.*third_party\/\([a-z0-9_-]*\).*/\1/p' "$BUILD_DIR/build.ninja" | sort -u)

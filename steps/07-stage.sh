@@ -17,8 +17,6 @@ mkdir -p "$STAGING_LIB"
 
 sed "s/#VERSION#/${VERSION:-0.0.0.0}/" <"$PATCHES/PDFiumConfig.cmake" >"$STAGING/PDFiumConfig.cmake"
 
-. "$PATCHES/collect_licenses.sh" "$STAGING/licenses"
-
 cp LICENSE "$STAGING"
 cat >>"$STAGING/LICENSE" <<END
 

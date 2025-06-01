@@ -22,7 +22,7 @@ Arguments:
 
 Options:
   -b branch = Chromium branch (default=main)
-  -s 0-9    = Set start step (default=0)
+  -s 0-10   = Set start step (default=0)
   -d        = debug build
   -j        = enable v8"
   exit
@@ -124,5 +124,6 @@ export PATH
 [ $START_STEP -le 5 ] && . steps/05-configure.sh
 [ $START_STEP -le 6 ] && . steps/06-build.sh
 [ $START_STEP -le 7 ] && . steps/07-stage.sh
-[ $START_STEP -le 8 ] && . steps/08-test.sh
-[ $START_STEP -le 9 ] && . steps/09-pack.sh
+[ $START_STEP -le 8 ] && . steps/08-licenses.sh
+[ $START_STEP -le 9 ] && . steps/09-test.sh
+[ $START_STEP -le 10 ] && . steps/10-pack.sh

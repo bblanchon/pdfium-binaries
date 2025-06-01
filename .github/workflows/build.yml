@@ -110,11 +110,14 @@ jobs:
       - name: Stage
         run: steps/07-stage.sh
         shell: bash
+      - name: Collect licenses
+        run: steps/08-licenses.sh
+        shell: bash
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: ${{ steps.init.outputs.artifact }}
           path: staging/
       - name: Test
-        run: steps/08-test.sh
+        run: steps/09-test.sh
         shell: bash
