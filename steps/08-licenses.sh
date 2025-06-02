@@ -87,6 +87,7 @@ done <<< "$THIRD_PARTY_LIBRARIES"
 
 if [ "$ENABLE_V8" == "true" ]; then
   cp "$SOURCE_DIR/v8/LICENSE.v8" "$OUTPUT_DIR/v8.txt"
+  cp "$SOURCE_DIR/v8/LICENSE.fdlibm" "$OUTPUT_DIR/fdlibm.txt"
 fi
 
 if [ "$TARGET_ENVIRONMENT" == "musl" ]; then
