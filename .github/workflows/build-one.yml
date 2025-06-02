@@ -60,6 +60,7 @@ jobs:
   build:
     name: Build
     uses: ./.github/workflows/build.yml
+    secrets: inherit
     with:
       branch: ${{ github.event.inputs.branch }}
       version: ${{ github.event.inputs.version }}

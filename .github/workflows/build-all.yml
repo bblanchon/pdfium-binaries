@@ -363,6 +363,7 @@ jobs:
   linux_musl_arm64:
     name: Linux musl ARM64
     uses: ./.github/workflows/build.yml
+    secrets: inherit
     with:
       branch: ${{ github.event.inputs.branch }}
       version: ${{ github.event.inputs.version }}
@@ -375,6 +376,7 @@ jobs:
   linux_musl_x64:
     name: Linux musl x64
     uses: ./.github/workflows/build.yml
+    secrets: inherit
     with:
       branch: ${{ github.event.inputs.branch }}
       version: ${{ github.event.inputs.version }}
@@ -387,6 +389,7 @@ jobs:
   linux_musl_x86:
     name: Linux musl x86
     uses: ./.github/workflows/build.yml
+    secrets: inherit
     with:
       branch: ${{ github.event.inputs.branch }}
       version: ${{ github.event.inputs.version }}
