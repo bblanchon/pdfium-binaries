@@ -781,3 +781,4 @@ jobs:
       base64-subjects: ${{ needs.publish.outputs.hashes }}
       upload-assets: true
       upload-tag-name: ${{ needs.publish.outputs.tagname }}
+      provenance-name: pdfium-binaries.intoto.jsonl
