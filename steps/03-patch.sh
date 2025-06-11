@@ -4,6 +4,7 @@ PATCHES="$PWD/patches"
 SOURCE="${PDFium_SOURCE_DIR:-pdfium}"
 OS="${PDFium_TARGET_OS:?}"
 TARGET_ENVIRONMENT="${PDFium_TARGET_ENVIRONMENT:-}"
+ENABLE_V8=${PDFium_ENABLE_V8:-false}
 
 apply_patch() {
   local FILE="$1"
@@ -16,7 +17,7 @@ pushd "${SOURCE}"
 [ "$OS" != "emscripten" ] && apply_patch "$PATCHES/shared_library.patch"
 apply_patch "$PATCHES/public_headers.patch"
 
-[ "${PDFium_ENABLE_V8:-}" == "true" ] && apply_patch "$PATCHES/v8/pdfium.patch"
+[ "$ENABLE_V8" == "true" ] && apply_patch "$PATCHES/v8/pdfium.patch"
 
 case "$OS" in
   android)
@@ -25,17 +26,17 @@ case "$OS" in
 
   ios)
     apply_patch "$PATCHES/ios/pdfium.patch"
-    [ "${PDFium_ENABLE_V8:-}" == "true" ] && apply_patch "$PATCHES/ios/v8.patch" v8
+    [ "$ENABLE_V8" == "true" ] && apply_patch "$PATCHES/ios/v8.patch" v8
     ;;
 
   linux)
-    [ "${PDFium_ENABLE_V8:-}" == "true" ] && apply_patch "$PATCHES/linux/v8.patch" v8
+    [ "$ENABLE_V8" == "true" ] && apply_patch "$PATCHES/linux/v8.patch" v8
     ;;
 
   emscripten)
     apply_patch "$PATCHES/wasm/pdfium.patch"
     apply_patch "$PATCHES/wasm/build.patch" build
-    [ "${PDFium_ENABLE_V8:-}" == "true" ] && apply_patch "$PATCHES/wasm/skia.patch"
+    [ "$ENABLE_V8" == "true" ] && apply_patch "$PATCHES/wasm/skia.patch"
     mkdir -p "build/config/wasm"
     cp "$PATCHES/wasm/config.gn" "build/config/wasm/BUILD.gn"
     ;;
