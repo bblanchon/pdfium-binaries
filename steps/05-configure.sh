@@ -49,6 +49,12 @@ mkdir -p "$BUILD"
       echo 'pdf_is_complete_lib = true'
       echo 'is_clang = false'
       echo 'use_custom_libcxx = false'
+      if [ "$ENABLE_V8" == "true" ]; then
+        # Set a toolchain with the same bitness as the target CPU
+        echo "v8_snapshot_toolchain = \"//build/toolchain/linux:x86\""
+        # Don't try to build libc++ because it requires GCC 14+
+        echo 'use_custom_libcxx_for_host = false'
+      fi
       ;;
   esac
 
