@@ -36,7 +36,10 @@ case "$OS" in
   emscripten)
     apply_patch "$PATCHES/wasm/pdfium.patch"
     apply_patch "$PATCHES/wasm/build.patch" build
-    [ "$ENABLE_V8" == "true" ] && apply_patch "$PATCHES/wasm/skia.patch"
+    if [ "$ENABLE_V8" == "true" ]; then
+      apply_patch "$PATCHES/wasm/skia.patch"
+      apply_patch "$PATCHES/wasm/v8.patch" v8
+    fi
     mkdir -p "build/config/wasm"
     cp "$PATCHES/wasm/config.gn" "build/config/wasm/BUILD.gn"
     ;;
