@@ -1,6 +1,6 @@
 #!/bin/bash -eu
 
-OS_NAMES="android|ios|linux|mac|wasm|win"
+OS_NAMES="android|emscripten|ios|linux|mac|win"
 CPU_NAMES="arm|arm64|x64|x86|wasm"
 ENV_NAMES="catalyst|device|musl|simulator"
 OS_ENV_COMBINATIONS="linux musl|ios (catalyst|device|simulator)"
@@ -22,7 +22,7 @@ Arguments:
 
 Options:
   -b branch = Chromium branch (default=main)
-  -s 0-9    = Set start step (default=0)
+  -s 0-10   = Set start step (default=0)
   -d        = debug build
   -j        = enable v8"
   exit
@@ -91,6 +91,9 @@ then
     echo "OS $1 doesn't support environment $3"
     exit 1
   fi
+elif [[ $1 == 'ios' ]]; then
+  echo "You must specify environment for ios builds"
+  exit 1
 fi
 
 if [[ ! $START_STEP =~ ^($STEP_REGEX)$ ]]
@@ -121,5 +124,6 @@ export PATH
 [ $START_STEP -le 5 ] && . steps/05-configure.sh
 [ $START_STEP -le 6 ] && . steps/06-build.sh
 [ $START_STEP -le 7 ] && . steps/07-stage.sh
-[ $START_STEP -le 8 ] && . steps/08-test.sh
-[ $START_STEP -le 9 ] && . steps/09-pack.sh
+[ $START_STEP -le 8 ] && . steps/08-licenses.sh
+[ $START_STEP -le 9 ] && . steps/09-test.sh
+[ $START_STEP -le 10 ] && . steps/10-pack.sh

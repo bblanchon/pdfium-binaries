@@ -3,14 +3,14 @@
   <metadata>
     <id>bblanchon.PDFium.WebAssembly</id>
     <version>$version$</version>
-    <authors>Benoit Blanchon</authors>
-    <owners>Benoit Blanchon</owners>
+    <authors>Benoît Blanchon</authors>
+    <owners>Benoît Blanchon</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <license type="expression">Apache-2.0</license>
     <projectUrl>https://github.com/bblanchon/pdfium-binaries</projectUrl>
     <description>This package contains pre-compiled binaries of the PDFium library, an open-source library for PDF manipulation and rendering.</description>
     <releaseNotes>$releaseNotes$</releaseNotes>
-    <copyright>Copyright © Benoit Blanchon 2017-2024</copyright>
+    <copyright>Copyright © Benoît Blanchon 2017-2025</copyright>
     <tags>PDFium PDF binaries library native Chromium wasm webassembly</tags>
     <repository type="git" url="https://github.com/bblanchon/pdfium-binaries.git" branch="$branch$" commit="$commit$" />
     <icon>icon.png</icon>
@@ -18,6 +18,7 @@
     <readme>README.md</readme>
     <dependencies>
       <group targetFramework="native" />
+      <group targetFramework="netstandard1.0" />
     </dependencies>
   </metadata>
 
@@ -27,6 +28,7 @@
 
     <!-- https://learn.microsoft.com/en-us/nuget/reference/errors-and-warnings/nu5128 -->
     <file src="_._" target="lib/native/_._" />
+    <file src="_._" target="lib/netstandard1.0/_._" />
 
     <!-- include hearder and lib files for C++ projects -->
     <file src="bblanchon.PDFium.native.targets" target="build/native/bblanchon.PDFium.WebAssembly.targets" />

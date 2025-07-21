@@ -17,7 +17,12 @@ mkdir -p "$STAGING_LIB"
 
 sed "s/#VERSION#/${VERSION:-0.0.0.0}/" <"$PATCHES/PDFiumConfig.cmake" >"$STAGING/PDFiumConfig.cmake"
 
-cp "$SOURCE/LICENSES" "$STAGING/LICENSE"
+cp LICENSE "$STAGING"
+cat >>"$STAGING/LICENSE" <<END
+
+This package also includes third-party software. See the licenses/ directory for their respective licenses.
+END
+
 cp "$BUILD/args.gn" "$STAGING"
 cp -R "$SOURCE/public" "$STAGING/include"
 rm -f "$STAGING/include/DEPS"
@@ -33,7 +38,7 @@ case "$OS" in
     mv "$BUILD/libpdfium.dylib" "$STAGING_LIB"
     ;;
 
-  wasm)
+  emscripten)
     mv "$BUILD/pdfium.html" "$STAGING_LIB"
     mv "$BUILD/pdfium.js" "$STAGING_LIB"
     mv "$BUILD/pdfium.wasm" "$STAGING_LIB"

@@ -1,8 +1,8 @@
 diff --git a/fpdfsdk/fpdf_view.cpp b/fpdfsdk/fpdf_view.cpp
-index 6b0a1c161..7a8788676 100644
+index 58a42e289..5c97b7e4e 100644
 --- a/fpdfsdk/fpdf_view.cpp
 +++ b/fpdfsdk/fpdf_view.cpp
-@@ -57,6 +57,9 @@
+@@ -58,6 +58,9 @@
  
  #ifdef PDF_ENABLE_V8
  #include "fxjs/cfx_v8_array_buffer_allocator.h"
@@ -12,7 +12,7 @@ index 6b0a1c161..7a8788676 100644
  #endif
  
  #ifdef PDF_ENABLE_XFA
-@@ -117,6 +120,11 @@ namespace {
+@@ -118,6 +121,11 @@ namespace {
  
  bool g_bLibraryInitialized = false;
  
@@ -24,9 +24,9 @@ index 6b0a1c161..7a8788676 100644
  void SetRendererType(FPDF_RENDERER_TYPE public_type) {
    // Internal definition of renderer types must stay updated with respect to
    // the public definition, such that all public definitions can be mapped to
-@@ -229,6 +237,22 @@ FPDF_InitLibraryWithConfig(const FPDF_LIBRARY_CONFIG* config) {
-   if (g_bLibraryInitialized)
+@@ -237,6 +245,22 @@ FPDF_InitLibraryWithConfig(const FPDF_LIBRARY_CONFIG* config) {
      return;
+   }
  
 +#ifdef PDF_ENABLE_V8
 +  g_platform = v8::platform::NewDefaultPlatform().release();
@@ -47,7 +47,7 @@ index 6b0a1c161..7a8788676 100644
    FX_InitializeMemoryAllocators();
    CFX_Timer::InitializeGlobals();
    CFX_GEModule::Create(config ? config->m_pUserFontPaths : nullptr);
-@@ -242,14 +266,13 @@ FPDF_InitLibraryWithConfig(const FPDF_LIBRARY_CONFIG* config) {
+@@ -250,14 +274,12 @@ FPDF_InitLibraryWithConfig(const FPDF_LIBRARY_CONFIG* config) {
    CPDFXFA_ModuleInit();
  #endif  // PDF_ENABLE_XFA
  
@@ -58,17 +58,16 @@ index 6b0a1c161..7a8788676 100644
 +#if PDF_ENABLE_V8
 +  IJS_Runtime::Initialize(0, g_isolate, g_platform);
 +#endif  // PDF_ENABLE_V8
-+
-+  if (config && config->version >= 4)
-+    SetRendererType(config->m_RendererType);
  
--    if (config->version >= 4)
+-    if (config->version >= 4) {
 -      SetRendererType(config->m_RendererType);
--  }
+-    }
++  if (config && config->version >= 4) {
++    SetRendererType(config->m_RendererType);
+   }
    g_bLibraryInitialized = true;
  }
- 
-@@ -275,6 +298,19 @@ FPDF_EXPORT void FPDF_CALLCONV FPDF_DestroyLibrary() {
+@@ -285,6 +307,19 @@ FPDF_EXPORT void FPDF_CALLCONV FPDF_DestroyLibrary() {
    CFX_Timer::DestroyGlobals();
    FX_DestroyMemoryAllocators();
  

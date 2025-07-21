@@ -1,56 +1,52 @@
 diff --git a/config/BUILDCONFIG.gn b/config/BUILDCONFIG.gn
-index 894e82b45..abce54b59 100644
+index 7831109..ae41e37 100644
 --- a/config/BUILDCONFIG.gn
 +++ b/config/BUILDCONFIG.gn
-@@ -268,6 +268,8 @@ if (target_os == "android") {
-   _default_toolchain = "//build/toolchain/aix:$target_cpu"
+@@ -280,10 +280,7 @@ if (target_os == "android") {
  } else if (target_os == "zos") {
    _default_toolchain = "//build/toolchain/zos:$target_cpu"
-+} else if (target_cpu == "wasm") {
-+  _default_toolchain = "//build/toolchain/wasm:emscripten"
+ } else if (target_os == "emscripten") {
+-  # Because it's too hard to remove all targets from //BUILD.gn that do not work with it.
+-  assert(
+-      false,
+-      "emscripten is not a supported target_os. It is available only as secondary toolchain.")
++  _default_toolchain = "//build/toolchain/wasm:$target_cpu"
  } else {
    assert(false, "Unsupported target_os: $target_os")
  }
-@@ -306,6 +308,7 @@ is_linux = current_os == "linux"
- is_mac = current_os == "mac"
- is_nacl = current_os == "nacl"
- is_win = current_os == "win" || current_os == "winuwp"
-+is_wasm = current_os == "wasm"
- 
- is_apple = is_ios || is_mac
- is_posix = !is_win && !is_fuchsia
 diff --git a/config/compiler/BUILD.gn b/config/compiler/BUILD.gn
-index 3c7b4d82d..da0d72cc1 100644
+index 59942a3..fb6a067 100644
 --- a/config/compiler/BUILD.gn
 +++ b/config/compiler/BUILD.gn
-@@ -318,6 +318,8 @@ config("compiler") {
+@@ -306,6 +306,8 @@ config("compiler") {
      configs += [ "//build/config/aix:compiler" ]
    } else if (current_os == "zos") {
      configs += [ "//build/config/zos:compiler" ]
-+  } else if (current_os == "wasm") {
++  } else if (current_os == "emscripten") {
 +    configs += [ "//build/config/wasm:compiler" ]
    }
  
    configs += [
-@@ -380,7 +382,7 @@ config("compiler") {
-           cflags += [ "-fstack-protector" ]
-         }
-       } else if ((is_posix && !is_chromeos && !is_nacl) || is_fuchsia) {
+@@ -393,7 +395,7 @@ config("compiler") {
+       } else if (is_chromeos) {
+         cflags += [ "-fstack-protector-strong" ]
+       } else if ((is_posix && !is_nacl) || is_fuchsia) {
 -        if (current_os != "aix") {
-+        if (current_os != "aix" && current_os != "wasm") {
++        if (current_os != "aix" && current_os != "emscripten") {
            # Not available on aix.
            cflags += [ "-fstack-protector" ]
          }
-diff --git a/toolchain/toolchain.gni b/toolchain/toolchain.gni
-index 14aa5f76d..b4af1af50 100644
---- a/toolchain/toolchain.gni
-+++ b/toolchain/toolchain.gni
-@@ -58,6 +58,8 @@ if (is_apple) {
-   shlib_extension = ".so"
- } else if (is_win) {
-   shlib_extension = ".dll"
-+} if (is_wasm) {
-+  shlib_extension = ".so"
- } else {
-   assert(false, "Platform not supported")
- }
+diff --git a/toolchain/wasm/BUILD.gn b/toolchain/wasm/BUILD.gn
+index 4b4d65c..08612bf 100644
+--- a/toolchain/wasm/BUILD.gn
++++ b/toolchain/wasm/BUILD.gn
+@@ -25,6 +25,9 @@ gcc_toolchain("wasm") {
+   nm = cc
+   ld = cxx
+ 
++  extra_cflags = "-Wno-unknown-warning-option"
++  extra_cxxflags = "-Wno-unknown-warning-option"
++
+   toolchain_args = {
+     current_cpu = "wasm"
+     current_os = "emscripten"

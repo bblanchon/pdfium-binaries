@@ -24,7 +24,7 @@ on:
         required: false
         default: false
       target_os:
-        description: Target OS (android|ios|linux|mac|wasm|win)
+        description: Target OS (android|emscripten|ios|linux|mac|win)
         type: string
         required: true
       target_cpu:
@@ -40,7 +40,7 @@ on:
         description: Emscripten SDK
         type: string
         required: false
-        default: 3.1.34
+        default: 3.1.72
     outputs:
       artifact:
         description: "The name of the artifact"
@@ -59,7 +59,7 @@ jobs:
             runner: ubuntu-20.04
     outputs:
       artifact: ${{ steps.init.outputs.artifact }}
-    runs-on: ${{ (inputs.target_os == 'ios' || inputs.target_os == 'mac') && 'macos-latest' || inputs.target_os == 'win' && 'windows-2022' || 'ubuntu-22.04' }}
+    runs-on: ${{ (inputs.target_os == 'ios' || inputs.target_os == 'mac') && 'macos-latest' || inputs.target_os == 'win' && 'windows-2022' || 'ubuntu-24.04' }}
     steps:
       - name: Initialize
         id: init
@@ -67,9 +67,9 @@ jobs:
         run: |
           ARTIFACT="pdfium"
           [ "${{inputs.enable_v8}}" == "true" ] && ARTIFACT="$ARTIFACT-v8"
-          ARTIFACT="$ARTIFACT-${{inputs.target_os}}"
+          [ "${{inputs.target_os}}" != "emscripten" ] && ARTIFACT="$ARTIFACT-${{inputs.target_os}}"
           [ "${{inputs.target_environment}}" != "" ] && ARTIFACT="$ARTIFACT-${{inputs.target_environment}}"
-          [ "${{inputs.target_os}}" != "${{inputs.target_cpu}}" ] && ARTIFACT="$ARTIFACT-${{inputs.target_cpu}}"
+          ARTIFACT="$ARTIFACT-${{inputs.target_cpu}}"
           [ "${{inputs.is_debug}}" == "true" ] && ARTIFACT="$ARTIFACT-debug"
           echo "artifact=$ARTIFACT" >> $GITHUB_OUTPUT
       - name: Checkout this repo
@@ -119,11 +119,14 @@ jobs:
       - name: Stage
         run: steps/07-stage.sh
         shell: bash
+      - name: Collect licenses
+        run: steps/08-licenses.sh
+        shell: bash
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: ${{ steps.init.outputs.artifact }}
           path: staging/
       - name: Test
-        run: steps/08-test.sh
+        run: steps/09-test.sh
         shell: bash
