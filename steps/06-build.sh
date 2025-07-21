@@ -1,6 +1,5 @@
 #!/bin/bash -eux
 
-IS_DEBUG=${PDFium_IS_DEBUG:-false}
 SOURCE=${PDFium_SOURCE_DIR:-pdfium}
 BUILD_DIR=${PDFium_BUILD_DIR:-$SOURCE/out}
 TARGET_CPU=${PDFium_TARGET_CPU:?}
