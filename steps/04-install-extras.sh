@@ -4,6 +4,7 @@ PATH_FILE=${GITHUB_PATH:-$PWD/.path}
 SOURCE="${PDFium_SOURCE_DIR:-pdfium}"
 OS="${PDFium_TARGET_OS:?}"
 CPU="${PDFium_TARGET_CPU:?}"
+PATCHES="$PWD/patches"
 
 pushd "$SOURCE"
 
@@ -31,6 +32,14 @@ case "$OS" in
     ./emsdk activate ${EMSDK_VERSION:-latest}
     echo "$PWD/upstream/emscripten" >> "$PATH_FILE"
     echo "$PWD/upstream/bin" >> "$PATH_FILE"
+
+    if [ "$CPU" == "wasm-standalone" ]; then
+      pushd "$PWD/upstream/emscripten"
+      patch -p1 --forward < "$PATCHES/wasm/emscripten.patch" || true
+      rm -Rf cache
+      popd
+    fi
+
     popd
     ;;
 esac
