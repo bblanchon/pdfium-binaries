@@ -48,15 +48,6 @@ on:
 
 jobs:
   build:
-    name: Build
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - artifact: pdfium-wasm
-            target_os: wasm
-            target_cpu: wasm
-            runner: ubuntu-20.04
     outputs:
       artifact: ${{ steps.init.outputs.artifact }}
     runs-on: ${{ (inputs.target_os == 'ios' || inputs.target_os == 'mac') && 'macos-latest' || inputs.target_os == 'win' && 'windows-2022' || 'ubuntu-24.04' }}

@@ -4,7 +4,6 @@ IS_DEBUG=${PDFium_IS_DEBUG:-false}
 OS=${PDFium_TARGET_OS:?}
 CPU=${PDFium_TARGET_CPU:?}
 VERSION=${PDFium_VERSION:-}
-
 PATCHES="$PWD/patches"
 
 SOURCE=${PDFium_SOURCE_DIR:-pdfium}
