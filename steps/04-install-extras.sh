@@ -28,8 +28,8 @@ case "$OS" in
       git clone https://github.com/emscripten-core/emsdk.git
     fi
     cd emsdk
-    ./emsdk install ${EMSDK_VERSION:-latest}
-    ./emsdk activate ${EMSDK_VERSION:-latest}
+    ./emsdk install ${EMSDK_VERSION:-4.0.11}
+    ./emsdk activate ${EMSDK_VERSION:-4.0.11}
     echo "$PWD/upstream/emscripten" >> "$PATH_FILE"
     echo "$PWD/upstream/bin" >> "$PATH_FILE"
 
