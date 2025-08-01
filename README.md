@@ -287,7 +287,7 @@ The following projects use (or recommend using) our PDFium builds:
   </thead>
   <tbody>
     <tr>
-      <td><img src="https://avatars.githubusercontent.com/u/5462433?v=4" width="48" height="48" alt="Benoit Blanchon"></td>
+      <td><img src="https://avatars.githubusercontent.com/u/5462433?v=4" width="48" height="48" alt="Benoît Blanchon"></td>
       <td><a href="https://github.com/bblanchon"><code>@bblanchon</code></a></td>
       <td>Main contributor</td>
     </tr>
