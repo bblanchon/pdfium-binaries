@@ -14,7 +14,11 @@ mkdir -p "$BUILD"
   echo "is_debug = $IS_DEBUG"
   echo "pdf_is_standalone = true"
   echo "pdf_use_partition_alloc = false"
-  echo "target_cpu = \"$TARGET_CPU\""
+  if [ "$TARGET_CPU" == "wasm-standalone" ]; then
+    echo "target_cpu = \"wasm\""
+  else
+    echo "target_cpu = \"$TARGET_CPU\""
+  fi
   echo "target_os = \"$OS\""
   echo "pdf_enable_v8 = $ENABLE_V8"
   echo "pdf_enable_xfa = $ENABLE_V8"
