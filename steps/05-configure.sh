@@ -42,13 +42,19 @@ mkdir -p "$BUILD"
       echo "clang_use_chrome_plugins = false"
       ;;
     mac)
-      echo 'mac_deployment_target = "10.13.0"'
+      echo 'mac_deployment_target = "11.0.0"'
       echo "clang_use_chrome_plugins = false"
       ;;
     emscripten)
       echo 'pdf_is_complete_lib = true'
       echo 'is_clang = false'
       echo 'use_custom_libcxx = false'
+      if [ "$ENABLE_V8" == "true" ]; then
+        # Set a toolchain with the same bitness as the target CPU
+        echo "v8_snapshot_toolchain = \"//build/toolchain/linux:x86\""
+        # Don't try to build libc++ because it requires GCC 14+
+        echo 'use_custom_libcxx_for_host = false'
+      fi
       ;;
   esac
 

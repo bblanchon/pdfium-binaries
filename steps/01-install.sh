@@ -6,6 +6,7 @@ TARGET_ENVIRONMENT=${PDFium_TARGET_ENVIRONMENT:-}
 TARGET_CPU=${PDFium_TARGET_CPU:?}
 CURRENT_CPU=${PDFium_CURRENT_CPU:-x64}
 MUSL_URL=${MUSL_URL:-https://musl.cc}
+ENABLE_V8=${PDFium_ENABLE_V8:-false}
 
 DepotTools_URL='https://chromium.googlesource.com/chromium/tools/depot_tools.git'
 DepotTools_DIR="$PWD/depot_tools"
@@ -101,4 +102,11 @@ case "$TARGET_OS" in
     # undefined symbol: be_memory_inline_jit_restrict_rwx_to_rx_with_witness_impl
     sudo xcode-select -s "/Applications/Xcode_15.0.1.app"
     ;;
+
+  emscripten)
+    if [ "$ENABLE_V8" == "true" ]; then
+      sudo apt-get update
+      # We need to install the snapshot toolchain for x86
+      sudo apt-get install -y g++-multilib
+    fi
 esac

@@ -1,8 +1,8 @@
 diff --git a/config/BUILDCONFIG.gn b/config/BUILDCONFIG.gn
-index 7831109..ae41e37 100644
+index 147226d..92ef627 100644
 --- a/config/BUILDCONFIG.gn
 +++ b/config/BUILDCONFIG.gn
-@@ -280,10 +280,7 @@ if (target_os == "android") {
+@@ -287,10 +287,7 @@ if (target_os == "android") {
  } else if (target_os == "zos") {
    _default_toolchain = "//build/toolchain/zos:$target_cpu"
  } else if (target_os == "emscripten") {
@@ -15,10 +15,10 @@ index 7831109..ae41e37 100644
    assert(false, "Unsupported target_os: $target_os")
  }
 diff --git a/config/compiler/BUILD.gn b/config/compiler/BUILD.gn
-index 59942a3..fb6a067 100644
+index 5103543..6bf11a8 100644
 --- a/config/compiler/BUILD.gn
 +++ b/config/compiler/BUILD.gn
-@@ -306,6 +306,8 @@ config("compiler") {
+@@ -309,6 +309,8 @@ config("compiler") {
      configs += [ "//build/config/aix:compiler" ]
    } else if (current_os == "zos") {
      configs += [ "//build/config/zos:compiler" ]
@@ -27,10 +27,10 @@ index 59942a3..fb6a067 100644
    }
  
    configs += [
-@@ -393,7 +395,7 @@ config("compiler") {
+@@ -395,7 +397,7 @@ config("compiler") {
        } else if (is_chromeos) {
          cflags += [ "-fstack-protector-strong" ]
-       } else if ((is_posix && !is_nacl) || is_fuchsia) {
+       } else if (is_posix || is_fuchsia) {
 -        if (current_os != "aix") {
 +        if (current_os != "aix" && current_os != "emscripten") {
            # Not available on aix.
