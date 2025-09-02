@@ -763,22 +763,9 @@ jobs:
       - name: Publish Release
         uses: ncipollo/release-action@v1
         with:
-          allowUpdates: true
+          immutableCreate: true
           bodyFile: RELEASE.md
           token: ${{ secrets.GITHUB_TOKEN }}
           name: PDFium ${{ github.event.inputs.version }}
           tag: ${{ github.event.inputs.branch }}
           artifacts: pdfium-*.tgz
-
-  provenance:
-    needs: [publish]
-    permissions:
-      actions: read # To read the workflow path.
-      id-token: write # To sign the provenance.
-      contents: write # To add assets to a release.
-    uses: slsa-framework/slsa-github-generator/.github/workflows/generator_generic_slsa3.yml@v2.1.0
-    with:
-      base64-subjects: ${{ needs.publish.outputs.hashes }}
-      upload-assets: true
-      upload-tag-name: ${{ needs.publish.outputs.tagname }}
-      provenance-name: pdfium-binaries.intoto.jsonl
