@@ -603,12 +603,16 @@ jobs:
       - name: Define properties
         shell: bash
         run: |
-          VERSION="${{ github.event.inputs.version || '0.0.0.0' }}"
+          VERSION="$VERSION"
           BRANCH="${GITHUB_REF#refs/heads/}"
           COMMIT="${GITHUB_SHA}"
           RELEASE_NOTES="${{github.server_url}}/${{github.repository}}/releases"
-          ${{ github.event.inputs.release }} && RELEASE_NOTES+="/tag/${{ github.event.inputs.branch }}"
+          $RELEASE && RELEASE_NOTES+="/tag/$BRANCH"
           echo "NUSPEC_PROPERTIES=version=$VERSION;branch=$BRANCH;commit=$COMMIT;releaseNotes=$RELEASE_NOTES" >> "$GITHUB_ENV"
+        env:
+          VERSION: ${{ github.event.inputs.version || '0.0.0.0' }}
+          RELEASE: ${{ github.event.inputs.release }}
+          BRANCH: ${{ github.event.inputs.branch }}
       - name: Pack
         shell: bash
         run: |
@@ -651,7 +655,7 @@ jobs:
 
           PLATFORM=\$1
           SOURCE_DIR=\$2
-          VERSION="${{ github.event.inputs.version }}"
+          VERSION="$VERSION"
 
           # rename "include/" into "include/pdfium/"
           shopt -s extglob
@@ -661,6 +665,8 @@ jobs:
           python conda/build.py pdfium-binaries \$PLATFORM \$VERSION --about-file conda/about.json --source-dir \$SOURCE_DIR --output-dir conda/out
           END
           chmod +x conda-build.sh
+        env:
+          VERSION: ${{ github.event.inputs.version }}
       - name: Build for linux-64
         run: ./conda-build.sh linux-64 pdfium-linux-x64
       - name: Build for linux-aarch64
@@ -745,18 +751,22 @@ jobs:
             echo "::endgroup::"
           done
       - name: Write release body
-        run: echo 'This version was built with branch `${{ github.event.inputs.branch }}` of PDFium' > RELEASE.md
+        run: echo "This version was built with branch `$BRANCH` of PDFium" > RELEASE.md
+        env:
+          BRANCH: ${{ github.event.inputs.branch }}
       - name: Get changes
         continue-on-error: true
         run: |
-          CURRENT_REV=${{ github.event.inputs.branch }}
+          CURRENT_REV=$BRANCH
           PREVIOUS_REV=$(curl --silent "https://api.github.com/repos/${{ github.repository }}/releases/latest" | jq -r ".tag_name")
-          git clone -b "${{ github.event.inputs.branch }}" https://pdfium.googlesource.com/pdfium.git
+          git clone -b "$BRANCH" https://pdfium.googlesource.com/pdfium.git
           cat <<END >> RELEASE.md
           ### Changes
           Commits between \`$PREVIOUS_REV\` and \`$CURRENT_REV\`:
           END
           git -C "pdfium" log origin/${PREVIOUS_REV}.. --pretty=format:'* [%s](https://pdfium.googlesource.com/pdfium/+/%H)' >> RELEASE.md
+        env:
+          BRANCH: ${{ github.event.inputs.branch }}
       - name: Generate artifacts checksums
         id: hash
         run: echo "hashes=$(sha256sum pdfium-*.tgz | base64 -w0)" >> "$GITHUB_OUTPUT"

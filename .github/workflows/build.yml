@@ -51,34 +51,32 @@ jobs:
     outputs:
       artifact: ${{ steps.init.outputs.artifact }}
     runs-on: ${{ (inputs.target_os == 'ios' || inputs.target_os == 'mac') && 'macos-14' || inputs.target_os == 'win' && 'windows-2022' || 'ubuntu-24.04' }}
+    env:
+      PDFium_BRANCH: ${{ inputs.branch }}
+      PDFium_IS_DEBUG: ${{ inputs.is_debug }}
+      PDFium_TARGET_CPU: ${{ inputs.target_cpu }}
+      PDFium_TARGET_OS: ${{ inputs.target_os }}
+      PDFium_TARGET_ENVIRONMENT: ${{ inputs.target_environment }}
+      PDFium_ENABLE_V8: ${{ inputs.enable_v8 }}
+      PDFium_VERSION: ${{ inputs.version }}
+      EMSDK_VERSION: ${{ inputs.emsdk_version }}
+      MUSL_URL: ${{ secrets.MUSL_URL }}
     steps:
       - name: Initialize
         id: init
         shell: bash
         run: |
           ARTIFACT="pdfium"
-          [ "${{inputs.enable_v8}}" == "true" ] && ARTIFACT="$ARTIFACT-v8"
-          [ "${{inputs.target_os}}" != "emscripten" ] && ARTIFACT="$ARTIFACT-${{inputs.target_os}}"
-          [ "${{inputs.target_environment}}" != "" ] && ARTIFACT="$ARTIFACT-${{inputs.target_environment}}"
-          ARTIFACT="$ARTIFACT-${{inputs.target_cpu}}"
+          [ "$PDFium_ENABLE_V8" == "true" ] && ARTIFACT="$ARTIFACT-v8"
+          [ "$PDFium_TARGET_OS" != "emscripten" ] && ARTIFACT="$ARTIFACT-$PDFium_TARGET_OS"
+          [ "$PDFium_TARGET_ENVIRONMENT" != "" ] && ARTIFACT="$ARTIFACT-$PDFium_TARGET_ENVIRONMENT"
+          ARTIFACT="$ARTIFACT-$PDFium_TARGET_CPU"
           [ "${{inputs.is_debug}}" == "true" ] && ARTIFACT="$ARTIFACT-debug"
           echo "artifact=$ARTIFACT" >> $GITHUB_OUTPUT
       - name: Checkout this repo
         uses: actions/checkout@v4
       - name: Set environment variables
-        run: |
-          cat >>$GITHUB_ENV <<END
-          PDFium_BRANCH=${{ inputs.branch }}
-          PDFium_IS_DEBUG=${{ inputs.is_debug }}
-          PDFium_TARGET_CPU=${{ inputs.target_cpu }}
-          PDFium_TARGET_OS=${{ inputs.target_os }}
-          PDFium_TARGET_ENVIRONMENT=${{ inputs.target_environment }}
-          PDFium_ENABLE_V8=${{ inputs.enable_v8 }}
-          PDFium_VERSION=${{ inputs.version }}
-          EMSDK_VERSION=${{ inputs.emsdk_version }}
-          MUSL_URL=${{ secrets.MUSL_URL }}
-          END
-          steps/00-environment.sh
+        run: steps/00-environment.sh
         shell: bash
       - name: Install (1/2)
         run: steps/01-install.sh
