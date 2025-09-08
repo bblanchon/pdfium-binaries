@@ -746,6 +746,8 @@ jobs:
       - win_x86_v8
     permissions:
       contents: write # to create releases
+      id-token: write # to attest build provenance
+      attestations: write # to attest build provenance
     steps:
       - name: Download artifacts
         uses: actions/download-artifact@v4
@@ -785,3 +787,7 @@ jobs:
           name: PDFium ${{ github.event.inputs.version }}
           tag: ${{ github.event.inputs.branch }}
           artifacts: pdfium-*.tgz
+      - name: Attest build provenance
+        uses: actions/attest-build-provenance@v3
+        with:
+          subject-path: pdfium-*.tgz
