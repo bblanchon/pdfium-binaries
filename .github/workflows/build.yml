@@ -49,6 +49,8 @@ on:
 permissions:
   contents: read
   actions: write
+  id-token: write
+  attestations: write
 
 jobs:
   build:
@@ -116,10 +118,16 @@ jobs:
         run: steps/08-licenses.sh
         shell: bash
       - name: Upload artifact
+        id: upload
         uses: actions/upload-artifact@v4
         with:
           name: ${{ steps.init.outputs.artifact }}
           path: staging/
+      - name: Attest build provenance
+        uses: actions/attest-build-provenance@v3
+        with:
+          subject-name: ${{ steps.init.outputs.artifact }}.zip
+          subject-digest: sha256:${{ steps.upload.outputs.artifact-digest }}
       - name: Test
         run: steps/09-test.sh
         shell: bash
