@@ -1,5 +1,9 @@
 name: Build all
 
+permissions:
+  contents: read
+  actions: write # to upload artifacts
+
 on:
   workflow_dispatch:
     inputs:
@@ -740,6 +744,8 @@ jobs:
       - win_x64_v8
       - win_x86
       - win_x86_v8
+    permissions:
+      contents: write # to create releases
     steps:
       - name: Download artifacts
         uses: actions/download-artifact@v4

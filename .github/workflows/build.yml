@@ -46,6 +46,10 @@ on:
         description: "The name of the artifact"
         value: ${{ jobs.build.outputs.artifact }}
 
+permissions:
+  contents: read
+  actions: write
+
 jobs:
   build:
     outputs:
