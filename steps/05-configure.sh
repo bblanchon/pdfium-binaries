@@ -29,7 +29,7 @@ mkdir -p "$BUILD"
   case "$OS" in
     android)
       echo "clang_use_chrome_plugins = false"
-      echo "default_min_sdk_version = 21"
+      echo "default_min_sdk_version = 23"
       ;;
     ios)
       [ -n "$TARGET_ENVIRONMENT" ] && echo "target_environment = \"$TARGET_ENVIRONMENT\""
