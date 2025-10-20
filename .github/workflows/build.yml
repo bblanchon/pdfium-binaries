@@ -54,7 +54,7 @@ jobs:
   build:
     outputs:
       artifact: ${{ steps.init.outputs.artifact }}
-    runs-on: ${{ (inputs.target_os == 'ios' || inputs.target_os == 'mac') && 'macos-14' || inputs.target_os == 'win' && 'windows-2022' || 'ubuntu-24.04' }}
+    runs-on: ${{ (inputs.target_os == 'ios' || inputs.target_os == 'mac') && 'macos-15' || inputs.target_os == 'win' && 'windows-2022' || 'ubuntu-24.04' }}
     env:
       PDFium_BRANCH: ${{ inputs.branch }}
       PDFium_IS_DEBUG: ${{ inputs.is_debug }}

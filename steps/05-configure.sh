@@ -42,7 +42,6 @@ mkdir -p "$BUILD"
       echo "clang_use_chrome_plugins = false"
       ;;
     mac)
-      echo 'mac_deployment_target = "11.0.0"'
       echo "clang_use_chrome_plugins = false"
       ;;
     emscripten)
