@@ -29,6 +29,10 @@ case "$OS" in
     [ "$ENABLE_V8" == "true" ] && apply_patch "$PATCHES/ios/v8.patch" v8
     ;;
 
+  mac)
+    apply_patch "$PATCHES/mac/build.patch" build
+    ;;
+
   linux)
     [ "$ENABLE_V8" == "true" ] && apply_patch "$PATCHES/linux/v8.patch" v8
     ;;
