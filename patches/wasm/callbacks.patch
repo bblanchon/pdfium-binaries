@@ -1,0 +1,215 @@
+diff --git a/fpdfsdk/BUILD.gn b/fpdfsdk/BUILD.gn
+index b97d88141..ec98cbb38 100644
+--- a/fpdfsdk/BUILD.gn
++++ b/fpdfsdk/BUILD.gn
+@@ -59,6 +59,7 @@ source_set("fpdfsdk") {
+     "fpdf_thumbnail.cpp",
+     "fpdf_transformpage.cpp",
+     "fpdf_view.cpp",
++    "fpdf_emscripten.c",
+   ]
+ 
+   configs += [
+diff --git a/fpdfsdk/fpdf_emscripten.c b/fpdfsdk/fpdf_emscripten.c
+new file mode 100644
+index 000000000..c2779b55b
+--- /dev/null
++++ b/fpdfsdk/fpdf_emscripten.c
+@@ -0,0 +1,196 @@
++#include <emscripten.h>
++#include <stdlib.h>
++#include <stdio.h>
++#include "public/fpdfview.h"
++#include "public/fpdf_save.h"
++#include "public/fpdf_dataavail.h"
++#include "public/fpdf_ext.h"
++#include "public/fpdf_formfill.h"
++#include "public/fpdf_progressive.h"
++
++extern int FPDF_FILEACCESS_CB(void* param, unsigned long position, unsigned char* pBuf, unsigned long size);
++
++EMSCRIPTEN_KEEPALIVE
++FPDF_FILEACCESS* FPDF_FILEACCESS_Create(unsigned long m_FileLen, void* m_Param) {
++  FPDF_FILEACCESS* access = malloc(sizeof(FPDF_FILEACCESS));
++  access->m_FileLen = m_FileLen;
++  access->m_Param = m_Param;
++  access->m_GetBlock = FPDF_FILEACCESS_CB;
++  return access;
++}
++
++EMSCRIPTEN_KEEPALIVE
++int FPDF_FILEACCESS_Size() {
++  return sizeof(FPDF_FILEACCESS);
++}
++
++extern int FPDF_FILEWRITE_CB(FPDF_FILEWRITE* pThis, const void* pData, unsigned long size);
++
++EMSCRIPTEN_KEEPALIVE
++FPDF_FILEWRITE* FPDF_FILEWRITE_Create() {
++  FPDF_FILEWRITE* writer = malloc(sizeof(FPDF_FILEWRITE));
++  writer->version = 1;
++  writer->WriteBlock = FPDF_FILEWRITE_CB;
++  return writer;
++}
++
++EMSCRIPTEN_KEEPALIVE
++int FPDF_FILEWRITE_Size() {
++  return sizeof(FPDF_FILEWRITE);
++}
++
++extern int FX_FILEAVAIL_IS_DATA_AVAILABLE_CB(struct _FX_FILEAVAIL *me, size_t offset, size_t size);
++
++EMSCRIPTEN_KEEPALIVE
++FX_FILEAVAIL* FX_FILEAVAIL_Create() {
++  FX_FILEAVAIL* fileAvail = malloc(sizeof(FX_FILEAVAIL));
++  fileAvail->IsDataAvail = FX_FILEAVAIL_IS_DATA_AVAILABLE_CB;
++  return fileAvail;
++}
++
++EMSCRIPTEN_KEEPALIVE
++int FX_FILEAVAIL_Size() {
++  return sizeof(FX_FILEAVAIL);
++}
++
++extern void FX_DOWNLOADHINTS_ADD_SEGMENT_CB(struct _FX_DOWNLOADHINTS *me, size_t offset, size_t size);
++
++EMSCRIPTEN_KEEPALIVE
++FX_DOWNLOADHINTS* FX_DOWNLOADHINTS_Create() {
++  FX_DOWNLOADHINTS* fileDownloadHints = malloc(sizeof(FX_DOWNLOADHINTS));
++  fileDownloadHints->AddSegment = FX_DOWNLOADHINTS_ADD_SEGMENT_CB;
++  return fileDownloadHints;
++}
++
++EMSCRIPTEN_KEEPALIVE
++int FX_DOWNLOADHINTS_Size() {
++  return sizeof(FX_DOWNLOADHINTS);
++}
++
++extern void UNSUPPORT_INFO_HANDLER_CB(struct _UNSUPPORT_INFO *pThis, int nType);
++
++EMSCRIPTEN_KEEPALIVE
++UNSUPPORT_INFO* UNSUPPORT_INFO_Create() {
++  UNSUPPORT_INFO* unsupportInfo = malloc(sizeof(UNSUPPORT_INFO));
++  unsupportInfo->version = 1;
++  unsupportInfo->FSDK_UnSupport_Handler = UNSUPPORT_INFO_HANDLER_CB;
++  return unsupportInfo;
++}
++
++EMSCRIPTEN_KEEPALIVE
++int UNSUPPORT_INFO_Size() {
++  return sizeof(UNSUPPORT_INFO);
++}
++
++extern time_t FSDK_SetTimeFunction_CB();
++
++EMSCRIPTEN_KEEPALIVE
++void FSDK_SetTimeFunction_SET_CB() {
++  FSDK_SetTimeFunction(&FSDK_SetTimeFunction_CB);
++}
++
++typedef struct PdfiumLocalTime {
++  int tm_sec;
++  int tm_min;
++  int tm_hour;
++  int tm_mday;
++  int tm_mon;
++  int tm_year;
++  int tm_wday;
++  int tm_yday;
++  int tm_isdst;
++} PdfiumLocalTime;
++
++typedef const time_t ctime_t;
++extern PdfiumLocalTime* FSDK_SetLocaltimeFunction_CB(ctime_t *curTime);
++
++static inline struct tm* setLocaltimeFunction_INLINE_CB(const time_t *curTime) {
++  // Initialize a tm struct.
++  struct tm * local_time = localtime(curTime);
++
++  // For some reason I could not get the tm struct available in Go.
++  // So we have to do it like this.
++  PdfiumLocalTime* goLocalTime = FSDK_SetLocaltimeFunction_CB(curTime);
++
++  // Overwrite the tm struct values with the custom values.
++  local_time->tm_sec = goLocalTime->tm_sec;
++  local_time->tm_min = goLocalTime->tm_min;
++  local_time->tm_hour = goLocalTime->tm_hour;
++  local_time->tm_mday = goLocalTime->tm_mday;
++  local_time->tm_mon = goLocalTime->tm_mon;
++  local_time->tm_year = goLocalTime->tm_year;
++  local_time->tm_wday = goLocalTime->tm_wday;
++  local_time->tm_yday = goLocalTime->tm_yday;
++  local_time->tm_isdst = goLocalTime->tm_isdst;
++
++  return local_time;
++}
++
++EMSCRIPTEN_KEEPALIVE
++void FSDK_SetLocaltimeFunction_SET_CB() {
++  FSDK_SetLocaltimeFunction(&setLocaltimeFunction_INLINE_CB);
++}
++
++extern void FPDF_FORMFILLINFO_Release_CB(struct _FPDF_FORMFILLINFO *this);
++extern void FPDF_FORMFILLINFO_FFI_Invalidate_CB(struct _FPDF_FORMFILLINFO *this, FPDF_PAGE page, double left, double top, double right, double bottom);
++extern void FPDF_FORMFILLINFO_FFI_OutputSelectedRect_CB(struct _FPDF_FORMFILLINFO *this, FPDF_PAGE page, double left, double top, double right, double bottom);
++extern void FPDF_FORMFILLINFO_FFI_SetCursor_CB(struct _FPDF_FORMFILLINFO *this, int nCursorType);
++extern int FPDF_FORMFILLINFO_FFI_SetTimer_CB(struct _FPDF_FORMFILLINFO *this, int uElapse, TimerCallback lpTimerFunc);
++extern void FPDF_FORMFILLINFO_FFI_KillTimer_CB(struct _FPDF_FORMFILLINFO *this, int nTimerID);
++extern FPDF_SYSTEMTIME FPDF_FORMFILLINFO_FFI_GetLocalTime_CB(struct _FPDF_FORMFILLINFO *this);
++extern void FPDF_FORMFILLINFO_FFI_OnChange_CB(struct _FPDF_FORMFILLINFO *this);
++extern FPDF_PAGE FPDF_FORMFILLINFO_FFI_GetPage_CB(struct _FPDF_FORMFILLINFO *this, FPDF_DOCUMENT document, int nPageIndex);
++extern FPDF_PAGE FPDF_FORMFILLINFO_FFI_GetCurrentPage_CB(struct _FPDF_FORMFILLINFO *this, FPDF_DOCUMENT document);
++extern int FPDF_FORMFILLINFO_FFI_GetRotation_CB(struct _FPDF_FORMFILLINFO *this, FPDF_PAGE page);
++extern void FPDF_FORMFILLINFO_FFI_ExecuteNamedAction_CB(struct _FPDF_FORMFILLINFO *this, FPDF_BYTESTRING namedAction);
++extern void FPDF_FORMFILLINFO_FFI_SetTextFieldFocus_CB(struct _FPDF_FORMFILLINFO *this, FPDF_WIDESTRING value, FPDF_DWORD valueLen, FPDF_BOOL is_focus);
++extern void FPDF_FORMFILLINFO_FFI_DoURIAction_CB(struct _FPDF_FORMFILLINFO *this, FPDF_BYTESTRING bsURI);
++extern void FPDF_FORMFILLINFO_FFI_DoGoToAction_CB(struct _FPDF_FORMFILLINFO *this, int nPageIndex, int zoomMode, float* fPosArray, int sizeofArray);
++
++EMSCRIPTEN_KEEPALIVE
++void FPDF_FORMFILLINFO_CALL_TIMER(TimerCallback t, int id) {
++  t(id);
++}
++
++EMSCRIPTEN_KEEPALIVE
++FPDF_FORMFILLINFO* FPDF_FORMFILLINFO_Create() {
++  FPDF_FORMFILLINFO* formFillInfo = malloc(sizeof(FPDF_FORMFILLINFO));
++  formFillInfo->version = 1;
++  formFillInfo->Release = &FPDF_FORMFILLINFO_Release_CB;
++  formFillInfo->FFI_Invalidate = &FPDF_FORMFILLINFO_FFI_Invalidate_CB;
++  formFillInfo->FFI_OutputSelectedRect = &FPDF_FORMFILLINFO_FFI_OutputSelectedRect_CB;
++  formFillInfo->FFI_SetCursor = &FPDF_FORMFILLINFO_FFI_SetCursor_CB;
++  formFillInfo->FFI_SetTimer = &FPDF_FORMFILLINFO_FFI_SetTimer_CB;
++  formFillInfo->FFI_KillTimer = &FPDF_FORMFILLINFO_FFI_KillTimer_CB;
++  formFillInfo->FFI_GetLocalTime = &FPDF_FORMFILLINFO_FFI_GetLocalTime_CB;
++  formFillInfo->FFI_OnChange = &FPDF_FORMFILLINFO_FFI_OnChange_CB;
++  formFillInfo->FFI_GetPage = &FPDF_FORMFILLINFO_FFI_GetPage_CB;
++  formFillInfo->FFI_GetCurrentPage = &FPDF_FORMFILLINFO_FFI_GetCurrentPage_CB;
++  formFillInfo->FFI_GetRotation = &FPDF_FORMFILLINFO_FFI_GetRotation_CB;
++  formFillInfo->FFI_ExecuteNamedAction = &FPDF_FORMFILLINFO_FFI_ExecuteNamedAction_CB;
++  formFillInfo->FFI_SetTextFieldFocus = &FPDF_FORMFILLINFO_FFI_SetTextFieldFocus_CB;
++  formFillInfo->FFI_DoURIAction = &FPDF_FORMFILLINFO_FFI_DoURIAction_CB;
++  formFillInfo->FFI_DoGoToAction = &FPDF_FORMFILLINFO_FFI_DoGoToAction_CB;
++  return formFillInfo;
++}
++
++EMSCRIPTEN_KEEPALIVE
++int FPDF_FORMFILLINFO_Size() {
++  return sizeof(FPDF_FORMFILLINFO);
++}
++
++extern int IFSDK_PAUSE_NeedToPauseNow_CB(struct _IFSDK_PAUSE *me);
++
++EMSCRIPTEN_KEEPALIVE
++IFSDK_PAUSE* IFSDK_PAUSE_Create(char *id) {
++  IFSDK_PAUSE* pause = malloc(sizeof(IFSDK_PAUSE));
++  pause->version = 1;
++  pause->user = id;
++  pause->NeedToPauseNow = &IFSDK_PAUSE_NeedToPauseNow_CB;
++  return pause;
++}
++
++EMSCRIPTEN_KEEPALIVE
++int IFSDK_PAUSE_Size() {
++  return sizeof(IFSDK_PAUSE);
++}
+\ No newline at end of file

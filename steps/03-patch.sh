@@ -3,6 +3,7 @@
 PATCHES="$PWD/patches"
 SOURCE="${PDFium_SOURCE_DIR:-pdfium}"
 OS="${PDFium_TARGET_OS:?}"
+CPU=${PDFium_TARGET_CPU:?}
 TARGET_ENVIRONMENT="${PDFium_TARGET_ENVIRONMENT:-}"
 ENABLE_V8=${PDFium_ENABLE_V8:-false}
 
@@ -40,6 +41,9 @@ case "$OS" in
   emscripten)
     apply_patch "$PATCHES/wasm/pdfium.patch"
     apply_patch "$PATCHES/wasm/build.patch" build
+    if [ "$CPU" == "wasm-standalone" ]; then
+      apply_patch "$PATCHES/wasm/callbacks.patch"
+    fi
     if [ "$ENABLE_V8" == "true" ]; then
       apply_patch "$PATCHES/wasm/skia.patch"
       apply_patch "$PATCHES/wasm/v8.patch" v8
