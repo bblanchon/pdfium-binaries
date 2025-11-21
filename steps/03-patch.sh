@@ -3,6 +3,7 @@
 PATCHES="$PWD/patches"
 SOURCE="${PDFium_SOURCE_DIR:-pdfium}"
 OS="${PDFium_TARGET_OS:?}"
+TARGET_CPU="${PDFium_TARGET_CPU:?}"
 TARGET_ENVIRONMENT="${PDFium_TARGET_ENVIRONMENT:-}"
 ENABLE_V8=${PDFium_ENABLE_V8:-false}
 
@@ -65,6 +66,12 @@ case "$TARGET_ENVIRONMENT" in
     apply_patch "$PATCHES/musl/build.patch" build
     mkdir -p "build/toolchain/linux/musl"
     cp "$PATCHES/musl/toolchain.gn" "build/toolchain/linux/musl/BUILD.gn"
+    ;;
+esac
+
+case "$TARGET_CPU" in
+  ppc64)
+    apply_patch "$PATCHES/ppc64/build.patch" build
     ;;
 esac
 

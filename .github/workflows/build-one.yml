@@ -27,6 +27,7 @@ on:
         options:
           - arm
           - arm64
+          - ppc64
           - x64
           - x86
           - wasm

@@ -70,7 +70,7 @@ case "$TARGET_OS" in
 
       sudo apt-get install -y $PACKAGES
 
-    else
+    else # i.e. not musl
 
       case "$TARGET_CPU" in
         arm)
@@ -79,6 +79,14 @@ case "$TARGET_OS" in
 
         arm64)
           sudo apt-get install -y libc6-i386 gcc-10-multilib g++-10-aarch64-linux-gnu gcc-10-aarch64-linux-gnu
+          ;;
+
+        ppc64)
+          sudo apt-get install -y gcc-11-multilib g++-11-powerpc64le-linux-gnu gcc-11-powerpc64le-linux-gnu
+          sudo update-alternatives --install /usr/bin/powerpc64le-linux-gnu-gcc powerpc64le-linux-gnu-gcc /usr/bin/powerpc64le-linux-gnu-gcc-11 100
+          sudo update-alternatives --install /usr/bin/powerpc64le-linux-gnu-g++ powerpc64le-linux-gnu-g++ /usr/bin/powerpc64le-linux-gnu-g++-11 100
+          sudo update-alternatives --set powerpc64le-linux-gnu-gcc /usr/bin/powerpc64le-linux-gnu-gcc-11
+          sudo update-alternatives --set powerpc64le-linux-gnu-g++ /usr/bin/powerpc64le-linux-gnu-g++-11
           ;;
 
         x86)

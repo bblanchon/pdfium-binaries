@@ -86,6 +86,9 @@ case "$OS" in
           SUFFIX="-10"
         fi
         ;;
+      ppc64)
+        PREFIX="powerpc64le-linux-gnu-"
+        ;;
       x86)
         if [ "$TARGET_ENVIRONMENT" == "musl" ]; then
           PREFIX="i686-linux-musl-"

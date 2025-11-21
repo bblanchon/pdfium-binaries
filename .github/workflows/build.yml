@@ -28,7 +28,7 @@ on:
         type: string
         required: true
       target_cpu:
-        description: Target (CPU arm|arm64|x64|x86|wasm)
+        description: Target (CPU arm|arm64|ppc64|x64|x86|wasm)
         type: string
         required: true
       target_environment:
