@@ -32,6 +32,7 @@ jobs:
             pdfium/**/*.cpp
             pdfium/**/*.gn
             pdfium/**/*.gni
+            pdfium/**/*.py
           retention-days: 1
 
   apply-patches:
@@ -50,6 +51,8 @@ jobs:
         v8:
           - false
           - true
+        cpu:
+          - arm64
         include:
           - os: linux
             environment: musl
@@ -69,7 +72,7 @@ jobs:
       - name: Apply patches
         run: steps/03-patch.sh
         env:
-          PDFium_TARGET_CPU: ${{ matrix.cpu || 'arm64' }}
+          PDFium_TARGET_CPU: ${{ matrix.cpu }}
           PDFium_TARGET_OS: ${{ matrix.os }}
           PDFium_ENABLE_V8: ${{ matrix.v8 || 'false' }}
           PDFium_TARGET_ENVIRONMENT: ${{ matrix.environment || '' }}
@@ -79,7 +82,7 @@ jobs:
         run: |
           {
             echo "## Rejected patches";
-            echo "The following patches for the configuration ${{ matrix.os }} ${{ matrix.cpu || 'arm64' }} ${{ matrix.v8 && 'v8' || '' }} ${{ matrix.environment || '' }} were rejected:";
+            echo "The following patches for the configuration ${{ matrix.os }} ${{ matrix.cpu }} ${{ matrix.v8 && 'v8' || '' }} ${{ matrix.environment || '' }} were rejected:";
             find pdfium -name '*.rej' -type f \
               -printf '### `%P`\n```patch\n' \
               -exec cat {} \; \
