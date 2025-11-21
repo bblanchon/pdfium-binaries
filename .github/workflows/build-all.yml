@@ -316,6 +316,17 @@ jobs:
       target_cpu: arm64
       enable_v8: true
 
+  linux_ppc64:
+    name: Linux ppc64
+    uses: ./.github/workflows/build.yml
+    with:
+      branch: ${{ github.event.inputs.branch }}
+      version: ${{ github.event.inputs.version }}
+      is_debug: ${{ github.event.inputs.is_debug == 'true' }}
+      target_os: linux
+      target_cpu: ppc64
+      enable_v8: false
+
   linux_x64:
     name: Linux x64
     uses: ./.github/workflows/build.yml
@@ -727,6 +738,7 @@ jobs:
       - linux_musl_arm64
       - linux_musl_x64
       - linux_musl_x86
+      - linux_ppc64
       - linux_x64
       - linux_x64_v8
       - linux_x86
