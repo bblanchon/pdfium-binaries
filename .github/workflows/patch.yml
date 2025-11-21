@@ -53,6 +53,8 @@ jobs:
         include:
           - os: linux
             environment: musl
+          - os: linux
+            cpu: ppc64
           - os: emscripten
     steps:
       - name: Checkout
@@ -67,6 +69,7 @@ jobs:
       - name: Apply patches
         run: steps/03-patch.sh
         env:
+          PDFium_TARGET_CPU: ${{ matrix.cpu || 'arm64' }}
           PDFium_TARGET_OS: ${{ matrix.os }}
           PDFium_ENABLE_V8: ${{ matrix.v8 || 'false' }}
           PDFium_TARGET_ENVIRONMENT: ${{ matrix.environment || '' }}
@@ -76,7 +79,7 @@ jobs:
         run: |
           {
             echo "## Rejected patches";
-            echo "The following patches for the configuration ${{ matrix.os }} ${{ matrix.v8 && 'v8' || '' }} ${{ matrix.environment || '' }} were rejected:";
+            echo "The following patches for the configuration ${{ matrix.os }} ${{ matrix.cpu || 'arm64' }} ${{ matrix.v8 && 'v8' || '' }} ${{ matrix.environment || '' }} were rejected:";
             find pdfium -name '*.rej' -type f \
               -printf '### `%P`\n```patch\n' \
               -exec cat {} \; \
