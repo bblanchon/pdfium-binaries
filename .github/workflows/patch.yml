@@ -48,17 +48,18 @@ jobs:
           - linux
           - macos
           - win
+        cpu:
+          - arm64
         v8:
           - false
           - true
-        cpu:
-          - arm64
         include:
           - os: linux
             environment: musl
           - os: linux
             cpu: ppc64
           - os: emscripten
+            cpu: wasm
     steps:
       - name: Checkout
         uses: actions/checkout@v4
