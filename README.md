@@ -292,51 +292,39 @@ The following projects use (or recommend using) our PDFium builds:
   </thead>
   <tbody>
     <tr>
-      <td><img src="https://avatars.githubusercontent.com/u/5462433?v=4" width="48" height="48" alt="Benoit Blanchon"></td>
+      <td><img src="https://github.com/bblanchon.png" width="48" height="48" alt="Benoit Blanchon"></td>
       <td><a href="https://github.com/bblanchon"><code>@bblanchon</code></a></td>
       <td>Main contributor</td>
     </tr>
     <tr>
-      <td><img src="https://avatars.githubusercontent.com/u/248162?v=4" width="48" height="48" alt="Christoffer Green"></td>
+      <td><img src="https://github.com/ChristofferGreen.png" width="48" height="48" alt="Christoffer Green"></td>
       <td><a href="https://github.com/ChristofferGreen"><code>@ChristofferGreen</code></a></td>
       <td>Linux ARM build</td>
     </tr>
     <tr>
-      <td rowspan="2"><img src="https://avatars.githubusercontent.com/u/1312921?v=4" width="48" height="48" alt="Jeroen Bobbeldijk"></td>
-      <td rowspan="2"><a href="https://github.com/jerbob92"><code>@jerbob92</code></a></td>
-      <td>Musl build</td>
+      <td><img src="https://github.com/jerbob92.png" width="48" height="48" alt="Jeroen Bobbeldijk"></td>
+      <td><a href="https://github.com/jerbob92"><code>@jerbob92</code></a></td>
+      <td>Musl and WebAssembly builds</td>
     </tr>
     <tr>
-      <td>WebAssembly build</td>
+      <td><img src="https://github.com/mara004.png" width="48" height="48" alt="mara004"></td>
+      <td><a href="https://github.com/mara004"><code>@mara004</code></a></td>
+      <td>Conda packages. ppc64 build. Constant aid.</td>
     </tr>
     <tr>
-      <td rowspan="3"><img src="https://avatars.githubusercontent.com/u/65915611?v=4" width="48" height="48" alt="mara004"></td>
-      <td rowspan="3"><a href="https://github.com/mara004"><code>@mara004</code></a></td>
-      <td>Conda packages</td>
-    </tr>
-    <tr>
-      <td>ppc64 build</td>
-    </tr>
-    <tr>
-      <td>Frequent help with many aspects of the project</td>
-    </tr>
-    <tr>
-      <td><img src="https://avatars.githubusercontent.com/u/40735330?v=4" width="48" height="48" alt="Marvin Gießing"></td>
+      <td><img src="https://github.com/mgiessing.png" width="48" height="48" alt="Marvin Gießing"></td>
       <td><a href="https://github.com/mgiessing"><code>@mgiessing</code></a></td>
       <td>ppc64 build</td>
     </tr>
     <tr>
-      <td><img src="https://avatars.githubusercontent.com/u/12021771?v=4" width="48" height="48" alt="David Sungaila"></td>
+      <td><img src="https://github.com/sungaila.png" width="48" height="48" alt="David Sungaila"></td>
       <td><a href="https://github.com/sungaila"><code>@sungaila</code></a></td>
       <td>NuGet packages</td>
     </tr>
     <tr>
-      <td rowspan="2"><img src="https://avatars.githubusercontent.com/u/5075894?v=4" width="48" height="48" alt="Tobias Taschner"></td>
-      <td rowspan="2"><a href="https://github.com/TcT2k"><code>@TcT2k</code></a></td>
-      <td>macOS build</td>
-    </tr>
-    <tr>
-      <td>V8 build</td>
+      <td><img src="https://github.com/TcT2k.png" width="48" height="48" alt="Tobias Taschner"></td>
+      <td><a href="https://github.com/TcT2k"><code>@TcT2k</code></a></td>
+      <td>macOS and V8 builds</td>
     </tr>
   </tbody>
 </table
