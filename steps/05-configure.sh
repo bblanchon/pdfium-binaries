@@ -40,6 +40,10 @@ mkdir -p "$BUILD"
       ;;
     linux)
       echo "clang_use_chrome_plugins = false"
+      if [ "$TARGET_CPU" == 'ppc64' ]; then
+        echo 'is_clang = false'
+        echo 'use_custom_libcxx = false'
+      fi
       ;;
     mac)
       echo "clang_use_chrome_plugins = false"

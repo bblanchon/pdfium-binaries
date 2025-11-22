@@ -86,8 +86,8 @@ Here are the download links for latest release:
   </tr>
 
   <tr>
-    <td rowspan="7">Linux</td>
-    <td rowspan="4">glibc</td>
+    <td rowspan="8">Linux</td>
+    <td rowspan="5">glibc</td>
     <td>arm</td>
     <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-linux-arm.tgz">pdfium-linux-arm.tgz</a></td>
     <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-v8-linux-arm.tgz">pdfium-v8-linux-arm.tgz</a></td>
@@ -96,6 +96,11 @@ Here are the download links for latest release:
     <td>arm64</td>
     <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-linux-arm64.tgz">pdfium-linux-arm64.tgz</a></td>
     <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-v8-linux-arm64.tgz">pdfium-v8-linux-arm64.tgz</a></td>
+  </tr>
+  <tr>
+    <td>ppc64</td>
+    <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-linux-ppc64.tgz">pdfium-linux-ppc64.tgz</a></td>
+    <td>not tested yet</td>
   </tr>
   <tr>
     <td>x64</td>
@@ -305,12 +310,20 @@ The following projects use (or recommend using) our PDFium builds:
       <td>WebAssembly build</td>
     </tr>
     <tr>
-      <td rowspan="2"><img src="https://avatars.githubusercontent.com/u/65915611?v=4" width="48" height="48" alt="mara004"></td>
-      <td rowspan="2"><a href="https://github.com/mara004"><code>@mara004</code></a></td>
+      <td rowspan="3"><img src="https://avatars.githubusercontent.com/u/65915611?v=4" width="48" height="48" alt="mara004"></td>
+      <td rowspan="3"><a href="https://github.com/mara004"><code>@mara004</code></a></td>
       <td>Conda packages</td>
     </tr>
     <tr>
+      <td>ppc64 build</td>
+    </tr>
+    <tr>
       <td>Frequent help with many aspects of the project</td>
+    </tr>
+    <tr>
+      <td><img src="https://avatars.githubusercontent.com/u/40735330?v=4" width="48" height="48" alt="Marvin Gießing"></td>
+      <td><a href="https://github.com/mgiessing"><code>@mgiessing</code></a></td>
+      <td>ppc64 build</td>
     </tr>
     <tr>
       <td><img src="https://avatars.githubusercontent.com/u/12021771?v=4" width="48" height="48" alt="David Sungaila"></td>
@@ -328,8 +341,7 @@ The following projects use (or recommend using) our PDFium builds:
   </tbody>
 </table
 
-[pdfium-vfp]:
-https://github.com/dmitriychunikhin/pdfium-vfp
+[pdfium-vfp]: https://github.com/dmitriychunikhin/pdfium-vfp
 [dart_pdf]: https://github.com/DavBfr/dart_pdf
 [pdfx]: https://github.com/scerio/packages.flutter/tree/main/packages/pdfx
 [go-pdfium]: https://github.com/klippa-app/go-pdfium

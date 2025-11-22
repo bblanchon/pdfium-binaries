@@ -1,7 +1,7 @@
 #!/bin/bash -eu
 
 OS_NAMES="android|emscripten|ios|linux|mac|win"
-CPU_NAMES="arm|arm64|x64|x86|wasm"
+CPU_NAMES="arm|arm64|ppc64|x64|x86|wasm"
 ENV_NAMES="catalyst|device|musl|simulator"
 OS_ENV_COMBINATIONS="linux musl|ios (catalyst|device|simulator)"
 STEP_REGEX="[0-9]"
