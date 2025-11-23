@@ -790,6 +790,11 @@ jobs:
       - name: Generate artifacts checksums
         id: hash
         run: echo "hashes=$(sha256sum pdfium-*.tgz | base64 -w0)" >> "$GITHUB_OUTPUT"
+      - name: Attest build provenance
+        id: provenance
+        uses: actions/attest-build-provenance@v3
+        with:
+          subject-path: pdfium-*.tgz
       - name: Publish Release
         uses: ncipollo/release-action@v1
         with:
@@ -798,8 +803,4 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           name: PDFium ${{ github.event.inputs.version }}
           tag: ${{ github.event.inputs.branch }}
-          artifacts: pdfium-*.tgz
-      - name: Attest build provenance
-        uses: actions/attest-build-provenance@v3
-        with:
-          subject-path: pdfium-*.tgz
+          artifacts: pdfium-*.tgz, ${{ steps.provenance.outputs.bundle-path }}
