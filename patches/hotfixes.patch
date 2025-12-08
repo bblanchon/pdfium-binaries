@@ -1,0 +1,13 @@
+diff --git a/fpdfsdk/fpdf_editpage.cpp b/fpdfsdk/fpdf_editpage.cpp
+index 76e3e26..f1b7be9 100644
+--- a/fpdfsdk/fpdf_editpage.cpp
++++ b/fpdfsdk/fpdf_editpage.cpp
+@@ -168,7 +168,7 @@ RetainPtr<const CPDF_Object> GetParamObject(void* out_value,
+ 
+ struct ParamsAndObject {
+   RetainPtr<CPDF_Dictionary> params;
+-  raw_ptr<CPDF_PageObject> page_obj;
++  CPDF_PageObject* page_obj;
+ };
+ 
+ ParamsAndObject SetParamValueHelper(FPDF_DOCUMENT document,
