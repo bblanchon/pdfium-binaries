@@ -1,8 +1,8 @@
 diff --git a/fpdfsdk/fpdf_view.cpp b/fpdfsdk/fpdf_view.cpp
-index 58a42e289..5c97b7e4e 100644
+index 2f7e5b1f2..22de37800 100644
 --- a/fpdfsdk/fpdf_view.cpp
 +++ b/fpdfsdk/fpdf_view.cpp
-@@ -58,6 +58,9 @@
+@@ -61,6 +61,9 @@
  
  #ifdef PDF_ENABLE_V8
  #include "fxjs/cfx_v8_array_buffer_allocator.h"
@@ -12,7 +12,7 @@ index 58a42e289..5c97b7e4e 100644
  #endif
  
  #ifdef PDF_ENABLE_XFA
-@@ -118,6 +121,11 @@ namespace {
+@@ -110,6 +113,11 @@ namespace {
  
  bool g_bLibraryInitialized = false;
  
@@ -24,7 +24,7 @@ index 58a42e289..5c97b7e4e 100644
  void SetRendererType(FPDF_RENDERER_TYPE public_type) {
    // Internal definition of renderer types must stay updated with respect to
    // the public definition, such that all public definitions can be mapped to
-@@ -237,6 +245,22 @@ FPDF_InitLibraryWithConfig(const FPDF_LIBRARY_CONFIG* config) {
+@@ -226,6 +234,22 @@ FPDF_InitLibraryWithConfig(const FPDF_LIBRARY_CONFIG* config) {
      return;
    }
  
@@ -47,7 +47,7 @@ index 58a42e289..5c97b7e4e 100644
    FX_InitializeMemoryAllocators();
    CFX_Timer::InitializeGlobals();
    CFX_GEModule::Create(config ? config->m_pUserFontPaths : nullptr);
-@@ -250,14 +274,12 @@ FPDF_InitLibraryWithConfig(const FPDF_LIBRARY_CONFIG* config) {
+@@ -239,14 +263,12 @@ FPDF_InitLibraryWithConfig(const FPDF_LIBRARY_CONFIG* config) {
    CPDFXFA_ModuleInit();
  #endif  // PDF_ENABLE_XFA
  
@@ -67,7 +67,7 @@ index 58a42e289..5c97b7e4e 100644
    }
    g_bLibraryInitialized = true;
  }
-@@ -285,6 +307,19 @@ FPDF_EXPORT void FPDF_CALLCONV FPDF_DestroyLibrary() {
+@@ -274,6 +296,19 @@ FPDF_EXPORT void FPDF_CALLCONV FPDF_DestroyLibrary() {
    CFX_Timer::DestroyGlobals();
    FX_DestroyMemoryAllocators();
  
@@ -86,30 +86,4 @@ index 58a42e289..5c97b7e4e 100644
 +
    g_bLibraryInitialized = false;
  }
- 
-diff --git a/fxbarcode/common/reedsolomon/BC_ReedSolomon.h b/fxbarcode/common/reedsolomon/BC_ReedSolomon.h
-index dab5224c9..a1f4b7f50 100644
---- a/fxbarcode/common/reedsolomon/BC_ReedSolomon.h
-+++ b/fxbarcode/common/reedsolomon/BC_ReedSolomon.h
-@@ -7,6 +7,8 @@
- #ifndef FXBARCODE_COMMON_REEDSOLOMON_BC_REEDSOLOMON_H_
- #define FXBARCODE_COMMON_REEDSOLOMON_BC_REEDSOLOMON_H_
- 
-+#include <stdint.h>
-+
- #include <memory>
- #include <vector>
- 
-diff --git a/fxbarcode/common/reedsolomon/BC_ReedSolomonGF256Poly.h b/fxbarcode/common/reedsolomon/BC_ReedSolomonGF256Poly.h
-index f94ecb86f..8dca54364 100644
---- a/fxbarcode/common/reedsolomon/BC_ReedSolomonGF256Poly.h
-+++ b/fxbarcode/common/reedsolomon/BC_ReedSolomonGF256Poly.h
-@@ -7,6 +7,8 @@
- #ifndef FXBARCODE_COMMON_REEDSOLOMON_BC_REEDSOLOMONGF256POLY_H_
- #define FXBARCODE_COMMON_REEDSOLOMON_BC_REEDSOLOMONGF256POLY_H_
- 
-+#include <stdint.h>
-+
- #include <memory>
- #include <vector>
  
