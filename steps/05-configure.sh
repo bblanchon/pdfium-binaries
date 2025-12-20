@@ -40,6 +40,11 @@ mkdir -p "$BUILD"
       ;;
     linux)
       echo "clang_use_chrome_plugins = false"
+      # AOTW, //build/config/sysroot.gni lacks handling of ppc64, so we manually set the sysroot to ensure working builds with proper glibc requirement
+      if [ "$TARGET_CPU" == "ppc64" ]; then
+        echo "use_sysroot = true"
+        echo "sysroot = \"//build/linux/debian_bullseye_ppc64el-sysroot\""
+      fi
       ;;
     mac)
       echo "clang_use_chrome_plugins = false"
