@@ -690,6 +690,8 @@ jobs:
         run: ./conda-build.sh linux-64 pdfium-linux-x64
       - name: Build for linux-aarch64
         run: ./conda-build.sh linux-aarch64 pdfium-linux-arm64
+      - name: Build for linux-ppc64le
+        run: ./conda-build.sh linux-ppc64le pdfium-linux-ppc64
       - name: Build for osx-arm64
         run: ./conda-build.sh osx-arm64 pdfium-mac-arm64
       - name: Build for osx-64
