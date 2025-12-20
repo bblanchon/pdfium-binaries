@@ -19,7 +19,6 @@ CONDA_PLATFORMS = {
     "linux-aarch64": ("linux", "aarch64"),
     "linux-armv6l": ("linux", "armv6l"),
     "linux-armv7l": ("linux", "armv7l"),
-    "linux-ppc64": ("linux", "ppc64"),
     "linux-ppc64le": ("linux", "ppc64le"),
     "linux-s390x": ("linux", "s390x"),
     "osx-arm64": ("osx", "arm64"),
