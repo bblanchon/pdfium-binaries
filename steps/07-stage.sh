@@ -3,6 +3,7 @@
 IS_DEBUG=${PDFium_IS_DEBUG:-false}
 OS=${PDFium_TARGET_OS:?}
 VERSION=${PDFium_VERSION:-}
+STATIC_LIBRARY=${PDFium_STATIC_LIBRARY:-false}
 PATCHES="$PWD/patches"
 
 SOURCE=${PDFium_SOURCE_DIR:-pdfium}
@@ -31,11 +32,19 @@ rm -f "$STAGING/include/PRESUBMIT.py"
 
 case "$OS" in
   android|linux)
-    mv "$BUILD/libpdfium.so" "$STAGING_LIB"
+    if [ "$STATIC_LIBRARY" == "true" ]; then
+      mv "$BUILD/obj/libpdfium.a" "$STAGING_LIB"
+    else
+      mv "$BUILD/libpdfium.so" "$STAGING_LIB"
+    fi
     ;;
 
   mac|ios)
-    mv "$BUILD/libpdfium.dylib" "$STAGING_LIB"
+    if [ "$STATIC_LIBRARY" == "true" ]; then
+      mv "$BUILD/obj/libpdfium.a" "$STAGING_LIB"
+    else
+      mv "$BUILD/libpdfium.dylib" "$STAGING_LIB"
+    fi
     ;;
 
   emscripten)
@@ -47,10 +56,14 @@ case "$OS" in
     ;;
 
   win)
-    mv "$BUILD/pdfium.dll.lib" "$STAGING_LIB"
-    mkdir -p "$STAGING_BIN"
-    mv "$BUILD/pdfium.dll" "$STAGING_BIN"
-    [ "$IS_DEBUG" == "true" ] && mv "$BUILD/pdfium.dll.pdb" "$STAGING_BIN"
+    if [ "$STATIC_LIBRARY" == "true" ]; then
+      mv "$BUILD/obj/pdfium.lib" "$STAGING_LIB"
+    else
+      mv "$BUILD/pdfium.dll.lib" "$STAGING_LIB"
+      mkdir -p "$STAGING_BIN"
+      mv "$BUILD/pdfium.dll" "$STAGING_BIN"
+      [ "$IS_DEBUG" == "true" ] && mv "$BUILD/pdfium.dll.pdb" "$STAGING_BIN"
+    fi
     ;;
 esac
 

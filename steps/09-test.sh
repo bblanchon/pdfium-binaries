@@ -3,11 +3,18 @@
 OS=${PDFium_TARGET_OS:?}
 CPU="${PDFium_TARGET_CPU:?}"
 TARGET_ENVIRONMENT="${PDFium_TARGET_ENVIRONMENT:-}"
+STATIC_LIBRARY=${PDFium_STATIC_LIBRARY:-false}
 SOURCE_DIR="$PWD/example"
 CMAKE_ARGS=()
 CAN_RUN_ON_HOST=false
 EXAMPLE="./example"
 SKIP_TESTS=false
+
+# Skip tests for static library builds (not yet supported)
+if [ "$STATIC_LIBRARY" == "true" ]; then
+  echo "Skipping tests for static library build"
+  exit 0
+fi
 
 export PDFium_DIR="$PWD/staging"
 
