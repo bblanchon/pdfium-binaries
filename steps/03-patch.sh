@@ -6,6 +6,7 @@ OS="${PDFium_TARGET_OS:?}"
 TARGET_CPU="${PDFium_TARGET_CPU:?}"
 TARGET_ENVIRONMENT="${PDFium_TARGET_ENVIRONMENT:-}"
 ENABLE_V8=${PDFium_ENABLE_V8:-false}
+STATIC_LIBRARY=${PDFium_STATIC_LIBRARY:-false}
 
 apply_patch() {
   local FILE="$1"
@@ -15,7 +16,7 @@ apply_patch() {
 
 pushd "${SOURCE}"
 
-[ "$OS" != "emscripten" ] && apply_patch "$PATCHES/shared_library.patch"
+[ "$STATIC_LIBRARY" != "true" ] && [ "$OS" != "emscripten" ] && apply_patch "$PATCHES/shared_library.patch"
 apply_patch "$PATCHES/public_headers.patch"
 
 [ "$ENABLE_V8" == "true" ] && apply_patch "$PATCHES/v8/pdfium.patch"
