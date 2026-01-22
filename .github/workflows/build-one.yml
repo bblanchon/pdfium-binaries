@@ -34,9 +34,9 @@ on:
       target_environment:
         description: Target environment
         type: choice
-        default: ''
+        default: ""
         options:
-          - ''
+          - ""
           - device
           - catalyst
           - musl
@@ -56,6 +56,11 @@ on:
         type: boolean
         required: false
         default: false
+      static_library:
+        description: Build as static library
+        type: boolean
+        required: false
+        default: false
 
 jobs:
   build:
@@ -71,3 +76,4 @@ jobs:
       target_environment: ${{ github.event.inputs.target_environment }}
       enable_v8: ${{ github.event.inputs.enable_v8 == 'true' }}
       emsdk_version: ${{ github.event.inputs.emsdk_version }}
+      static_library: ${{ github.event.inputs.static_library == 'true' }}
