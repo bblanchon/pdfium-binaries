@@ -13,6 +13,7 @@ STAGING_BIN="$STAGING/bin"
 STAGING_LIB="$STAGING/lib"
 
 mkdir -p "$STAGING"
+rm -rf "$STAGING"/*
 mkdir -p "$STAGING_LIB"
 
 sed "s/#VERSION#/${VERSION:-0.0.0.0}/" <"$PATCHES/PDFiumConfig.cmake" >"$STAGING/PDFiumConfig.cmake"

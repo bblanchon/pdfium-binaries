@@ -161,6 +161,7 @@ CMAKE_ARGS+=("$SOURCE_DIR")
 if [ $SKIP_TESTS == "false" ]; then
   mkdir -p build
   pushd build
+  rm -rf *
 
   cmake "${CMAKE_ARGS[@]}"
   cmake --build .
