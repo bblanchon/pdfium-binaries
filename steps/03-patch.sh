@@ -43,7 +43,6 @@ case "$OS" in
     apply_patch "$PATCHES/wasm/pdfium.patch"
     apply_patch "$PATCHES/wasm/build.patch" build
     if [ "$ENABLE_V8" == "true" ]; then
-      apply_patch "$PATCHES/wasm/skia.patch"
       apply_patch "$PATCHES/wasm/v8.patch" v8
     fi
     mkdir -p "build/config/wasm"
