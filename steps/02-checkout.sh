@@ -7,7 +7,7 @@ ENABLE_V8=${PDFium_ENABLE_V8:-false}
 CONFIG_ARGS=()
 if [ "$ENABLE_V8" == "false" ]; then
   CONFIG_ARGS+=(
-     --custom-var "checkout_configuration=minimal"
+     --custom-var "checkout_configuration=small"
   )
 fi
 
