@@ -658,6 +658,7 @@ jobs:
     needs:
       - linux_arm64
       - linux_x64
+      - linux_ppc64
       - mac_arm64
       - mac_x64
       - win_arm64
