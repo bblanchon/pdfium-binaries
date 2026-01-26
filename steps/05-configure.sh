@@ -7,6 +7,7 @@ TARGET_CPU=${PDFium_TARGET_CPU:?}
 TARGET_ENVIRONMENT=${PDFium_TARGET_ENVIRONMENT:-}
 ENABLE_V8=${PDFium_ENABLE_V8:-false}
 IS_DEBUG=${PDFium_IS_DEBUG:-false}
+BUILD_TYPE=${PDFium_BUILD_TYPE:-shared}
 
 mkdir -p "$BUILD"
 
@@ -24,6 +25,10 @@ mkdir -p "$BUILD"
   if [ "$ENABLE_V8" == "true" ]; then
     echo "v8_use_external_startup_data = false"
     echo "v8_enable_i18n_support = false"
+  fi
+
+  if [ "$BUILD_TYPE" == "static" ]; then
+    echo "pdf_is_complete_lib = true"
   fi
 
   case "$OS" in

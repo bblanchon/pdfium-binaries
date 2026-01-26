@@ -24,11 +24,12 @@ Options:
   -b branch = Chromium branch (default=main)
   -g 0-10   = Go immediately to step n (default=0)
   -d        = debug build
+  -s        = static build (experimental)
   -j        = enable v8"
   exit
 fi
 
-while getopts "b:djmg:" OPTION
+while getopts "b:djmsg:" OPTION
 do
   case $OPTION in
     b)
@@ -41,6 +42,10 @@ do
 
     j)
       export PDFium_ENABLE_V8=true
+      ;;
+
+    s)
+      export PDFium_BUILD_TYPE="static"
       ;;
 
     g)
