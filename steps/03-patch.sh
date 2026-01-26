@@ -71,6 +71,7 @@ esac
 
 case "$TARGET_CPU" in
   ppc64)
+    apply_patch "$PATCHES/ppc64/pdfium.patch"
     apply_patch "$PATCHES/ppc64/build.patch" build
     ;;
 esac

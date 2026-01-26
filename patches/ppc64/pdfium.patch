@@ -1,0 +1,13 @@
+diff --git a/skia/BUILD.gn b/skia/BUILD.gn
+index 67e13608f..3340926b6 100644
+--- a/skia/BUILD.gn
++++ b/skia/BUILD.gn
+@@ -513,7 +513,7 @@ skia_source_set("skia_opts") {
+   } else if (current_cpu == "mipsel" || current_cpu == "mips64el") {
+     cflags += [ "-fomit-frame-pointer" ]
+   } else {
+-    assert(false, "Unsupported target CPU " + current_cpu)
++    # assert(false, "Unsupported target CPU " + current_cpu)
+   }
+ 
+   if (is_android && !is_debug) {
