@@ -37,6 +37,7 @@ case "$OS" in
 
   linux)
     [ "$ENABLE_V8" == "true" ] && apply_patch "$PATCHES/linux/v8.patch" v8
+    apply_patch "$PATCHES/linux/build.patch" build
     ;;
 
   emscripten)
