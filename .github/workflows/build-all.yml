@@ -778,7 +778,7 @@ jobs:
             echo "::endgroup::"
           done
       - name: Write release body
-        run: echo "This version was built with branch `$BRANCH` of PDFium" > RELEASE.md
+        run: echo "This version was built with branch \`$BRANCH\` of PDFium" > RELEASE.md
         env:
           BRANCH: ${{ github.event.inputs.branch }}
       - name: Get changes
