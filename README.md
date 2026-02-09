@@ -259,23 +259,24 @@ Please find the [documentation of the PDFium API on developers.foxit.com](https:
 
 The following projects use (or recommend using) our PDFium builds:
 
-| Name                     | Language | Description                                                                                                 |
-|:-------------------------|:---------|:------------------------------------------------------------------------------------------------------------|
-| [dart_pdf][dart_pdf]     | Dart     | PDF creation module for dart/flutter                                                                        |
-| [DtronixPdf][dtronixpdf] | C#       | PDF viewer and editor toolset                                                                               |
-| [go-pdfium][go-pdfium]   | Go       | Go wrapper around PDFium with helper functions for various methods like image rendering and text extraction |
-| [libvips][libvips]       | C        | A performant image processing library                                                                       |
-| [PDFium RS][pdfium_rs]   | Rust     | Rust wrapper around PDFium                                                                                  |
-| [pdfium-vfp][pdfium-vfp] | VFP      | PDF Viewer component for Visual FoxPro                                                                      |
-| [PDFiumCore][pdfiumcore] | C#       | .NET Standard P/Invoke bindings for PDFium                                                                  |
-| [PdfiumLib][pdfiumlib]   | Pascal   | An interface to libpdfium for Delphi                                                                        |
-| [PdfLibCore][pdflibcore] | C#       | A fast PDF editing and reading library for modern .NET Core applications                                    |
-| [PDFtoImage][pdftoimage] | C#       | .NET library to render PDF content into images                                                              |
-| [PDFtoZPL][pdftozpl]     | C#       | A .NET library to convert PDF files (and bitmaps) into Zebra Programming Language code                      |
-| [PDFx][pdfx]             | Dart     | Flutter Render & show PDF documents on Web, MacOs 10.11+, Android 5.0+, iOS and Windows                     |
-| [PyPDFium2][pypdfium2]   | Python   | Python bindings to PDFium                                                                                   |
-| [Spacedrive][spacedrive] | Rust/TS  | Cross-platform file manager, powered by a virtual distributed filesystem                                    |
-| [wxPDFView][wxpdfview]   | C++      | wxWidgets components to display PDF content                                                                 |
+| Name                       | Language | Description                                                                             |
+|:---------------------------|:---------|:----------------------------------------------------------------------------------------|
+| [dart_pdf][dart_pdf]       | Dart     | PDF creation module for dart/flutter                                                    |
+| [DtronixPdf][dtronixpdf]   | C#       | PDF viewer and editor toolset                                                           |
+| [go-pdfium][go-pdfium]     | Go       | Go wrapper around PDFium with image rendering and text extraction                       |
+| [libvips][libvips]         | C        | A performant image processing library                                                   |
+| [PDFium RS][pdfium_rs]     | Rust     | Rust wrapper around PDFium                                                              |
+| [pdfium-vfp][pdfium-vfp]   | VFP      | PDF Viewer component for Visual FoxPro                                                  |
+| [pdfium.vapi][pdfium-vapi] | Vala     | Vala vapi binding and GTK demo app to display PDF content                               |
+| [PDFiumCore][pdfiumcore]   | C#       | .NET Standard P/Invoke bindings for PDFium                                              |
+| [PdfiumLib][pdfiumlib]     | Pascal   | An interface to libpdfium for Delphi                                                    |
+| [PdfLibCore][pdflibcore]   | C#       | A fast PDF editing and reading library for modern .NET Core applications                |
+| [PDFtoImage][pdftoimage]   | C#       | .NET library to render PDF content into images                                          |
+| [PDFtoZPL][pdftozpl]       | C#       | A .NET library to convert PDF files (and bitmaps) into Zebra Programming Language code  |
+| [PDFx][pdfx]               | Dart     | Flutter Render & show PDF documents on Web, MacOs 10.11+, Android 5.0+, iOS and Windows |
+| [PyPDFium2][pypdfium2]     | Python   | Python bindings to PDFium                                                               |
+| [Spacedrive][spacedrive]   | Rust/TS  | Cross-platform file manager, powered by a virtual distributed filesystem                |
+| [wxPDFView][wxpdfview]     | C++      | wxWidgets components to display PDF content                                             |
 
 *Did we miss a project? Please open a PR!*  
 
@@ -344,3 +345,4 @@ The following projects use (or recommend using) our PDFium builds:
 [dtronixpdf]: https://github.com/Dtronix/DtronixPdf
 [pdftozpl]: https://github.com/sungaila/PDFtoZPL
 [spacedrive]: https://github.com/spacedriveapp/spacedrive
+[pdfium-vapi]: https://github.com/taozuhong/pdfium.vapi
