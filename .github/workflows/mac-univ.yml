@@ -28,12 +28,12 @@ jobs:
         run: |
           echo "artifact=$ARTIFACT_X64" | sed "s/x64/univ/g" >> $GITHUB_OUTPUT
       - name: Download ${{ inputs.artifact_x64 }}
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: ${{ inputs.artifact_x64 }}
           path: ${{ inputs.artifact_x64 }}
       - name: Download ${{ inputs.artifact_arm64 }}
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: ${{ inputs.artifact_arm64 }}
           path: ${{ inputs.artifact_arm64 }}
@@ -50,7 +50,7 @@ jobs:
           OUTPUT_DIR: ${{ steps.init.outputs.artifact }}
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: ${{ steps.init.outputs.artifact }}
           path: ${{ steps.init.outputs.artifact }}

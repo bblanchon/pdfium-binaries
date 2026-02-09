@@ -24,7 +24,7 @@ jobs:
           gclient sync -r "origin/${PDFium_BRANCH}" --no-history --shallow
 
       - name: Upload PDFium artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: pdfium
           path: |
@@ -62,10 +62,10 @@ jobs:
             cpu: wasm
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Download PDFium artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: pdfium
           path: pdfium

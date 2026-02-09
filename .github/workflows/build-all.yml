@@ -611,9 +611,9 @@ jobs:
       - win_x86_v8
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Download artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           path: nuget
       - name: Prepare header files
@@ -641,7 +641,7 @@ jobs:
             echo "::endgroup::"
           done
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: NuGet packages
           path: '*.nupkg'
@@ -665,9 +665,9 @@ jobs:
       - win_x64
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Download artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
       - name: Create build script
         run: |
           cat >conda-build.sh <<END
@@ -702,7 +702,7 @@ jobs:
       - name: Build for win-arm64
         run: ./conda-build.sh win-arm64 pdfium-win-arm64
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: Conda packages
           path: conda/out/
@@ -769,7 +769,7 @@ jobs:
       attestations: write # to attest build provenance
     steps:
       - name: Download artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
       - name: Create tarballs
         run: |
           for DIR in pdfium-*; do

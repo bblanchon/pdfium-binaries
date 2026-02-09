@@ -78,7 +78,7 @@ jobs:
           [ "${{inputs.is_debug}}" == "true" ] && ARTIFACT="$ARTIFACT-debug"
           echo "artifact=$ARTIFACT" >> $GITHUB_OUTPUT
       - name: Checkout this repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Set environment variables
         run: steps/00-environment.sh
         shell: bash
@@ -116,7 +116,7 @@ jobs:
         run: steps/08-licenses.sh
         shell: bash
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: ${{ steps.init.outputs.artifact }}
           path: staging/
