@@ -276,6 +276,7 @@ The following projects use (or recommend using) our PDFium builds:
 | [PyPDFium2][pypdfium2]   | Python   | Python bindings to PDFium                                                                                   |
 | [Spacedrive][spacedrive] | Rust/TS  | Cross-platform file manager, powered by a virtual distributed filesystem                                    |
 | [wxPDFView][wxpdfview]   | C++      | wxWidgets components to display PDF content                                                                 |
+| [pdfium.vapi](https://github.com/taozuhong/pdfium.vapi)   | Vala      | Vala vapi binding and GTK demo app to display PDF content with zoom in / zoom out / fit to page / fit to width / rotate |
 
 *Did we miss a project? Please open a PR!*  
 
