@@ -19,6 +19,7 @@ jobs:
       - name: Checkout PDFium
         run: |
           PDFium_BRANCH=$(git ls-remote --sort version:refname --refs https://pdfium.googlesource.com/pdfium.git 'chromium/*' | tail -n 1 | cut -d/ -f3-4)
+          echo "PDFium branch = \`$PDFium_BRANCH\`" >> $GITHUB_STEP_SUMMARY
           echo "Checking out branch $PDFium_BRANCH"
           gclient config --unmanaged "https://pdfium.googlesource.com/pdfium.git"
           gclient sync -r "origin/${PDFium_BRANCH}" --no-history --shallow
