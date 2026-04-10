@@ -7,6 +7,7 @@ TARGET_CPU=${PDFium_TARGET_CPU:?}
 TARGET_ENVIRONMENT=${PDFium_TARGET_ENVIRONMENT:-}
 ENABLE_V8=${PDFium_ENABLE_V8:-false}
 IS_DEBUG=${PDFium_IS_DEBUG:-false}
+BUILD_TYPE=${PDFium_BUILD_TYPE:-shared}
 
 mkdir -p "$BUILD"
 
@@ -30,10 +31,14 @@ mkdir -p "$BUILD"
     echo "v8_enable_i18n_support = false"
   fi
 
+  if [ "$BUILD_TYPE" == "static" ]; then
+    echo "pdf_is_complete_lib = true"
+  fi
+
   case "$OS" in
     android)
       echo "clang_use_chrome_plugins = false"
-      echo "default_min_sdk_version = 21"
+      echo "default_min_sdk_version = 23"
       ;;
     ios)
       [ -n "$TARGET_ENVIRONMENT" ] && echo "target_environment = \"$TARGET_ENVIRONMENT\""
@@ -44,9 +49,13 @@ mkdir -p "$BUILD"
       ;;
     linux)
       echo "clang_use_chrome_plugins = false"
+      # AOTW, //build/config/sysroot.gni lacks handling of ppc64, so we manually set the sysroot to ensure working builds with proper glibc requirement
+      if [ "$TARGET_CPU" == "ppc64" ]; then
+        echo "use_sysroot = true"
+        echo "sysroot = \"//build/linux/debian_bullseye_ppc64el-sysroot\""
+      fi
       ;;
     mac)
-      echo 'mac_deployment_target = "10.13.0"'
       echo "clang_use_chrome_plugins = false"
       ;;
     emscripten)
@@ -68,6 +77,7 @@ mkdir -p "$BUILD"
       echo 'is_clang = false'
       echo 'use_custom_libcxx = false'
       echo 'use_custom_libcxx_for_host = false'
+      echo 'use_glib = false'
       [ "$ENABLE_V8" == "true" ] && case "$TARGET_CPU" in
         arm)
             echo "v8_snapshot_toolchain = \"//build/toolchain/linux:clang_x86_v8_arm\""

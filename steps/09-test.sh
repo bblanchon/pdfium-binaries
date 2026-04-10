@@ -86,6 +86,9 @@ case "$OS" in
           SUFFIX="-10"
         fi
         ;;
+      ppc64)
+        PREFIX="powerpc64le-linux-gnu-"
+        ;;
       x86)
         if [ "$TARGET_ENVIRONMENT" == "musl" ]; then
           PREFIX="i686-linux-musl-"
@@ -158,6 +161,7 @@ CMAKE_ARGS+=("$SOURCE_DIR")
 if [ $SKIP_TESTS == "false" ]; then
   mkdir -p build
   pushd build
+  rm -rf *
 
   cmake "${CMAKE_ARGS[@]}"
   cmake --build .

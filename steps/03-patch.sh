@@ -3,9 +3,10 @@
 PATCHES="$PWD/patches"
 SOURCE="${PDFium_SOURCE_DIR:-pdfium}"
 OS="${PDFium_TARGET_OS:?}"
-CPU=${PDFium_TARGET_CPU:?}
+TARGET_CPU="${PDFium_TARGET_CPU:?}"
 TARGET_ENVIRONMENT="${PDFium_TARGET_ENVIRONMENT:-}"
 ENABLE_V8=${PDFium_ENABLE_V8:-false}
+BUILD_TYPE=${PDFium_BUILD_TYPE:-shared}
 
 apply_patch() {
   local FILE="$1"
@@ -15,7 +16,7 @@ apply_patch() {
 
 pushd "${SOURCE}"
 
-[ "$OS" != "emscripten" ] && apply_patch "$PATCHES/shared_library.patch"
+[ "$BUILD_TYPE" == "shared" ] && [ "$OS" != "emscripten" ] && apply_patch "$PATCHES/shared_library.patch"
 apply_patch "$PATCHES/public_headers.patch"
 
 [ "$ENABLE_V8" == "true" ] && apply_patch "$PATCHES/v8/pdfium.patch"
@@ -30,6 +31,10 @@ case "$OS" in
     [ "$ENABLE_V8" == "true" ] && apply_patch "$PATCHES/ios/v8.patch" v8
     ;;
 
+  mac)
+    apply_patch "$PATCHES/mac/build.patch" build
+    ;;
+
   linux)
     [ "$ENABLE_V8" == "true" ] && apply_patch "$PATCHES/linux/v8.patch" v8
     ;;
@@ -37,11 +42,10 @@ case "$OS" in
   emscripten)
     apply_patch "$PATCHES/wasm/pdfium.patch"
     apply_patch "$PATCHES/wasm/build.patch" build
-    if [ "$CPU" == "wasm-standalone" ]; then
+    if [ "$TARGET_CPU" == "wasm-standalone" ]; then
       apply_patch "$PATCHES/wasm/callbacks.patch"
     fi
     if [ "$ENABLE_V8" == "true" ]; then
-      apply_patch "$PATCHES/wasm/skia.patch"
       apply_patch "$PATCHES/wasm/v8.patch" v8
     fi
     mkdir -p "build/config/wasm"
@@ -65,6 +69,13 @@ case "$TARGET_ENVIRONMENT" in
     apply_patch "$PATCHES/musl/build.patch" build
     mkdir -p "build/toolchain/linux/musl"
     cp "$PATCHES/musl/toolchain.gn" "build/toolchain/linux/musl/BUILD.gn"
+    ;;
+esac
+
+case "$TARGET_CPU" in
+  ppc64)
+    apply_patch "$PATCHES/ppc64/pdfium.patch"
+    apply_patch "$PATCHES/ppc64/build.patch" build
     ;;
 esac
 

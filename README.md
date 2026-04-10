@@ -86,8 +86,8 @@ Here are the download links for latest release:
   </tr>
 
   <tr>
-    <td rowspan="7">Linux</td>
-    <td rowspan="4">glibc</td>
+    <td rowspan="8">Linux</td>
+    <td rowspan="5">glibc</td>
     <td>arm</td>
     <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-linux-arm.tgz">pdfium-linux-arm.tgz</a></td>
     <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-v8-linux-arm.tgz">pdfium-v8-linux-arm.tgz</a></td>
@@ -96,6 +96,11 @@ Here are the download links for latest release:
     <td>arm64</td>
     <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-linux-arm64.tgz">pdfium-linux-arm64.tgz</a></td>
     <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-v8-linux-arm64.tgz">pdfium-v8-linux-arm64.tgz</a></td>
+  </tr>
+  <tr>
+    <td>ppc64</td>
+    <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-linux-ppc64.tgz">pdfium-linux-ppc64.tgz</a></td>
+    <td>not tested yet</td>
   </tr>
   <tr>
     <td>x64</td>
@@ -254,23 +259,25 @@ Please find the [documentation of the PDFium API on developers.foxit.com](https:
 
 The following projects use (or recommend using) our PDFium builds:
 
-| Name                     | Language | Description                                                                                                 |
-|:-------------------------|:---------|:------------------------------------------------------------------------------------------------------------|
-| [dart_pdf][dart_pdf]     | Dart     | PDF creation module for dart/flutter                                                                        |
-| [DtronixPdf][dtronixpdf] | C#       | PDF viewer and editor toolset                                                                               |
-| [go-pdfium][go-pdfium]   | Go       | Go wrapper around PDFium with helper functions for various methods like image rendering and text extraction |
-| [libvips][libvips]       | C        | A performant image processing library                                                                       |
-| [PDFium RS][pdfium_rs]   | Rust     | Rust wrapper around PDFium                                                                                  |
-| [pdfium-vfp][pdfium-vfp] | VFP      | PDF Viewer component for Visual FoxPro                                                                      |
-| [PDFiumCore][pdfiumcore] | C#       | .NET Standard P/Invoke bindings for PDFium                                                                  |
-| [PdfiumLib][pdfiumlib]   | Pascal   | An interface to libpdfium for Delphi                                                                        |
-| [PdfLibCore][pdflibcore] | C#       | A fast PDF editing and reading library for modern .NET Core applications                                    |
-| [PDFtoImage][pdftoimage] | C#       | .NET library to render PDF content into images                                                              |
-| [PDFtoZPL][pdftozpl]     | C#       | A .NET library to convert PDF files (and bitmaps) into Zebra Programming Language code                      |
-| [PDFx][pdfx]             | Dart     | Flutter Render & show PDF documents on Web, MacOs 10.11+, Android 5.0+, iOS and Windows                     |
-| [PyPDFium2][pypdfium2]   | Python   | Python bindings to PDFium                                                                                   |
-| [Spacedrive][spacedrive] | Rust/TS  | Cross-platform file manager, powered by a virtual distributed filesystem                                    |
-| [wxPDFView][wxpdfview]   | C++      | wxWidgets components to display PDF content                                                                 |
+| Name                           | Language | Description                                                                             |
+| :----------------------------- | :------- | :-------------------------------------------------------------------------------------- |
+| [dart_pdf][dart_pdf]           | Dart     | PDF creation module for dart/flutter                                                    |
+| [DtronixPdf][dtronixpdf]       | C#       | PDF viewer and editor toolset                                                           |
+| [go-pdfium][go-pdfium]         | Go       | Go wrapper around PDFium with image rendering and text extraction                       |
+| [libvips][libvips]             | C        | A performant image processing library                                                   |
+| [PDFium RS][pdfium_rs]         | Rust     | Rust wrapper around PDFium                                                              |
+| [pdfium-render][pdfium-render] | Rust     | A high-level idiomatic Rust wrapper around PDFium                                       |
+| [pdfium-vfp][pdfium-vfp]       | VFP      | PDF Viewer component for Visual FoxPro                                                  |
+| [pdfium.vapi][pdfium-vapi]     | Vala     | Vala vapi binding and GTK demo app to display PDF content                               |
+| [PDFiumCore][pdfiumcore]       | C#       | .NET Standard P/Invoke bindings for PDFium                                              |
+| [PdfiumLib][pdfiumlib]         | Pascal   | An interface to libpdfium for Delphi                                                    |
+| [PdfLibCore][pdflibcore]       | C#       | A fast PDF editing and reading library for modern .NET Core applications                |
+| [PDFtoImage][pdftoimage]       | C#       | .NET library to render PDF content into images                                          |
+| [PDFtoZPL][pdftozpl]           | C#       | A .NET library to convert PDF files (and bitmaps) into Zebra Programming Language code  |
+| [PDFx][pdfx]                   | Dart     | Flutter Render & show PDF documents on Web, MacOs 10.11+, Android 5.0+, iOS and Windows |
+| [PyPDFium2][pypdfium2]         | Python   | Python bindings to PDFium                                                               |
+| [Spacedrive][spacedrive]       | Rust/TS  | Cross-platform file manager, powered by a virtual distributed filesystem                |
+| [wxPDFView][wxpdfview]         | C++      | wxWidgets components to display PDF content                                             |
 
 *Did we miss a project? Please open a PR!*  
 
@@ -287,60 +294,57 @@ The following projects use (or recommend using) our PDFium builds:
   </thead>
   <tbody>
     <tr>
-      <td><img src="https://avatars.githubusercontent.com/u/5462433?v=4" width="48" height="48" alt="Benoit Blanchon"></td>
+      <td><img src="https://github.com/bblanchon.png" width="48" height="48" alt="Benoit Blanchon"></td>
       <td><a href="https://github.com/bblanchon"><code>@bblanchon</code></a></td>
       <td>Main contributor</td>
     </tr>
     <tr>
-      <td><img src="https://avatars.githubusercontent.com/u/248162?v=4" width="48" height="48" alt="Christoffer Green"></td>
+      <td><img src="https://github.com/ChristofferGreen.png" width="48" height="48" alt="Christoffer Green"></td>
       <td><a href="https://github.com/ChristofferGreen"><code>@ChristofferGreen</code></a></td>
       <td>Linux ARM build</td>
     </tr>
     <tr>
-      <td rowspan="2"><img src="https://avatars.githubusercontent.com/u/1312921?v=4" width="48" height="48" alt="Jeroen Bobbeldijk"></td>
-      <td rowspan="2"><a href="https://github.com/jerbob92"><code>@jerbob92</code></a></td>
-      <td>Musl build</td>
+      <td><img src="https://github.com/jerbob92.png" width="48" height="48" alt="Jeroen Bobbeldijk"></td>
+      <td><a href="https://github.com/jerbob92"><code>@jerbob92</code></a></td>
+      <td>Musl and WebAssembly builds</td>
     </tr>
     <tr>
-      <td>WebAssembly build</td>
+      <td><img src="https://github.com/mara004.png" width="48" height="48" alt="mara004"></td>
+      <td><a href="https://github.com/mara004"><code>@mara004</code></a></td>
+      <td>Conda packages. ppc64 build. Constant aid.</td>
     </tr>
     <tr>
-      <td rowspan="2"><img src="https://avatars.githubusercontent.com/u/65915611?v=4" width="48" height="48" alt="mara004"></td>
-      <td rowspan="2"><a href="https://github.com/mara004"><code>@mara004</code></a></td>
-      <td>Conda packages</td>
+      <td><img src="https://github.com/mgiessing.png" width="48" height="48" alt="Marvin Gießing"></td>
+      <td><a href="https://github.com/mgiessing"><code>@mgiessing</code></a></td>
+      <td>ppc64 build</td>
     </tr>
     <tr>
-      <td>Frequent help with many aspects of the project</td>
-    </tr>
-    <tr>
-      <td><img src="https://avatars.githubusercontent.com/u/12021771?v=4" width="48" height="48" alt="David Sungaila"></td>
+      <td><img src="https://github.com/sungaila.png" width="48" height="48" alt="David Sungaila"></td>
       <td><a href="https://github.com/sungaila"><code>@sungaila</code></a></td>
       <td>NuGet packages</td>
     </tr>
     <tr>
-      <td rowspan="2"><img src="https://avatars.githubusercontent.com/u/5075894?v=4" width="48" height="48" alt="Tobias Taschner"></td>
-      <td rowspan="2"><a href="https://github.com/TcT2k"><code>@TcT2k</code></a></td>
-      <td>macOS build</td>
-    </tr>
-    <tr>
-      <td>V8 build</td>
+      <td><img src="https://github.com/TcT2k.png" width="48" height="48" alt="Tobias Taschner"></td>
+      <td><a href="https://github.com/TcT2k"><code>@TcT2k</code></a></td>
+      <td>macOS and V8 builds</td>
     </tr>
   </tbody>
 </table
 
-[pdfium-vfp]:
-https://github.com/dmitriychunikhin/pdfium-vfp
 [dart_pdf]: https://github.com/DavBfr/dart_pdf
-[pdfx]: https://github.com/scerio/packages.flutter/tree/main/packages/pdfx
+[dtronixpdf]: https://github.com/Dtronix/DtronixPdf
 [go-pdfium]: https://github.com/klippa-app/go-pdfium
-[pdfium_rs]: https://github.com/asafigan/pdfium_rs
-[pdfiumcore]: https://github.com/Dtronix/PDFiumCore
-[pdftoimage]: https://github.com/sungaila/PDFtoImage
-[pypdfium2]: https://github.com/pypdfium2-team/pypdfium2
-[wxpdfview]: https://github.com/TcT2k/wxPDFView
 [libvips]: https://github.com/libvips/libvips
+[pdfium_rs]: https://github.com/asafigan/pdfium_rs
+[pdfium-render]: https://github.com/ajrcarey/pdfium-render
+[pdfium-vapi]: https://github.com/taozuhong/pdfium.vapi
+[pdfium-vfp]: https://github.com/dmitriychunikhin/pdfium-vfp
+[pdfiumcore]: https://github.com/Dtronix/PDFiumCore
 [pdfiumlib]: https://github.com/ahausladen/PdfiumLib
 [pdflibcore]: https://github.com/jbaarssen/PdfLibCore
-[dtronixpdf]: https://github.com/Dtronix/DtronixPdf
+[pdftoimage]: https://github.com/sungaila/PDFtoImage
 [pdftozpl]: https://github.com/sungaila/PDFtoZPL
+[pdfx]: https://github.com/scerio/packages.flutter/tree/main/packages/pdfx
+[pypdfium2]: https://github.com/pypdfium2-team/pypdfium2
 [spacedrive]: https://github.com/spacedriveapp/spacedrive
+[wxpdfview]: https://github.com/TcT2k/wxPDFView

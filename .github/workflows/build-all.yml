@@ -1,5 +1,9 @@
 name: Build all
 
+permissions:
+  contents: read
+  actions: write # to upload artifacts
+
 on:
   workflow_dispatch:
     inputs:
@@ -312,6 +316,17 @@ jobs:
       target_cpu: arm64
       enable_v8: true
 
+  linux_ppc64:
+    name: Linux ppc64
+    uses: ./.github/workflows/build.yml
+    with:
+      branch: ${{ github.event.inputs.branch }}
+      version: ${{ github.event.inputs.version }}
+      is_debug: ${{ github.event.inputs.is_debug == 'true' }}
+      target_os: linux
+      target_cpu: ppc64
+      enable_v8: false
+
   linux_x64:
     name: Linux x64
     uses: ./.github/workflows/build.yml
@@ -562,6 +577,10 @@ jobs:
       - android_x64_v8
       - android_x86
       - android_x86_v8
+      - ios_catalyst_arm64
+      - ios_catalyst_arm64_v8
+      - ios_catalyst_x64
+      - ios_catalyst_x64_v8
       - ios_device_arm64
       - ios_device_arm64_v8
       - ios_simulator_arm64
@@ -592,9 +611,9 @@ jobs:
       - win_x86_v8
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Download artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           path: nuget
       - name: Prepare header files
@@ -603,12 +622,16 @@ jobs:
       - name: Define properties
         shell: bash
         run: |
-          VERSION="${{ github.event.inputs.version || '0.0.0.0' }}"
+          VERSION="$VERSION"
           BRANCH="${GITHUB_REF#refs/heads/}"
           COMMIT="${GITHUB_SHA}"
           RELEASE_NOTES="${{github.server_url}}/${{github.repository}}/releases"
-          ${{ github.event.inputs.release }} && RELEASE_NOTES+="/tag/${{ github.event.inputs.branch }}"
+          $RELEASE && RELEASE_NOTES+="/tag/$BRANCH"
           echo "NUSPEC_PROPERTIES=version=$VERSION;branch=$BRANCH;commit=$COMMIT;releaseNotes=$RELEASE_NOTES" >> "$GITHUB_ENV"
+        env:
+          VERSION: ${{ github.event.inputs.version || '0.0.0.0' }}
+          RELEASE: ${{ github.event.inputs.release }}
+          BRANCH: ${{ github.event.inputs.branch }}
       - name: Pack
         shell: bash
         run: |
@@ -618,7 +641,7 @@ jobs:
             echo "::endgroup::"
           done
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: NuGet packages
           path: '*.nupkg'
@@ -635,15 +658,16 @@ jobs:
     needs:
       - linux_arm64
       - linux_x64
+      - linux_ppc64
       - mac_arm64
       - mac_x64
       - win_arm64
       - win_x64
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Download artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
       - name: Create build script
         run: |
           cat >conda-build.sh <<END
@@ -651,7 +675,7 @@ jobs:
 
           PLATFORM=\$1
           SOURCE_DIR=\$2
-          VERSION="${{ github.event.inputs.version }}"
+          VERSION="$VERSION"
 
           # rename "include/" into "include/pdfium/"
           shopt -s extglob
@@ -661,10 +685,14 @@ jobs:
           python conda/build.py pdfium-binaries \$PLATFORM \$VERSION --about-file conda/about.json --source-dir \$SOURCE_DIR --output-dir conda/out
           END
           chmod +x conda-build.sh
+        env:
+          VERSION: ${{ github.event.inputs.version }}
       - name: Build for linux-64
         run: ./conda-build.sh linux-64 pdfium-linux-x64
       - name: Build for linux-aarch64
         run: ./conda-build.sh linux-aarch64 pdfium-linux-arm64
+      - name: Build for linux-ppc64le
+        run: ./conda-build.sh linux-ppc64le pdfium-linux-ppc64
       - name: Build for osx-arm64
         run: ./conda-build.sh osx-arm64 pdfium-mac-arm64
       - name: Build for osx-64
@@ -674,7 +702,7 @@ jobs:
       - name: Build for win-arm64
         run: ./conda-build.sh win-arm64 pdfium-win-arm64
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: Conda packages
           path: conda/out/
@@ -717,6 +745,7 @@ jobs:
       - linux_musl_arm64
       - linux_musl_x64
       - linux_musl_x86
+      - linux_ppc64
       - linux_x64
       - linux_x64_v8
       - linux_x86
@@ -734,9 +763,13 @@ jobs:
       - win_x64_v8
       - win_x86
       - win_x86_v8
+    permissions:
+      contents: write # to create releases
+      id-token: write # to attest build provenance
+      attestations: write # to attest build provenance
     steps:
       - name: Download artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
       - name: Create tarballs
         run: |
           for DIR in pdfium-*; do
@@ -745,40 +778,38 @@ jobs:
             echo "::endgroup::"
           done
       - name: Write release body
-        run: echo 'This version was built with branch `${{ github.event.inputs.branch }}` of PDFium' > RELEASE.md
+        run: echo "This version was built with branch \`$BRANCH\` of PDFium" > RELEASE.md
+        env:
+          BRANCH: ${{ github.event.inputs.branch }}
       - name: Get changes
         continue-on-error: true
         run: |
-          CURRENT_REV=${{ github.event.inputs.branch }}
+          CURRENT_REV=$BRANCH
           PREVIOUS_REV=$(curl --silent "https://api.github.com/repos/${{ github.repository }}/releases/latest" | jq -r ".tag_name")
-          git clone -b "${{ github.event.inputs.branch }}" https://pdfium.googlesource.com/pdfium.git
+          git clone -b "$BRANCH" https://pdfium.googlesource.com/pdfium.git
           cat <<END >> RELEASE.md
           ### Changes
           Commits between \`$PREVIOUS_REV\` and \`$CURRENT_REV\`:
           END
           git -C "pdfium" log origin/${PREVIOUS_REV}.. --pretty=format:'* [%s](https://pdfium.googlesource.com/pdfium/+/%H)' >> RELEASE.md
+        env:
+          BRANCH: ${{ github.event.inputs.branch }}
       - name: Generate artifacts checksums
         id: hash
         run: echo "hashes=$(sha256sum pdfium-*.tgz | base64 -w0)" >> "$GITHUB_OUTPUT"
+      - name: Attest build provenance
+        id: provenance
+        uses: actions/attest-build-provenance@v3
+        with:
+          subject-path: pdfium-*.tgz
+      - name: Rename provenance file
+        run: mv "${{ steps.provenance.outputs.bundle-path }}" pdfium-attestation.json
       - name: Publish Release
         uses: ncipollo/release-action@v1
         with:
-          allowUpdates: true
+          immutableCreate: true
           bodyFile: RELEASE.md
           token: ${{ secrets.GITHUB_TOKEN }}
           name: PDFium ${{ github.event.inputs.version }}
           tag: ${{ github.event.inputs.branch }}
-          artifacts: pdfium-*.tgz
-
-  provenance:
-    needs: [publish]
-    permissions:
-      actions: read # To read the workflow path.
-      id-token: write # To sign the provenance.
-      contents: write # To add assets to a release.
-    uses: slsa-framework/slsa-github-generator/.github/workflows/generator_generic_slsa3.yml@v2.1.0
-    with:
-      base64-subjects: ${{ needs.publish.outputs.hashes }}
-      upload-assets: true
-      upload-tag-name: ${{ needs.publish.outputs.tagname }}
-      provenance-name: pdfium-binaries.intoto.jsonl
+          artifacts: pdfium-*.tgz, pdfium-attestation.json

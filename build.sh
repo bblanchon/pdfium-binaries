@@ -1,10 +1,10 @@
 #!/bin/bash -eu
 
 OS_NAMES="android|emscripten|ios|linux|mac|win"
-CPU_NAMES="arm|arm64|x64|x86|wasm|wasm-standalone"
+CPU_NAMES="arm|arm64|ppc64|x64|x86|wasm|wasm-standalone"
 ENV_NAMES="catalyst|device|musl|simulator"
 OS_ENV_COMBINATIONS="linux musl|ios (catalyst|device|simulator)"
-STEP_REGEX="[0-9]"
+STEP_REGEX="[0-9]|10"
 
 START_STEP=0
 
@@ -22,13 +22,14 @@ Arguments:
 
 Options:
   -b branch = Chromium branch (default=main)
-  -s 0-10   = Set start step (default=0)
+  -g 0-10   = Go immediately to step n (default=0)
   -d        = debug build
+  -s        = static build (experimental)
   -j        = enable v8"
   exit
 fi
 
-while getopts "b:djms:" OPTION
+while getopts "b:djmsg:" OPTION
 do
   case $OPTION in
     b)
@@ -44,6 +45,10 @@ do
       ;;
 
     s)
+      export PDFium_BUILD_TYPE="static"
+      ;;
+
+    g)
       START_STEP="$OPTARG"
       ;;
 

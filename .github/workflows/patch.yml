@@ -19,12 +19,13 @@ jobs:
       - name: Checkout PDFium
         run: |
           PDFium_BRANCH=$(git ls-remote --sort version:refname --refs https://pdfium.googlesource.com/pdfium.git 'chromium/*' | tail -n 1 | cut -d/ -f3-4)
+          echo "PDFium branch = \`$PDFium_BRANCH\`" >> $GITHUB_STEP_SUMMARY
           echo "Checking out branch $PDFium_BRANCH"
           gclient config --unmanaged "https://pdfium.googlesource.com/pdfium.git"
           gclient sync -r "origin/${PDFium_BRANCH}" --no-history --shallow
 
       - name: Upload PDFium artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: pdfium
           path: |
@@ -32,6 +33,7 @@ jobs:
             pdfium/**/*.cpp
             pdfium/**/*.gn
             pdfium/**/*.gni
+            pdfium/**/*.py
           retention-days: 1
 
   apply-patches:
@@ -47,19 +49,24 @@ jobs:
           - linux
           - macos
           - win
+        cpu:
+          - arm64
         v8:
           - false
           - true
         include:
           - os: linux
             environment: musl
+          - os: linux
+            cpu: ppc64
           - os: emscripten
+            cpu: wasm
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Download PDFium artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: pdfium
           path: pdfium
@@ -67,6 +74,7 @@ jobs:
       - name: Apply patches
         run: steps/03-patch.sh
         env:
+          PDFium_TARGET_CPU: ${{ matrix.cpu }}
           PDFium_TARGET_OS: ${{ matrix.os }}
           PDFium_ENABLE_V8: ${{ matrix.v8 || 'false' }}
           PDFium_TARGET_ENVIRONMENT: ${{ matrix.environment || '' }}
@@ -76,7 +84,7 @@ jobs:
         run: |
           {
             echo "## Rejected patches";
-            echo "The following patches for the configuration ${{ matrix.os }} ${{ matrix.v8 && 'v8' || '' }} ${{ matrix.environment || '' }} were rejected:";
+            echo "The following patches for the configuration ${{ matrix.os }} ${{ matrix.cpu }} ${{ matrix.v8 && 'v8' || '' }} ${{ matrix.environment || '' }} were rejected:";
             find pdfium -name '*.rej' -type f \
               -printf '### `%P`\n```patch\n' \
               -exec cat {} \; \
