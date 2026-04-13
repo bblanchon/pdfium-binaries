@@ -9,7 +9,7 @@ ninja -C "$BUILD_DIR" pdfium
 
 if [[ "$TARGET_CPU" == "wasm" || "$TARGET_CPU" == "wasm-standalone" ]]; then
   LIBPDFIUMA="$BUILD_DIR/obj/libpdfium.a"
-  EXPORTED_FUNCTIONS=$(llvm-nm $LIBPDFIUMA --format=just-symbols | grep "^FPDF\|^FSDK\|^FORM\|^IFSDK" | sed 's/^/_/' | paste -sd "," -)
+  EXPORTED_FUNCTIONS=$("$SOURCE/third_party/emsdk/upstream/bin/llvm-nm" $LIBPDFIUMA --format=just-symbols | grep "^FPDF\|^FSDK\|^FORM\|^IFSDK" | sed 's/^/_/' | paste -sd "," -)
   EMCC_ARGS=(
     -s ALLOW_MEMORY_GROWTH=1
     -s ALLOW_TABLE_GROWTH=1
