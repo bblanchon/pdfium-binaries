@@ -128,7 +128,7 @@ index 206b5c3ee..42b891150 100644
 +
 +weak_alias(freopen, freopen64);
 diff --git a/system/lib/standalone/standalone.c b/system/lib/standalone/standalone.c
-index 3a910ba66..1cb01d42b 100644
+index dbc17febb..66f275efb 100644
 --- a/system/lib/standalone/standalone.c
 +++ b/system/lib/standalone/standalone.c
 @@ -6,6 +6,7 @@
@@ -154,7 +154,7 @@ index 3a910ba66..1cb01d42b 100644
  
  #include <emscripten.h>
  #include <emscripten/heap.h>
-@@ -34,6 +43,13 @@
+@@ -35,6 +44,13 @@
  
  // libc
  
@@ -168,7 +168,7 @@ index 3a910ba66..1cb01d42b 100644
  void _abort_js(void) {
    __builtin_trap();
    /* Beyond this point should be unreachable. */
-@@ -65,53 +81,1009 @@ weak int _munmap_js(
+@@ -66,6 +82,269 @@ weak int _munmap_js(
    return -ENOSYS;
  }
  
@@ -432,10 +432,13 @@ index 3a910ba66..1cb01d42b 100644
 +  _Exit(EX_OSERR);
 +  software:
 +  _Exit(EX_SOFTWARE);
++
 +}
 +
- // open(), etc. - we just support the standard streams, with no
- // corner case error checking; everything else is not permitted.
+ weak int _poll_js(void *fds, int nfds, int timeout, void* ctx, void* arg) {
+   return -ENOSYS;
+ }
+@@ -75,48 +354,742 @@ weak int _poll_js(void *fds, int nfds, int timeout, void* ctx, void* arg) {
  // TODO: full file support for WASI, or an option for it
  // open()
  weak int __syscall_openat(int dirfd, intptr_t path, int flags, ...) {
@@ -1193,7 +1196,7 @@ index 3a910ba66..1cb01d42b 100644
  }
  
  // Emscripten additions
-@@ -157,12 +1129,21 @@ weak double emscripten_date_now(void) {
+@@ -162,12 +1135,21 @@ weak double emscripten_date_now(void) {
    return clock_gettime_ms(CLOCK_REALTIME);
  }
  
@@ -1215,7 +1218,7 @@ index 3a910ba66..1cb01d42b 100644
    abort();
  }
  #endif
-@@ -265,6 +1246,21 @@ int _setitimer_js(int which, double timeout) {
+@@ -270,6 +1252,21 @@ int _setitimer_js(int which, double timeout) {
    return -1;
  }
  
@@ -1237,11 +1240,10 @@ index 3a910ba66..1cb01d42b 100644
  weak uintptr_t emscripten_stack_snapshot(void) {
    return 0;
  }
-@@ -308,3 +1304,250 @@ weak void _emscripten_get_progname(char* buf, int length) {
- }
+@@ -314,6 +1311,252 @@ weak void _emscripten_get_progname(char* buf, int length) {
  
  weak void _emscripten_runtime_keepalive_clear() {}
-+
+ 
 +/* 2000-03-01 (mod 400 year, immediately after feb29 */
 +#define LEAPOCH (946684800LL + 86400*(31+29))
 +#define DAYS_PER_400Y (365*400 + 97)
@@ -1488,3 +1490,6 @@ index 3a910ba66..1cb01d42b 100644
 +  return -1;
 +}
 +
+ void __throw_exception_with_stack_trace(_Unwind_Exception* exception_object) {
+   _Unwind_RaiseException(exception_object);
+ }
