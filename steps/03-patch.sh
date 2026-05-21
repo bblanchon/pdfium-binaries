@@ -16,7 +16,15 @@ apply_patch() {
 
 pushd "${SOURCE}"
 
-[ "$BUILD_TYPE" == "shared" ] && [ "$OS" != "emscripten" ] && apply_patch "$PATCHES/shared_library.patch"
+case "$BUILD_TYPE" in
+  shared)
+    [ "$OS" != "emscripten" ] && apply_patch "$PATCHES/shared_library.patch"
+    ;;
+  static)
+    apply_patch "$PATCHES/static_library.patch"
+    ;;
+esac
+
 apply_patch "$PATCHES/public_headers.patch"
 
 [ "$ENABLE_V8" == "true" ] && apply_patch "$PATCHES/v8/pdfium.patch"
