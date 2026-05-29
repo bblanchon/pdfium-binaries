@@ -15,6 +15,11 @@ mkdir -p "$BUILD"
   echo "is_debug = $IS_DEBUG"
   echo "pdf_is_standalone = true"
   echo "pdf_use_partition_alloc = false"
+  # AddressSanitizer build, for triaging humanpred/rpdfium#44.
+  # is_lsan needs PartitionAlloc which we explicitly disable
+  # above; setting it to false avoids a gn dependency error.
+  echo "is_asan = true"
+  echo "is_lsan = false"
   echo "target_cpu = \"$TARGET_CPU\""
   echo "target_os = \"$OS\""
   echo "pdf_enable_v8 = $ENABLE_V8"
