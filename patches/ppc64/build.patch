@@ -1,0 +1,36 @@
+diff --git a/linux/sysroot_scripts/install-sysroot.py b/linux/sysroot_scripts/install-sysroot.py
+index 3158972..fadb431 100755
+--- a/linux/sysroot_scripts/install-sysroot.py
++++ b/linux/sysroot_scripts/install-sysroot.py
+@@ -46,6 +46,7 @@ ARCH_TRANSLATIONS = {
+     "mips": "mipsel",
+     "mips64": "mips64el",
+     "ppc64le": "ppc64el",
++    "ppc64": "ppc64el",
+ }
+ 
+ DEFAULT_TARGET_PLATFORMS = {
+diff --git a/toolchain/linux/BUILD.gn b/toolchain/linux/BUILD.gn
+index a6e20a0..b98f5dc 100644
+--- a/toolchain/linux/BUILD.gn
++++ b/toolchain/linux/BUILD.gn
+@@ -312,12 +312,14 @@ gcc_toolchain("s390x") {
+ }
+ 
+ gcc_toolchain("ppc64") {
+-  cc = "gcc"
+-  cxx = "g++"
++  toolprefix = "powerpc64le-linux-gnu-"
+ 
+-  readelf = "readelf"
+-  nm = "nm"
+-  ar = "ar"
++  cc = "${toolprefix}gcc"
++  cxx = "${toolprefix}g++"
++
++  readelf = "${toolprefix}readelf"
++  nm = "${toolprefix}nm"
++  ar = "${toolprefix}ar"
+   ld = cxx
+ 
+   toolchain_args = {

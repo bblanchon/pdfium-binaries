@@ -36,6 +36,9 @@ jobs:
   wasm:
     name: WASM
     uses: ./.github/workflows/build.yml
+    permissions:
+      contents: read
+      actions: write
     needs:
       - query
     if: always() && !cancelled() && !failure()

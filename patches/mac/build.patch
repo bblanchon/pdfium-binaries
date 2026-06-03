@@ -1,0 +1,21 @@
+diff --git a/toolchain/apple/toolchain.gni b/toolchain/apple/toolchain.gni
+index ec3b67a..c0beb8c 100644
+--- a/toolchain/apple/toolchain.gni
++++ b/toolchain/apple/toolchain.gni
+@@ -502,6 +502,16 @@ template("single_apple_toolchain") {
+       nm = "${prefix}llvm-nm"
+       otool = "${prefix}llvm-otool"
+ 
++      # Give room to set the soname equivalent path in the resulting output.
++      # Required for usage in nixpkgs (as they set the LC_ID_DYLIB to a path in
++      # /nix/store).
++      #
++      # Refused by Chromium in
++      # https://groups.google.com/g/pdfium/c/72lDbDSQric/m/Eq7VgkPZDwAJ due to
++      # it not making sense in their context to be able to patch binary
++      # headers.
++      linker_driver_args += " -Wl,-headerpad_max_install_names"
++
+       link_command = "$linker_driver_env $linker_driver"
+       link_command += " -Wcrl,otoolpath,$otool -Wcrl,nmpath,$nm"
+       link_command += " -Wcrl,tocname,\"$tocname\""

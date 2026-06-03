@@ -1,8 +1,8 @@
 diff --git a/core/fxcrt/BUILD.gn b/core/fxcrt/BUILD.gn
-index 90b9ec7..1e9be68 100644
+index 796a10a..abcbc2d 100644
 --- a/core/fxcrt/BUILD.gn
 +++ b/core/fxcrt/BUILD.gn
-@@ -150,7 +150,7 @@ source_set("fxcrt") {
+@@ -159,7 +159,7 @@ source_set("fxcrt") {
    } else {
      sources += [ "fx_memory_malloc.cpp" ]
    }
@@ -12,10 +12,10 @@ index 90b9ec7..1e9be68 100644
        "cfx_fileaccess_posix.cpp",
        "cfx_fileaccess_posix.h",
 diff --git a/core/fxge/BUILD.gn b/core/fxge/BUILD.gn
-index 215a63b..e52e9b6 100644
+index 933f538..3df15ad 100644
 --- a/core/fxge/BUILD.gn
 +++ b/core/fxge/BUILD.gn
-@@ -160,7 +160,7 @@ source_set("fxge") {
+@@ -166,7 +166,7 @@ source_set("fxge") {
      ]
    }
  
@@ -24,3 +24,16 @@ index 215a63b..e52e9b6 100644
      sources += [ "linux/fx_linux_impl.cpp" ]
    }
  
+diff --git a/skia/BUILD.gn b/skia/BUILD.gn
+index 67e1360..3340926 100644
+--- a/skia/BUILD.gn
++++ b/skia/BUILD.gn
+@@ -513,7 +513,7 @@ skia_source_set("skia_opts") {
+   } else if (current_cpu == "mipsel" || current_cpu == "mips64el") {
+     cflags += [ "-fomit-frame-pointer" ]
+   } else {
+-    assert(false, "Unsupported target CPU " + current_cpu)
++    # assert(false, "Unsupported target CPU " + current_cpu)
+   }
+ 
+   if (is_android && !is_debug) {
