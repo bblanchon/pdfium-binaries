@@ -1,14 +1,14 @@
 import("//build/toolchain/gcc_toolchain.gni")
 
 gcc_toolchain("x86") {
-  toolprefix = "i686-linux-musl-"
+  toolprefix = "//third_party/i686-linux-musl-cross/bin/i686-linux-musl-"
 
-  cc = "${toolprefix}gcc"
-  cxx = "${toolprefix}g++"
+  cc = rebase_path("${toolprefix}gcc")
+  cxx = rebase_path("${toolprefix}g++")
 
-  readelf = "${toolprefix}readelf"
-  nm = "${toolprefix}nm"
-  ar = "${toolprefix}ar"
+  readelf = rebase_path("${toolprefix}readelf")
+  nm = rebase_path("${toolprefix}nm")
+  ar = rebase_path("${toolprefix}ar")
   ld = cxx
 
   extra_ldflags = "-static-libgcc -static-libstdc++"
@@ -23,14 +23,14 @@ gcc_toolchain("x86") {
 }
 
 gcc_toolchain("x64") {
-  toolprefix = "x86_64-linux-musl-"
+  toolprefix = "//third_party/x86_64-linux-musl-cross/bin/x86_64-linux-musl-"
 
-  cc = "${toolprefix}gcc"
-  cxx = "${toolprefix}g++"
+  cc = rebase_path("${toolprefix}gcc")
+  cxx = rebase_path("${toolprefix}g++")
 
-  readelf = "${toolprefix}readelf"
-  nm = "${toolprefix}nm"
-  ar = "${toolprefix}ar"
+  readelf = rebase_path("${toolprefix}readelf")
+  nm = rebase_path("${toolprefix}nm")
+  ar = rebase_path("${toolprefix}ar")
   ld = cxx
 
   extra_ldflags = "-static-libgcc -static-libstdc++"
@@ -45,14 +45,14 @@ gcc_toolchain("x64") {
 }
 
 gcc_toolchain("arm") {
-  toolprefix = "arm-linux-musleabihf-"
+  toolprefix = "//third_party/arm-linux-musleabihf-cross/bin/arm-linux-musleabihf-"
 
-  cc = "${toolprefix}gcc"
-  cxx = "${toolprefix}g++"
+  cc = rebase_path("${toolprefix}gcc")
+  cxx = rebase_path("${toolprefix}g++")
 
-  readelf = "${toolprefix}readelf"
-  nm = "${toolprefix}nm"
-  ar = "${toolprefix}ar"
+  readelf = rebase_path("${toolprefix}readelf")
+  nm = rebase_path("${toolprefix}nm")
+  ar = rebase_path("${toolprefix}ar")
   ld = cxx
 
   extra_ldflags = "-static-libgcc -static-libstdc++"
@@ -67,14 +67,14 @@ gcc_toolchain("arm") {
 }
 
 gcc_toolchain("arm64") {
-  toolprefix = "aarch64-linux-musl-"
+  toolprefix = "//third_party/aarch64-linux-musl-cross/bin/aarch64-linux-musl-"
 
-  cc = "${toolprefix}gcc"
-  cxx = "${toolprefix}g++"
+  cc = rebase_path("${toolprefix}gcc")
+  cxx = rebase_path("${toolprefix}g++")
 
-  readelf = "${toolprefix}readelf"
-  nm = "${toolprefix}nm"
-  ar = "${toolprefix}ar"
+  readelf = rebase_path("${toolprefix}readelf")
+  nm = rebase_path("${toolprefix}nm")
+  ar = rebase_path("${toolprefix}ar")
   ld = cxx
 
   extra_cxxflags= "-flax-vector-conversions"  # issue #150
