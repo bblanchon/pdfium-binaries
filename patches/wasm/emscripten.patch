@@ -128,7 +128,7 @@ index 206b5c3ee..42b891150 100644
 +
 +weak_alias(freopen, freopen64);
 diff --git a/system/lib/standalone/standalone.c b/system/lib/standalone/standalone.c
-index dbc17febb..66f275efb 100644
+index 755049544..28187455c 100644
 --- a/system/lib/standalone/standalone.c
 +++ b/system/lib/standalone/standalone.c
 @@ -6,6 +6,7 @@
@@ -168,7 +168,7 @@ index dbc17febb..66f275efb 100644
  void _abort_js(void) {
    __builtin_trap();
    /* Beyond this point should be unreachable. */
-@@ -66,6 +82,269 @@ weak int _munmap_js(
+@@ -66,6 +82,273 @@ weak int _munmap_js(
    return -ENOSYS;
  }
  
@@ -435,10 +435,14 @@ index dbc17febb..66f275efb 100644
 +
 +}
 +
- weak int _poll_js(void *fds, int nfds, int timeout, void* ctx, void* arg) {
++weak int _poll_js(void *fds, int nfds, int timeout, void* ctx, void* arg) {
++  return -ENOSYS;
++}
++
+ weak int __syscall_poll(intptr_t fds, int nfds, int timeout) {
    return -ENOSYS;
  }
-@@ -75,48 +354,742 @@ weak int _poll_js(void *fds, int nfds, int timeout, void* ctx, void* arg) {
+@@ -75,48 +358,742 @@ weak int __syscall_poll(intptr_t fds, int nfds, int timeout) {
  // TODO: full file support for WASI, or an option for it
  // open()
  weak int __syscall_openat(int dirfd, intptr_t path, int flags, ...) {
@@ -1196,7 +1200,7 @@ index dbc17febb..66f275efb 100644
  }
  
  // Emscripten additions
-@@ -162,12 +1135,21 @@ weak double emscripten_date_now(void) {
+@@ -162,12 +1139,21 @@ weak double emscripten_date_now(void) {
    return clock_gettime_ms(CLOCK_REALTIME);
  }
  
@@ -1218,7 +1222,7 @@ index dbc17febb..66f275efb 100644
    abort();
  }
  #endif
-@@ -270,6 +1252,21 @@ int _setitimer_js(int which, double timeout) {
+@@ -270,6 +1256,21 @@ int _setitimer_js(int which, double timeout) {
    return -1;
  }
  
@@ -1240,7 +1244,7 @@ index dbc17febb..66f275efb 100644
  weak uintptr_t emscripten_stack_snapshot(void) {
    return 0;
  }
-@@ -314,6 +1311,252 @@ weak void _emscripten_get_progname(char* buf, int length) {
+@@ -314,6 +1315,252 @@ weak void _emscripten_get_progname(char* buf, int length) {
  
  weak void _emscripten_runtime_keepalive_clear() {}
  
