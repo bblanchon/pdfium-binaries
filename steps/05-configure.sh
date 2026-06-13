@@ -8,6 +8,8 @@ TARGET_ENVIRONMENT=${PDFium_TARGET_ENVIRONMENT:-}
 ENABLE_V8=${PDFium_ENABLE_V8:-false}
 IS_DEBUG=${PDFium_IS_DEBUG:-false}
 BUILD_TYPE=${PDFium_BUILD_TYPE:-shared}
+NO_LLD=${PDFium_NO_LLD:-false}
+NO_ABSEIL=${PDFium_NO_ABSEIL:-false}
 
 mkdir -p "$BUILD"
 
@@ -22,6 +24,14 @@ mkdir -p "$BUILD"
   echo "treat_warnings_as_errors = false"
   echo "is_component_build = false"
 
+  if [ "$NO_LLD" == "true" ]; then
+      echo "use_lld = false"
+  fi
+
+  if [ "$NO_ABSEIL" == "true" ]; then
+      echo "use_custom_libcxx = false"
+  fi
+  
   if [ "$ENABLE_V8" == "true" ]; then
     echo "v8_use_external_startup_data = false"
     echo "v8_enable_i18n_support = false"

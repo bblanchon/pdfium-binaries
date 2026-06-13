@@ -25,11 +25,13 @@ Options:
   -g 0-10   = Go immediately to step n (default=0)
   -d        = debug build
   -s        = static build (experimental)
-  -j        = enable v8"
+  -j        = enable v8
+  -l        = do not use lld linker
+  -x        = do not use Abseil C++ library"
   exit
 fi
 
-while getopts "b:djmsg:" OPTION
+while getopts "b:djmsg:lx" OPTION
 do
   case $OPTION in
     b)
@@ -51,7 +53,15 @@ do
     g)
       START_STEP="$OPTARG"
       ;;
-
+    
+    l)
+      export PDFium_NO_LLD=true
+      ;;
+    
+    x)
+      export PDFium_NO_ABSEIL=true
+      ;;
+    
     *)
       echo "Invalid flag -$OPTION"
       exit 1
