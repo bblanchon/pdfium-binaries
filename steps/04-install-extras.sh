@@ -11,7 +11,7 @@ pushd "$SOURCE"
 
 case "$TARGET_OS" in
   linux)
-    build/install-build-deps.sh
+    build/install-build-deps.sh --no-prompt
     gclient runhooks
     build/linux/sysroot_scripts/install-sysroot.py "--arch=$TARGET_CPU"
 
@@ -35,7 +35,7 @@ case "$TARGET_OS" in
     ;;
 
   android)
-    build/install-build-deps.sh --android
+    build/install-build-deps.sh --no-prompt --android
     gclient runhooks
     ;;
 
