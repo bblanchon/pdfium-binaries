@@ -29,6 +29,11 @@ mkdir -p "$BUILD"
 
   if [ "$BUILD_TYPE" == "static" ]; then
     echo "pdf_is_complete_lib = true"
+
+    if [ "$OS-$TARGET_CPU" == "linux-arm64" ]; then
+      echo "use_lld = false"
+      echo "use_custom_libcxx = false"
+    fi
   fi
 
   case "$OS" in
