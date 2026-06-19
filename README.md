@@ -98,6 +98,11 @@ Here are the download links for latest release:
     <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-v8-linux-arm64.tgz">pdfium-v8-linux-arm64.tgz</a></td>
   </tr>
   <tr>
+    <td>mips64el</td>
+    <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-linux-mips64el.tgz">pdfium-linux-mips64el.tgz</a></td>
+    <td>not tested yet</td>
+  </tr>
+  <tr>
     <td>ppc64</td>
     <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-linux-ppc64.tgz">pdfium-linux-ppc64.tgz</a></td>
     <td>not tested yet</td>

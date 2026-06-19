@@ -1,0 +1,29 @@
+diff --git a/config/compiler/BUILD.gn b/config/compiler/BUILD.gn
+index e1da114..22aebba 100644
+--- a/config/compiler/BUILD.gn
++++ b/config/compiler/BUILD.gn
+@@ -660,9 +660,10 @@ config("compiler") {
+     # TODO(crbug.com/376278218): This causes segfault on Linux ARM builds.
+     # It also causes segfault on Linux s390x:
+     # https://github.com/llvm/llvm-project/issues/149511
+-    if (is_linux && use_lld && current_cpu != "arm" && current_cpu != "s390x") {
+-      cflags += [ "-Wa,--crel,--allow-experimental-crel" ]
+-    }
++    # XXX(pypdfium2)
++    # if (is_linux && use_lld && current_cpu != "arm" && current_cpu != "s390x") {
++    #   cflags += [ "-Wa,--crel,--allow-experimental-crel" ]
++    # }
+   }
+ 
+   # C11/C++11 compiler flags setup.
+@@ -1085,7 +1086,9 @@ config("linker") {
+ 
+   if (is_linux || is_chromeos || is_android || is_fuchsia) {
+     ldflags += [
+-      "-Wl,-z,noexecstack",
++      # XXX(pypdfium2) on mips64el, the linker asks for an execstack, so enable it here:
++      # ld.lld: error: ../../build/linux/debian_bullseye_mips64el-sysroot/usr/lib/mips64el-linux-gnuabi64/crti.o: requires an executable stack, but -z execstack is not specified
++      "-Wl,-z,execstack",
+       "-Wl,-z,relro",
+     ]
+ 

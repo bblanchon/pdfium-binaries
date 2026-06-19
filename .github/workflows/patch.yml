@@ -59,6 +59,8 @@ jobs:
             environment: musl
           - os: linux
             cpu: ppc64
+          - os: linux
+            cpu: mips64el
           - os: emscripten
             cpu: wasm
     steps:
