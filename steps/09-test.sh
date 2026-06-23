@@ -86,6 +86,9 @@ case "$OS" in
           SUFFIX="-10"
         fi
         ;;
+      mips64el)
+        PREFIX="mips64el-linux-gnuabi64-"
+        ;;
       ppc64)
         PREFIX="powerpc64le-linux-gnu-"
         ;;
