@@ -1,90 +1,28 @@
 diff --git a/config/compiler/BUILD.gn b/config/compiler/BUILD.gn
-index e1da114..22aebba 100644
+index e1da114..70a4b9e 100644
 --- a/config/compiler/BUILD.gn
 +++ b/config/compiler/BUILD.gn
-@@ -660,9 +660,10 @@ config("compiler") {
-     # TODO(crbug.com/376278218): This causes segfault on Linux ARM builds.
-     # It also causes segfault on Linux s390x:
-     # https://github.com/llvm/llvm-project/issues/149511
+@@ -655,14 +655,6 @@ config("compiler") {
+     } else {
+       cflags += [ "-ffp-contract=off" ]
+     }
+-
+-    # Enable ELF CREL (see crbug.com/357878242) for all platforms that use ELF.
+-    # TODO(crbug.com/376278218): This causes segfault on Linux ARM builds.
+-    # It also causes segfault on Linux s390x:
+-    # https://github.com/llvm/llvm-project/issues/149511
 -    if (is_linux && use_lld && current_cpu != "arm" && current_cpu != "s390x") {
 -      cflags += [ "-Wa,--crel,--allow-experimental-crel" ]
 -    }
-+    # XXX(pypdfium2)
-+    # if (is_linux && use_lld && current_cpu != "arm" && current_cpu != "s390x") {
-+    #   cflags += [ "-Wa,--crel,--allow-experimental-crel" ]
-+    # }
    }
  
    # C11/C++11 compiler flags setup.
-@@ -1085,7 +1086,9 @@ config("linker") {
+@@ -1085,7 +1077,7 @@ config("linker") {
  
    if (is_linux || is_chromeos || is_android || is_fuchsia) {
      ldflags += [
 -      "-Wl,-z,noexecstack",
-+      # XXX(pypdfium2) on mips64el, the linker asks for an execstack, so enable it here:
-+      # ld.lld: error: ../../build/linux/debian_bullseye_mips64el-sysroot/usr/lib/mips64el-linux-gnuabi64/crti.o: requires an executable stack, but -z execstack is not specified
 +      "-Wl,-z,execstack",
        "-Wl,-z,relro",
      ]
  
-diff --git a/config/clang/BUILD.gn b/config/clang/BUILD.gn
-index c38670a..f0aa8df 100644
---- a/config/clang/BUILD.gn
-+++ b/config/clang/BUILD.gn
-@@ -242,35 +242,10 @@ template("clang_lib") {
- }
- 
- # Adds a dependency on the Clang runtime library clang_rt.builtins.
--clang_lib("compiler_builtins") {
--  if (is_mac) {
--    libname = "osx"
--  } else if (is_ios) {
--    if (target_platform == "iphoneos") {
--      if (target_environment == "simulator") {
--        libname = "iossim"
--      } else if (target_environment == "device") {
--        libname = "ios"
--      } else if (target_environment == "catalyst") {
--        libname = "osx"
--      } else {
--        assert(false, "unsupported target_environment=$target_environment")
--      }
--    } else if (target_platform == "tvos") {
--      if (target_environment == "simulator") {
--        libname = "tvossim"
--      } else if (target_environment == "device") {
--        libname = "tvos"
--      } else {
--        assert(false, "unsupported target_environment=$target_environment")
--      }
--    } else {
--      assert(false, "unsupported target_platform=$target_platform")
--    }
--  } else if (current_cpu != "ppc64" && current_cpu != "s390x") {
--    libname = "builtins"
--  }
--}
-+# XXX(pypdfium2) --no-libclang-rt
-+# clang_lib("compiler_builtins") {
-+#   # ...
-+# }
- 
- # Adds a dependency on the Clang runtime library clang_rt.profile.
- clang_lib("compiler_profile") {
-diff --git a/config/compiler/BUILD.gn b/config/compiler/BUILD.gn
-index e1da114..7bf7a1b 100644
---- a/config/compiler/BUILD.gn
-+++ b/config/compiler/BUILD.gn
-@@ -1684,9 +1684,9 @@ config("runtime_library") {
-   # can be replaced by the C++ symbols. This config ensures the C++ symbols
-   # exist and are strong in order to cause that replacement to occur by
-   # explicitly linking in clang's compiler-rt library.
--  if (is_clang && !(is_a_target_toolchain && is_cronet_build)) {
--    configs += [ "//build/config/clang:compiler_builtins" ]
--  }
-+  # if (is_clang && !(is_a_target_toolchain && is_cronet_build)) {
-+  #   configs += [ "//build/config/clang:compiler_builtins" ]
-+  # }
- 
-   # TODO(crbug.com/40570904): Come up with a better name for is POSIX + Fuchsia
-   # configuration.
