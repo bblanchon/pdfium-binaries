@@ -79,6 +79,9 @@ case "$TARGET_ENVIRONMENT" in
 esac
 
 case "$TARGET_CPU" in
+  mips64el)
+    apply_patch "$PATCHES/mips64el/build.patch" build
+    ;;
   ppc64)
     apply_patch "$PATCHES/ppc64/pdfium.patch"
     apply_patch "$PATCHES/ppc64/build.patch" build

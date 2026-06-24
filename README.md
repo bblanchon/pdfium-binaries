@@ -98,6 +98,11 @@ Here are the download links for latest release:
     <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-v8-linux-arm64.tgz">pdfium-v8-linux-arm64.tgz</a></td>
   </tr>
   <tr>
+    <td>mips64el</td>
+    <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-linux-mips64el.tgz">pdfium-linux-mips64el.tgz</a></td>
+    <td>not tested yet</td>
+  </tr>
+  <tr>
     <td>ppc64</td>
     <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-linux-ppc64.tgz">pdfium-linux-ppc64.tgz</a></td>
     <td>not tested yet</td>
@@ -311,7 +316,7 @@ The following projects use (or recommend using) our PDFium builds:
     <tr>
       <td><img src="https://github.com/mara004.png" width="48" height="48" alt="mara004"></td>
       <td><a href="https://github.com/mara004"><code>@mara004</code></a></td>
-      <td>Conda packages. ppc64 build. Constant aid.</td>
+      <td>Conda packages. ppc and mips builds. Constant aid.</td>
     </tr>
     <tr>
       <td><img src="https://github.com/mgiessing.png" width="48" height="48" alt="Marvin Gießing"></td>
