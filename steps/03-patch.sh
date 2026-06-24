@@ -26,6 +26,7 @@ case "$BUILD_TYPE" in
 esac
 
 apply_patch "$PATCHES/public_headers.patch"
+apply_patch "$PATCHES/clang_rt.patch" build
 
 [ "$ENABLE_V8" == "true" ] && apply_patch "$PATCHES/v8/pdfium.patch"
 
