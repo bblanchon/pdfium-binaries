@@ -7,9 +7,9 @@ IS_DEBUG=${PDFium_IS_DEBUG:-false}
 
 ninja -C "$BUILD_DIR" pdfium
 
-if [ "$TARGET_CPU" == "wasm" ]; then
+if [[ "$TARGET_CPU" == "wasm" || "$TARGET_CPU" == "wasm-standalone" ]]; then
   LIBPDFIUMA="$BUILD_DIR/obj/libpdfium.a"
-  EXPORTED_FUNCTIONS=$(llvm-nm $LIBPDFIUMA --format=just-symbols | grep "^FPDF\|^FSDK\|^FORM\|^IFSDK" | sed 's/^/_/' | paste -sd "," -)
+  EXPORTED_FUNCTIONS=$("$SOURCE/third_party/emsdk/upstream/bin/llvm-nm" $LIBPDFIUMA --format=just-symbols | grep "^FPDF\|^FSDK\|^FORM\|^IFSDK" | sed 's/^/_/' | paste -sd "," -)
   EMCC_ARGS=(
     -s ALLOW_MEMORY_GROWTH=1
     -s ALLOW_TABLE_GROWTH=1
@@ -21,6 +21,13 @@ if [ "$TARGET_CPU" == "wasm" ]; then
     "$LIBPDFIUMA"
     --no-entry
   )
+  if [[ "$TARGET_CPU" == "wasm-standalone" ]]; then
+    EMCC_ARGS+=(
+      -s ERROR_ON_UNDEFINED_SYMBOLS=0
+      -s STANDALONE_WASM=1
+    )
+  fi
+
   if [[ "$IS_DEBUG" == "true" ]]; then
     EMCC_ARGS+=(
       --profile

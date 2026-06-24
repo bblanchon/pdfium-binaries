@@ -50,6 +50,9 @@ case "$OS" in
   emscripten)
     apply_patch "$PATCHES/wasm/pdfium.patch"
     apply_patch "$PATCHES/wasm/build.patch" build
+    if [ "$TARGET_CPU" == "wasm-standalone" ]; then
+      apply_patch "$PATCHES/wasm/callbacks.patch"
+    fi
     if [ "$ENABLE_V8" == "true" ]; then
       apply_patch "$PATCHES/wasm/v8.patch" v8
     fi
