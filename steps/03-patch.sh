@@ -59,6 +59,7 @@ case "$OS" in
     ;;
 
   win)
+    apply_patch "$PATCHES/win/pdfium.patch"
     apply_patch "$PATCHES/win/build.patch" build
 
     VERSION=${PDFium_VERSION:-0.0.0.0}
