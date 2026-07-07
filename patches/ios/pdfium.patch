@@ -11,19 +11,6 @@ index 5617425a1..5305ed83f 100644
      sources += [
        "apple/capple_platform.cpp",
        "apple/capple_platform.h",
-diff --git a/core/fxge/cfx_substfont.h b/core/fxge/cfx_substfont.h
-index 2c531ef36..34a249947 100644
---- a/core/fxge/cfx_substfont.h
-+++ b/core/fxge/cfx_substfont.h
-@@ -53,7 +53,7 @@ class CFX_SubstFont {
-   bool IsSymbolic() const { return charset_ == FX_Charset::kSymbol; }
-   bool IsBold() const { return weight_ == pdfium::kFontWeightBold; }
- 
--#if BUILDFLAG(IS_MAC)
-+#if BUILDFLAG(IS_APPLE)
-   bool IsMediumWeight() const { return weight_ >= 500 && weight_ <= 600; }
- #endif
- 
 diff --git a/testing/test.gni b/testing/test.gni
 index 6ad2c2d4a..21600090e 100644
 --- a/testing/test.gni
