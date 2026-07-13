@@ -802,7 +802,7 @@ jobs:
         continue-on-error: true
         run: |
           CURRENT_REV=$BRANCH
-          PREVIOUS_REV=$(curl --silent "https://api.github.com/repos/$REPO_NAME/releases/latest" | jq -r ".tag_name")
+          PREVIOUS_REV=$(curl --silent "https://api.github.com/repos/$REPOSITORY/releases/latest" | jq -r ".tag_name")
           git clone -b "$BRANCH" https://pdfium.googlesource.com/pdfium.git
           cat <<END >> RELEASE.md
           ### Changes
@@ -810,7 +810,7 @@ jobs:
           END
           git -C "pdfium" log origin/${PREVIOUS_REV}.. --pretty=format:'* [%s](https://pdfium.googlesource.com/pdfium/+/%H)' >> RELEASE.md
         env:
-          REPO_NAME: ${{ github.repository }}
+          REPOSITORY: ${{ github.repository }}
           BRANCH: ${{ github.event.inputs.branch }}
       - name: Generate artifacts checksums
         id: hash
