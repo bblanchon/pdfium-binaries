@@ -86,10 +86,15 @@ jobs:
         run: |
           {
             echo "## Rejected patches";
-            echo "The following patches for the configuration ${{ matrix.os }} ${{ matrix.cpu }} ${{ matrix.v8 && 'v8' || '' }} ${{ matrix.environment || '' }} were rejected:";
+            echo "The following patches for the configuration $MATRIX_OS $MATRIX_CPU $MATRIX_V8 $MATRIX_ENVIRONMENT were rejected:";
             find pdfium -name '*.rej' -type f \
               -printf '### `%P`\n```patch\n' \
               -exec cat {} \; \
               -printf '```\n' || \
               echo 'No .rej files found';
           } >> $GITHUB_STEP_SUMMARY
+        env:
+          MATRIX_OS: ${{ matrix.os }}
+          MATRIX_CPU: ${{ matrix.cpu }}
+          MATRIX_V8: ${{ matrix.v8 && 'v8' || '' }}
+          MATRIX_ENVIRONMENT: ${{ matrix.environment || '' }}
