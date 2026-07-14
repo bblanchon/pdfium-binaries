@@ -80,7 +80,7 @@ case "$TARGET_ENVIRONMENT" in
 esac
 
 case "$TARGET_CPU" in
-  mips64el)
+  mipsel|mips64el)
     apply_patch "$PATCHES/mips64el/build.patch" build
     ;;
   ppc64)

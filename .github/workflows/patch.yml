@@ -60,6 +60,8 @@ jobs:
           - os: linux
             cpu: ppc64
           - os: linux
+            cpu: mipsel
+          - os: linux
             cpu: mips64el
           - os: emscripten
             cpu: wasm
