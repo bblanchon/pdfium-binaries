@@ -647,12 +647,13 @@ jobs:
           VERSION="$VERSION"
           BRANCH="${GITHUB_REF#refs/heads/}"
           COMMIT="${GITHUB_SHA}"
-          RELEASE_NOTES="${{github.server_url}}/${{github.repository}}/releases"
+          RELEASE_NOTES="${RELEASE_PREFIX}/releases"
           $RELEASE && RELEASE_NOTES+="/tag/$BRANCH"
           echo "NUSPEC_PROPERTIES=version=$VERSION;branch=$BRANCH;commit=$COMMIT;releaseNotes=$RELEASE_NOTES" >> "$GITHUB_ENV"
         env:
           VERSION: ${{ github.event.inputs.version || '0.0.0.0' }}
           RELEASE: ${{ github.event.inputs.release }}
+          RELEASE_PREFIX: ${{ format('{0}/{1}', github.server_url, github.repository) }}
           BRANCH: ${{ github.event.inputs.branch }}
       - name: Pack
         shell: bash
@@ -669,7 +670,7 @@ jobs:
           path: '*.nupkg'
       - name: Push to nuget.org
         if: env.NUGET_API_KEY && startsWith(github.event.inputs.branch, 'chromium/') && github.event.inputs.version && github.event.inputs.nuget == 'true'
-        run: nuget push -Source nuget.org -ApiKey ${{ secrets.NUGET_API_KEY }} *.nupkg
+        run: nuget push -Source nuget.org -ApiKey "$NUGET_API_KEY" *.nupkg
         env:
           NUGET_API_KEY: ${{ secrets.NUGET_API_KEY  }}
 
@@ -813,7 +814,7 @@ jobs:
         continue-on-error: true
         run: |
           CURRENT_REV=$BRANCH
-          PREVIOUS_REV=$(curl --silent "https://api.github.com/repos/${{ github.repository }}/releases/latest" | jq -r ".tag_name")
+          PREVIOUS_REV=$(curl --silent "https://api.github.com/repos/$REPOSITORY/releases/latest" | jq -r ".tag_name")
           git clone -b "$BRANCH" https://pdfium.googlesource.com/pdfium.git
           cat <<END >> RELEASE.md
           ### Changes
@@ -821,6 +822,7 @@ jobs:
           END
           git -C "pdfium" log origin/${PREVIOUS_REV}.. --pretty=format:'* [%s](https://pdfium.googlesource.com/pdfium/+/%H)' >> RELEASE.md
         env:
+          REPOSITORY: ${{ github.repository }}
           BRANCH: ${{ github.event.inputs.branch }}
       - name: Generate artifacts checksums
         id: hash
@@ -831,7 +833,9 @@ jobs:
         with:
           subject-path: pdfium-*.tgz
       - name: Rename provenance file
-        run: mv "${{ steps.provenance.outputs.bundle-path }}" pdfium-attestation.json
+        run: mv "$BUNDLE_PATH" pdfium-attestation.json
+        env:
+          BUNDLE_PATH: ${{ steps.provenance.outputs.bundle-path }}
       - name: Publish Release
         uses: ncipollo/release-action@v1
         with:
