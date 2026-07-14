@@ -86,8 +86,8 @@ Here are the download links for latest release:
   </tr>
 
   <tr>
-    <td rowspan="8">Linux</td>
-    <td rowspan="5">glibc</td>
+    <td rowspan="10">Linux</td>
+    <td rowspan="7">glibc</td>
     <td>arm</td>
     <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-linux-arm.tgz">pdfium-linux-arm.tgz</a></td>
     <td><a href="https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-v8-linux-arm.tgz">pdfium-v8-linux-arm.tgz</a></td>
