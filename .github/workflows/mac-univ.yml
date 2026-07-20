@@ -1,3 +1,5 @@
+name: macOS universal library
+
 on:
   workflow_call:
     inputs:
@@ -16,6 +18,7 @@ on:
 
 jobs:
   build:
+    name: Build
     runs-on: macos-latest
     outputs:
       artifact: ${{ steps.init.outputs.artifact }}

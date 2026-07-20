@@ -52,6 +52,7 @@ permissions:
 
 jobs:
   build:
+    name: Build
     outputs:
       artifact: ${{ steps.init.outputs.artifact }}
     runs-on: ${{ (inputs.target_os == 'ios' || inputs.target_os == 'mac') && 'macos-15' || inputs.target_os == 'win' && 'windows-2022' || 'ubuntu-24.04' }}
