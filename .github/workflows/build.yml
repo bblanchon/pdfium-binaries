@@ -48,7 +48,7 @@ on:
 
 permissions:
   contents: read
-  actions: write
+  actions: write  # Needed to upload the build artifact
 
 jobs:
   build:
