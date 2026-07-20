@@ -79,6 +79,8 @@ jobs:
           echo "artifact=$ARTIFACT" >> $GITHUB_OUTPUT
       - name: Checkout this repo
         uses: actions/checkout@v6
+        with:
+          persist-credentials: false
       - name: Set environment variables
         run: steps/00-environment.sh
         shell: bash

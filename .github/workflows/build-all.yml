@@ -634,6 +634,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+        with:
+          persist-credentials: false
       - name: Download artifacts
         uses: actions/download-artifact@v7
         with:
@@ -688,6 +690,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+        with:
+          persist-credentials: false
       - name: Download artifacts
         uses: actions/download-artifact@v7
       - name: Create build script
