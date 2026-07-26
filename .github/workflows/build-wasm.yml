@@ -45,7 +45,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        emsdk_version: [3.1.56]
+        emsdk_version: [3.1.56, 6.0.2]
+        use_system_libjpeg: [false, true]
     with:
       branch: ${{ github.event.inputs.branch || needs.query.outputs.branch }}
       version: ${{ github.event.inputs.version || needs.query.outputs.version }}
@@ -54,6 +55,7 @@ jobs:
       target_cpu: wasm
       enable_v8: false
       emsdk_version: ${{ matrix.emsdk_version }}
+      use_system_libjpeg: ${{ matrix.use_system_libjpeg }}
 
   nuget:
     name: Build NuGet packages

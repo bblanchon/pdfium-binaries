@@ -8,6 +8,7 @@ TARGET_ENVIRONMENT=${PDFium_TARGET_ENVIRONMENT:-}
 ENABLE_V8=${PDFium_ENABLE_V8:-false}
 IS_DEBUG=${PDFium_IS_DEBUG:-false}
 BUILD_TYPE=${PDFium_BUILD_TYPE:-shared}
+USE_SYSTEM_LIBJPEG=${PDFium_USE_SYSTEM_LIBJPEG:-false}
 
 mkdir -p "$BUILD"
 
@@ -64,6 +65,7 @@ mkdir -p "$BUILD"
       echo 'pdf_is_complete_lib = true'
       echo 'is_clang = false'
       echo 'use_custom_libcxx = false'
+      echo "use_system_libjpeg = $USE_SYSTEM_LIBJPEG"
       if [ "$ENABLE_V8" == "true" ]; then
         # Set a toolchain with the same bitness as the target CPU
         echo "v8_snapshot_toolchain = \"//build/toolchain/linux:x86\""

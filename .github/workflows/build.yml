@@ -40,7 +40,12 @@ on:
         description: Emscripten SDK
         type: string
         required: false
-        default: 3.1.72
+        default: 3.1.56
+      use_system_libjpeg:
+        description: Use the Emscripten system libjpeg instead of bundling PDFium's libjpeg-turbo
+        type: boolean
+        required: false
+        default: false
     outputs:
       artifact:
         description: "The name of the artifact"
@@ -64,6 +69,7 @@ jobs:
       PDFium_ENABLE_V8: ${{ inputs.enable_v8 }}
       PDFium_VERSION: ${{ inputs.version }}
       EMSDK_VERSION: ${{ inputs.emsdk_version }}
+      PDFium_USE_SYSTEM_LIBJPEG: ${{ inputs.use_system_libjpeg }}
       MUSL_URL: ${{ secrets.MUSL_URL }}
     steps:
       - name: Initialize
@@ -75,6 +81,7 @@ jobs:
           [ "$PDFium_TARGET_OS" != "emscripten" ] && ARTIFACT="$ARTIFACT-$PDFium_TARGET_OS"
           [ "$PDFium_TARGET_ENVIRONMENT" != "" ] && ARTIFACT="$ARTIFACT-$PDFium_TARGET_ENVIRONMENT"
           ARTIFACT="$ARTIFACT-$PDFium_TARGET_CPU"
+          [ "$PDFium_TARGET_OS" == "emscripten" ] && [ "$PDFium_USE_SYSTEM_LIBJPEG" == "true" ] && ARTIFACT="$ARTIFACT-system-libjpeg"
           [ "${{inputs.is_debug}}" == "true" ] && ARTIFACT="$ARTIFACT-debug"
           [ "${{inputs.emsdk_version}}" != "" ] && ARTIFACT="$ARTIFACT-${{inputs.emsdk_version}}"
           echo "artifact=$ARTIFACT" >> $GITHUB_OUTPUT

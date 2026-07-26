@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <!-- Package .props files are imported before the consuming .csproj body. The item selection therefore lives in .targets, which is evaluated afterwards. -->
+  <PropertyGroup>
+    <_PDFiumNativeLibraryVariant Condition="'$(PDFiumUseSystemLibjpeg)' == 'true'">system-libjpeg</_PDFiumNativeLibraryVariant>
+    <_PDFiumNativeLibraryVariant Condition="'$(_PDFiumNativeLibraryVariant)' == ''">bundled-libjpeg</_PDFiumNativeLibraryVariant>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(_SungailaPDFiumNativeReferenceAdded)' != 'true'">
+    <NativeFileReference Include="$(_PDFiumNativeLibraryRootDir)$(_PDFiumNativeLibraryVariant)\pdfium.a" />
+  </ItemGroup>
+
+  <!-- Avoid adding the archive twice if NuGet imports both build and buildTransitive assets. -->
+  <PropertyGroup>
+    <_SungailaPDFiumNativeReferenceAdded>true</_SungailaPDFiumNativeReferenceAdded>
+  </PropertyGroup>
+
+</Project>

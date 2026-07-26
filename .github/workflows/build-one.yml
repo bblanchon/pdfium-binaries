@@ -38,7 +38,12 @@ on:
         description: Emscripten SDK
         type: string
         required: false
-        default: 3.1.72
+        default: 3.1.56
+      use_system_libjpeg:
+        description: Use the Emscripten system libjpeg
+        type: boolean
+        required: false
+        default: false
       is_debug:
         description: Is debug
         type: boolean
@@ -59,3 +64,4 @@ jobs:
       target_environment: ${{ github.event.inputs.target_environment }}
       enable_v8: false
       emsdk_version: ${{ github.event.inputs.emsdk_version }}
+      use_system_libjpeg: ${{ github.event.inputs.use_system_libjpeg == 'true' }}

@@ -6,6 +6,7 @@ SOURCE="${PDFium_SOURCE_DIR:-pdfium}"
 TARGET_OS=${PDFium_TARGET_OS:?}
 TARGET_ENVIRONMENT=${PDFium_TARGET_ENVIRONMENT:-}
 TARGET_CPU=${PDFium_TARGET_CPU:?}
+USE_SYSTEM_LIBJPEG=${PDFium_USE_SYSTEM_LIBJPEG:-false}
 
 pushd "$SOURCE"
 
@@ -49,6 +50,7 @@ case "$TARGET_OS" in
     cd emsdk
     ./emsdk install ${EMSDK_VERSION:-latest}
     ./emsdk activate ${EMSDK_VERSION:-latest}
+    [ "$USE_SYSTEM_LIBJPEG" == "true" ] && ./upstream/emscripten/embuilder build libjpeg
     echo "$PWD/upstream/emscripten" >> "$PATH_FILE"
     echo "$PWD/upstream/bin" >> "$PATH_FILE"
     popd

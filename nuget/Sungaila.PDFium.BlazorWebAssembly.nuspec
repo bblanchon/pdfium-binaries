@@ -29,8 +29,15 @@
     <!-- WebAssembly-specific dependencies aren't referenced automatically and must be referenced manually as NativeFileReferences. -->
     <!-- Package authors can choose to add the native references by including a .props file in the package with the references. -->
     <!-- https://learn.microsoft.com/en-us/aspnet/core/blazor/webassembly-native-dependencies#package-native-dependencies-in-a-nuget-package -->
-    <file src="pdfium-wasm-3.1.56/lib/libpdfium.a" target="build/net9.0/pdfium.a" />
+    <file src="pdfium-wasm-3.1.56/lib/libpdfium.a" target="build/net9.0/bundled-libjpeg/pdfium.a" />
+    <file src="pdfium-wasm-system-libjpeg-3.1.56/lib/libpdfium.a" target="build/net9.0/system-libjpeg/pdfium.a" />
+		<file src="pdfium-wasm-6.0.2/lib/libpdfium.a" target="build/net11.0/bundled-libjpeg/pdfium.a" />
+		<file src="pdfium-wasm-system-libjpeg-6.0.2/lib/libpdfium.a" target="build/net11.0/system-libjpeg/pdfium.a" />
+
     <file src="Sungaila.PDFium.BlazorWebAssembly.net9.0.props" target="build/net9.0/Sungaila.PDFium.BlazorWebAssembly.props" />
-    <file src="Sungaila.PDFium.BlazorWebAssembly.net9.0.props" target="buildTransitive/net9.0/Sungaila.PDFium.BlazorWebAssembly.props" />
+		<file src="Sungaila.PDFium.BlazorWebAssembly.net9.0.props" target="buildTransitive/net9.0/Sungaila.PDFium.BlazorWebAssembly.props" />
+		
+    <file src="Sungaila.PDFium.BlazorWebAssembly.net9.0.targets" target="build/net9.0/Sungaila.PDFium.BlazorWebAssembly.targets" />
+    <file src="Sungaila.PDFium.BlazorWebAssembly.net9.0.targets" target="buildTransitive/net9.0/Sungaila.PDFium.BlazorWebAssembly.targets" />
   </files>
 </package>
