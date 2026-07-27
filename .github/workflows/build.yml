@@ -36,6 +36,11 @@ on:
         type: string
         required: false
         default: ''
+      build_type:
+        description: Build type (shared|static)
+        type: string
+        required: false
+        default: shared
       emsdk_version:
         description: Emscripten SDK
         type: string
@@ -68,6 +73,7 @@ jobs:
       PDFium_TARGET_OS: ${{ inputs.target_os }}
       PDFium_TARGET_ENVIRONMENT: ${{ inputs.target_environment }}
       PDFium_ENABLE_V8: ${{ inputs.enable_v8 }}
+      PDFium_BUILD_TYPE: ${{ inputs.build_type }}
       PDFium_VERSION: ${{ inputs.version }}
       EMSDK_VERSION: ${{ inputs.emsdk_version }}
       MUSL_URL: ${{ secrets.MUSL_URL }}
@@ -81,6 +87,7 @@ jobs:
           [ "$PDFium_TARGET_OS" != "emscripten" ] && ARTIFACT="$ARTIFACT-$PDFium_TARGET_OS"
           [ "$PDFium_TARGET_ENVIRONMENT" != "" ] && ARTIFACT="$ARTIFACT-$PDFium_TARGET_ENVIRONMENT"
           ARTIFACT="$ARTIFACT-$PDFium_TARGET_CPU"
+          [ "$PDFium_BUILD_TYPE" == "static" ] && ARTIFACT="$ARTIFACT-static"
           [ "$IS_DEBUG" == "true" ] && ARTIFACT="$ARTIFACT-debug"
           echo "artifact=$ARTIFACT" >> $GITHUB_OUTPUT
         env:
