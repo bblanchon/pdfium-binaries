@@ -1,18 +1,18 @@
 diff --git a/core/fxge/BUILD.gn b/core/fxge/BUILD.gn
-index a4deadb1c..12994a22a 100644
+index 5617425a1..5305ed83f 100644
 --- a/core/fxge/BUILD.gn
 +++ b/core/fxge/BUILD.gn
-@@ -167,7 +167,7 @@ source_set("fxge") {
+@@ -175,7 +175,7 @@ source_set("fxge") {
      sources += [ "linux/fx_linux_impl.cpp" ]
    }
  
 -  if (is_mac) {
 +  if (is_mac || is_ios) {
      sources += [
-       "apple/fx_apple_impl.cpp",
-       "apple/fx_apple_platform.cpp",
+       "apple/capple_platform.cpp",
+       "apple/capple_platform.h",
 diff --git a/testing/test.gni b/testing/test.gni
-index 9d528da98..2c2a6706f 100644
+index 6ad2c2d4a..21600090e 100644
 --- a/testing/test.gni
 +++ b/testing/test.gni
 @@ -207,11 +207,6 @@ template("test") {

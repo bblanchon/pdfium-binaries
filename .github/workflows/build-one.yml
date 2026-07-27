@@ -27,6 +27,8 @@ on:
         options:
           - arm
           - arm64
+          - mipsel
+          - mips64el
           - ppc64
           - x64
           - x86

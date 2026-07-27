@@ -29,6 +29,7 @@ if(WIN32)
     PROPERTIES
     IMPORTED_LOCATION             "${PDFium_LIBRARY}"
     INTERFACE_INCLUDE_DIRECTORIES "${PDFium_INCLUDE_DIR};${PDFium_INCLUDE_DIR}/cpp"
+    IMPORTED_LINK_INTERFACE_LANGUAGES "CXX"
   )
 
   find_package_handle_standard_args(PDFium
@@ -46,6 +47,7 @@ else()
     PROPERTIES
     IMPORTED_LOCATION             "${PDFium_LIBRARY}"
     INTERFACE_INCLUDE_DIRECTORIES "${PDFium_INCLUDE_DIR};${PDFium_INCLUDE_DIR}/cpp"
+    IMPORTED_LINK_INTERFACE_LANGUAGES "CXX"
   )
 
   find_package_handle_standard_args(PDFium

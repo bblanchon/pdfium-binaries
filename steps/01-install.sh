@@ -81,6 +81,22 @@ case "$TARGET_OS" in
           sudo apt-get install -y libc6-i386 gcc-10-multilib g++-10-aarch64-linux-gnu gcc-10-aarch64-linux-gnu
           ;;
 
+        mipsel)
+          sudo apt-get install -y gcc-11-multilib g++-11-mipsel-linux-gnu gcc-11-mipsel-linux-gnu
+          sudo update-alternatives --install /usr/bin/mipsel-linux-gnu-gcc mipsel-linux-gnu-gcc /usr/bin/mipsel-linux-gnu-gcc-11 100
+          sudo update-alternatives --install /usr/bin/mipsel-linux-gnu-g++ mipsel-linux-gnu-g++ /usr/bin/mipsel-linux-gnu-g++-11 100
+          sudo update-alternatives --set mipsel-linux-gnu-gcc /usr/bin/mipsel-linux-gnu-gcc-11
+          sudo update-alternatives --set mipsel-linux-gnu-g++ /usr/bin/mipsel-linux-gnu-g++-11
+          ;;
+
+        mips64el)
+          sudo apt-get install -y gcc-11-multilib g++-11-mips64el-linux-gnuabi64 gcc-11-mips64el-linux-gnuabi64
+          sudo update-alternatives --install /usr/bin/mips64el-linux-gnuabi64-gcc mips64el-linux-gnuabi64-gcc /usr/bin/mips64el-linux-gnuabi64-gcc-11 100
+          sudo update-alternatives --install /usr/bin/mips64el-linux-gnuabi64-g++ mips64el-linux-gnuabi64-g++ /usr/bin/mips64el-linux-gnuabi64-g++-11 100
+          sudo update-alternatives --set mips64el-linux-gnuabi64-gcc /usr/bin/mips64el-linux-gnuabi64-gcc-11
+          sudo update-alternatives --set mips64el-linux-gnuabi64-g++ /usr/bin/mips64el-linux-gnuabi64-g++-11
+          ;;
+
         ppc64)
           sudo apt-get install -y gcc-11-multilib g++-11-powerpc64le-linux-gnu gcc-11-powerpc64le-linux-gnu
           sudo update-alternatives --install /usr/bin/powerpc64le-linux-gnu-gcc powerpc64le-linux-gnu-gcc /usr/bin/powerpc64le-linux-gnu-gcc-11 100

@@ -26,6 +26,7 @@ case "$BUILD_TYPE" in
 esac
 
 apply_patch "$PATCHES/public_headers.patch"
+apply_patch "$PATCHES/clang_rt.patch" build
 
 [ "$ENABLE_V8" == "true" ] && apply_patch "$PATCHES/v8/pdfium.patch"
 
@@ -61,6 +62,7 @@ case "$OS" in
     ;;
 
   win)
+    apply_patch "$PATCHES/win/pdfium.patch"
     apply_patch "$PATCHES/win/build.patch" build
 
     VERSION=${PDFium_VERSION:-0.0.0.0}
@@ -81,6 +83,9 @@ case "$TARGET_ENVIRONMENT" in
 esac
 
 case "$TARGET_CPU" in
+  mipsel|mips64el)
+    apply_patch "$PATCHES/mips64el/build.patch" build
+    ;;
   ppc64)
     apply_patch "$PATCHES/ppc64/pdfium.patch"
     apply_patch "$PATCHES/ppc64/build.patch" build

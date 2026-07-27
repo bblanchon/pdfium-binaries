@@ -1,0 +1,15 @@
+diff --git a/core/fxge/cfx_renderdevice.h b/core/fxge/cfx_renderdevice.h
+index 8f427ce01..4114b9884 100644
+--- a/core/fxge/cfx_renderdevice.h
++++ b/core/fxge/cfx_renderdevice.h
+@@ -19,6 +19,10 @@
+ #include "core/fxge/dib/fx_dib.h"
+ #include "core/fxge/renderdevicedriver_iface.h"
+ 
++#if BUILDFLAG(IS_WIN)
++#include <windows.h>
++#endif
++
+ class CFX_DIBBase;
+ class CFX_DIBitmap;
+ class CFX_Font;
