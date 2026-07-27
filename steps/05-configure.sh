@@ -34,6 +34,15 @@ mkdir -p "$BUILD"
       echo "use_lld = false"
       echo "use_custom_libcxx = false"
     fi
+
+    # A static archive is linked into the consumer's binary, which uses the
+    # platform libc++. Chromium's bundled libc++ mangles as std::__Cr and its
+    # compiled iostream objects are not part of the archive, so linking fails on
+    # undefined std::__Cr::ios_base symbols as soon as pdfium's FDF code is
+    # pulled in. Build against the system libc++ (std::__1) instead.
+    if [ "$OS" == "ios" ] || [ "$OS" == "mac" ]; then
+      echo "use_custom_libcxx = false"
+    fi
   fi
 
   case "$OS" in
