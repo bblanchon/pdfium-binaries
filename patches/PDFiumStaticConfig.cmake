@@ -50,6 +50,17 @@ else()
     IMPORTED_LINK_INTERFACE_LANGUAGES "CXX"
   )
 
+  # A shared build resolves these itself; a static archive leaves them to the
+  # consumer, so linking fails on _CFRelease, _CGBitmapContextCreate and
+  # friends without them.
+  if(APPLE)
+    set_property(TARGET pdfium APPEND PROPERTY
+      INTERFACE_LINK_LIBRARIES
+        "-framework CoreFoundation"
+        "-framework CoreGraphics"
+    )
+  endif()
+
   find_package_handle_standard_args(PDFium
     REQUIRED_VARS PDFium_LIBRARY PDFium_INCLUDE_DIR
     VERSION_VAR PDFium_VERSION
