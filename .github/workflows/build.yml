@@ -41,6 +41,11 @@ on:
         type: string
         required: false
         default: 3.1.72
+      emsdk_target:
+        description: Emscripten target environment(s)
+        type: string
+        required: false
+        default: web,worker,node,shell
     outputs:
       artifact:
         description: "The name of the artifact"
@@ -64,6 +69,7 @@ jobs:
       PDFium_ENABLE_V8: ${{ inputs.enable_v8 }}
       PDFium_VERSION: ${{ inputs.version }}
       EMSDK_VERSION: ${{ inputs.emsdk_version }}
+      EMSDK_TARGET_ENVIRONMENT: ${{ inputs.emsdk_target }}
       MUSL_URL: ${{ secrets.MUSL_URL }}
     steps:
       - name: Initialize

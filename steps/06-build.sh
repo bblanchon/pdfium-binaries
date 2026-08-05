@@ -17,6 +17,7 @@ if [ "$TARGET_CPU" == "wasm" ]; then
     -s EXPORTED_RUNTIME_METHODS="ccall,cwrap,addFunction,removeFunction"
     -s LLD_REPORT_UNDEFINED
     -s WASM=1
+    -s ENVIRONMENT=$EMSDK_TARGET_ENVIRONMENT
     -o "$BUILD_DIR/pdfium.html"
     "$LIBPDFIUMA"
     --no-entry
