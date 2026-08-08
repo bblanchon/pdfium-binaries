@@ -1,8 +1,6 @@
 name: Build all
 
-permissions:
-  contents: read
-  actions: write # to upload artifacts
+permissions: {}
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}-${{ github.event.inputs.branch }}
@@ -597,6 +595,9 @@ jobs:
   nuget:
     name: Build NuGet packages
     runs-on: windows-latest
+    permissions:
+      contents: read
+      actions: write # Download/upload artifacts
     needs:
       - android_arm
       - android_arm_v8
@@ -686,6 +687,9 @@ jobs:
     name: Conda packages
     if: github.event.inputs.version
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: write # Download/upload artifacts
     needs:
       - linux_arm64
       - linux_x64

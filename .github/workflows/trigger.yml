@@ -9,10 +9,14 @@ concurrency:
   group: ${{ github.workflow }}
   cancel-in-progress: true
 
+permissions: {}
+
 jobs:
   trigger:
     name: Trigger build
     runs-on: ubuntu-latest
+    permissions:
+      actions: write # Trigger downstream workflow
     steps:
     - name: Get Chrome version
       id: chromium

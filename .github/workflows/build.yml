@@ -46,13 +46,14 @@ on:
         description: "The name of the artifact"
         value: ${{ jobs.build.outputs.artifact }}
 
-permissions:
-  contents: read
-  actions: write  # Needed to upload the build artifact
+permissions: {}
 
 jobs:
   build:
     name: Build
+    permissions:
+      contents: read
+      actions: write # Upload workflow artifacts
     outputs:
       artifact: ${{ steps.init.outputs.artifact }}
     runs-on: ${{ (inputs.target_os == 'ios' || inputs.target_os == 'mac') && 'macos-15' || inputs.target_os == 'win' && 'windows-2022' || 'ubuntu-24.04' }}

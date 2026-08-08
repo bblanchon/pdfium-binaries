@@ -10,10 +10,14 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+permissions: {}
+
 jobs:
   checkout:
     name: Checkout PDFium
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Install depot_tools
         run: |
@@ -44,6 +48,9 @@ jobs:
     name: Apply patches
     runs-on: ubuntu-latest
     needs: checkout
+    permissions:
+      contents: read
+      actions: write # Upload/download workflow artifacts
     strategy:
       fail-fast: false
       matrix:
