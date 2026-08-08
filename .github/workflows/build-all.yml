@@ -4,6 +4,10 @@ permissions:
   contents: read
   actions: write # to upload artifacts
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}-${{ github.event.inputs.branch }}
+  cancel-in-progress: true
+
 on:
   workflow_dispatch:
     inputs:
