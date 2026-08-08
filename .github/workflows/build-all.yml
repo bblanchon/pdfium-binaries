@@ -851,11 +851,13 @@ jobs:
         env:
           BUNDLE_PATH: ${{ steps.provenance.outputs.bundle-path }}
       - name: Publish Release
-        uses: ncipollo/release-action@v1
-        with:
-          immutableCreate: true
-          bodyFile: RELEASE.md
-          token: ${{ secrets.GITHUB_TOKEN }}
-          name: PDFium ${{ github.event.inputs.version }}
-          tag: ${{ github.event.inputs.branch }}
-          artifacts: pdfium-*.tgz, pdfium-attestation.json
+        run: |
+          gh release create "$BRANCH" \
+            pdfium-*.tgz \
+            pdfium-attestation.json \
+            --title "PDFium $VERSION" \
+            --notes-file RELEASE.md
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH: ${{ github.event.inputs.branch }}
+          VERSION: ${{ github.event.inputs.version }}
