@@ -995,5 +995,6 @@ jobs:
             --notes-file RELEASE.md
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
           BRANCH: ${{ github.event.inputs.branch }}
           VERSION: ${{ github.event.inputs.version }}
