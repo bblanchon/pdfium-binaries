@@ -990,6 +990,7 @@ jobs:
           gh release create "$BRANCH" \
             pdfium-*.tgz \
             pdfium-attestation.json \
+            --target "$GITHUB_SHA" \
             --title "PDFium $VERSION" \
             --notes-file RELEASE.md
         env:
