@@ -972,7 +972,7 @@ jobs:
           git -C "pdfium" log origin/${PREVIOUS_REV}.. --pretty=format:'* [%s](https://pdfium.googlesource.com/pdfium/+/%H)' >> RELEASE.md
         env:
           BRANCH: ${{ github.event.inputs.branch }}
-          LATEST_RELEASE_URL: ${{ format('{0}/{1}/releases/latest', github.server_url, github.repository) }}
+          LATEST_RELEASE_URL: ${{ format('{0}/repos/{1}/releases/latest', github.api_url, github.repository) }}
       - name: Generate artifacts checksums
         id: hash
         run: echo "hashes=$(sha256sum pdfium-*.tgz | base64 -w0)" >> "$GITHUB_OUTPUT"
