@@ -46,6 +46,9 @@ on:
 jobs:
   android_arm:
     name: Android ARM
+    permissions:
+      contents: read
+      actions: write # Upload workflow artifacts
     uses: ./.github/workflows/build.yml
     with:
       branch: ${{ github.event.inputs.branch }}
@@ -59,6 +62,9 @@ jobs:
     name: Android ARM V8
     if: github.event.inputs.enable_v8 == 'true'
     needs: android_arm
+    permissions:
+      contents: read
+      actions: write # Upload workflow artifacts
     uses: ./.github/workflows/build.yml
     with:
       branch: ${{ github.event.inputs.branch }}
@@ -70,6 +76,9 @@ jobs:
 
   android_arm64:
     name: Android ARM64
+    permissions:
+      contents: read
+      actions: write # Upload workflow artifacts
     uses: ./.github/workflows/build.yml
     with:
       branch: ${{ github.event.inputs.branch }}
@@ -83,6 +92,9 @@ jobs:
     name: Android ARM64 V8
     if: github.event.inputs.enable_v8 == 'true'
     needs: android_arm64
+    permissions:
+      contents: read
+      actions: write # Upload workflow artifacts
     uses: ./.github/workflows/build.yml
     with:
       branch: ${{ github.event.inputs.branch }}
@@ -94,6 +106,9 @@ jobs:
 
   android_x64:
     name: Android x64
+    permissions:
+      contents: read
+      actions: write # Upload workflow artifacts
     uses: ./.github/workflows/build.yml
     with:
       branch: ${{ github.event.inputs.branch }}
@@ -107,6 +122,9 @@ jobs:
     name: Android x64 V8
     if: github.event.inputs.enable_v8 == 'true'
     needs: android_x64
+    permissions:
+      contents: read
+      actions: write # Upload workflow artifacts
     uses: ./.github/workflows/build.yml
     with:
       branch: ${{ github.event.inputs.branch }}
@@ -118,6 +136,9 @@ jobs:
 
   android_x86:
     name: Android x86
+    permissions:
+      contents: read
+      actions: write # Upload workflow artifacts
     uses: ./.github/workflows/build.yml
     with:
       branch: ${{ github.event.inputs.branch }}
@@ -131,6 +152,9 @@ jobs:
     name: Android x86 V8
     if: github.event.inputs.enable_v8 == 'true'
     needs: android_x86
+    permissions:
+      contents: read
+      actions: write # Upload workflow artifacts
     uses: ./.github/workflows/build.yml
     with:
       branch: ${{ github.event.inputs.branch }}
@@ -142,6 +166,9 @@ jobs:
 
   ios_catalyst_arm64:
     name: iOS catalyst ARM64
+    permissions:
+      contents: read
+      actions: write # Upload workflow artifacts
     uses: ./.github/workflows/build.yml
     with:
       branch: ${{ github.event.inputs.branch }}
@@ -156,6 +183,9 @@ jobs:
     name: iOS catalyst ARM64 V8
     if: github.event.inputs.enable_v8 == 'true'
     needs: ios_catalyst_arm64
+    permissions:
+      contents: read
+      actions: write # Upload workflow artifacts
     uses: ./.github/workflows/build.yml
     with:
       branch: ${{ github.event.inputs.branch }}
@@ -168,6 +198,9 @@ jobs:
 
   ios_catalyst_x64:
     name: iOS catalyst x64
+    permissions:
+      contents: read
+      actions: write # Upload workflow artifacts
     uses: ./.github/workflows/build.yml
     with:
       branch: ${{ github.event.inputs.branch }}
@@ -182,6 +215,9 @@ jobs:
     name: iOS catalyst x64 V8
     if: github.event.inputs.enable_v8 == 'true'
     needs: ios_catalyst_x64
+    permissions:
+      contents: read
+      actions: write # Upload workflow artifacts
     uses: ./.github/workflows/build.yml
     with:
       branch: ${{ github.event.inputs.branch }}
@@ -194,6 +230,9 @@ jobs:
 
   ios_device_arm64:
     name: iOS device ARM64
+    permissions:
+      contents: read
+      actions: write # Upload workflow artifacts
     uses: ./.github/workflows/build.yml
     with:
       branch: ${{ github.event.inputs.branch }}
@@ -208,6 +247,9 @@ jobs:
     name: iOS device ARM64 V8
     if: github.event.inputs.enable_v8 == 'true'
     needs: ios_device_arm64
+    permissions:
+      contents: read
+      actions: write # Upload workflow artifacts
     uses: ./.github/workflows/build.yml
     with:
       branch: ${{ github.event.inputs.branch }}
@@ -220,6 +262,9 @@ jobs:
 
   ios_simulator_arm64:
     name: iOS simulator ARM64
+    permissions:
+      contents: read
+      actions: write # Upload workflow artifacts
     uses: ./.github/workflows/build.yml
     with:
       branch: ${{ github.event.inputs.branch }}
@@ -234,6 +279,9 @@ jobs:
     name: iOS simulator ARM64 V8
     if: github.event.inputs.enable_v8 == 'true'
     needs: ios_simulator_arm64
+    permissions:
+      contents: read
+      actions: write # Upload workflow artifacts
     uses: ./.github/workflows/build.yml
     with:
       branch: ${{ github.event.inputs.branch }}
@@ -246,6 +294,9 @@ jobs:
 
   ios_simulator_x64:
     name: iOS simulator x64
+    permissions:
+      contents: read
+      actions: write # Upload workflow artifacts
     uses: ./.github/workflows/build.yml
     with:
       branch: ${{ github.event.inputs.branch }}
@@ -260,6 +311,9 @@ jobs:
     name: iOS simulator x64 V8
     if: github.event.inputs.enable_v8 == 'true'
     needs: ios_simulator_x64
+    permissions:
+      contents: read
+      actions: write # Upload workflow artifacts
     uses: ./.github/workflows/build.yml
     with:
       branch: ${{ github.event.inputs.branch }}
@@ -272,6 +326,9 @@ jobs:
 
   linux_arm:
     name: Linux ARM
+    permissions:
+      contents: read
+      actions: write # Upload workflow artifacts
     uses: ./.github/workflows/build.yml
     with:
       branch: ${{ github.event.inputs.branch }}
@@ -285,6 +342,9 @@ jobs:
     name: Linux ARM V8
     if: github.event.inputs.enable_v8 == 'true'
     needs: linux_arm
+    permissions:
+      contents: read
+      actions: write # Upload workflow artifacts
     uses: ./.github/workflows/build.yml
     with:
       branch: ${{ github.event.inputs.branch }}
@@ -296,6 +356,9 @@ jobs:
 
   linux_arm64:
     name: Linux ARM64
+    permissions:
+      contents: read
+      actions: write # Upload workflow artifacts
     uses: ./.github/workflows/build.yml
     with:
       branch: ${{ github.event.inputs.branch }}
@@ -309,6 +372,9 @@ jobs:
     name: Linux ARM64 V8
     if: github.event.inputs.enable_v8 == 'true'
     needs: linux_arm64
+    permissions:
+      contents: read
+      actions: write # Upload workflow artifacts
     uses: ./.github/workflows/build.yml
     with:
       branch: ${{ github.event.inputs.branch }}
@@ -320,6 +386,9 @@ jobs:
 
   linux_mipsel:
     name: Linux mipsel
+    permissions:
+      contents: read
+      actions: write # Upload workflow artifacts
     uses: ./.github/workflows/build.yml
     with:
       branch: ${{ github.event.inputs.branch }}
@@ -331,6 +400,9 @@ jobs:
 
   linux_mips64el:
     name: Linux mips64el
+    permissions:
+      contents: read
+      actions: write # Upload workflow artifacts
     uses: ./.github/workflows/build.yml
     with:
       branch: ${{ github.event.inputs.branch }}
@@ -342,6 +414,9 @@ jobs:
 
   linux_ppc64:
     name: Linux ppc64
+    permissions:
+      contents: read
+      actions: write # Upload workflow artifacts
     uses: ./.github/workflows/build.yml
     with:
       branch: ${{ github.event.inputs.branch }}
@@ -353,6 +428,9 @@ jobs:
 
   linux_x64:
     name: Linux x64
+    permissions:
+      contents: read
+      actions: write # Upload workflow artifacts
     uses: ./.github/workflows/build.yml
     with:
       branch: ${{ github.event.inputs.branch }}
@@ -366,6 +444,9 @@ jobs:
     name: Linux x64 V8
     if: github.event.inputs.enable_v8 == 'true'
     needs: linux_x64
+    permissions:
+      contents: read
+      actions: write # Upload workflow artifacts
     uses: ./.github/workflows/build.yml
     with:
       branch: ${{ github.event.inputs.branch }}
@@ -377,6 +458,9 @@ jobs:
 
   linux_x86:
     name: Linux x86
+    permissions:
+      contents: read
+      actions: write # Upload workflow artifacts
     uses: ./.github/workflows/build.yml
     with:
       branch: ${{ github.event.inputs.branch }}
@@ -390,6 +474,9 @@ jobs:
     name: Linux x86 V8
     if: github.event.inputs.enable_v8 == 'true'
     needs: linux_x86
+    permissions:
+      contents: read
+      actions: write # Upload workflow artifacts
     uses: ./.github/workflows/build.yml
     with:
       branch: ${{ github.event.inputs.branch }}
@@ -401,6 +488,9 @@ jobs:
 
   linux_musl_arm64:
     name: Linux musl ARM64
+    permissions:
+      contents: read
+      actions: write # Upload workflow artifacts
     uses: ./.github/workflows/build.yml
     secrets:
       MUSL_URL: ${{ secrets.MUSL_URL }}
@@ -415,6 +505,9 @@ jobs:
 
   linux_musl_x64:
     name: Linux musl x64
+    permissions:
+      contents: read
+      actions: write # Upload workflow artifacts
     uses: ./.github/workflows/build.yml
     secrets:
       MUSL_URL: ${{ secrets.MUSL_URL }}
@@ -429,6 +522,9 @@ jobs:
 
   linux_musl_x86:
     name: Linux musl x86
+    permissions:
+      contents: read
+      actions: write # Upload workflow artifacts
     uses: ./.github/workflows/build.yml
     secrets:
       MUSL_URL: ${{ secrets.MUSL_URL }}
@@ -443,6 +539,9 @@ jobs:
 
   mac_arm64:
     name: macOS ARM64
+    permissions:
+      contents: read
+      actions: write # Upload workflow artifacts
     uses: ./.github/workflows/build.yml
     with:
       branch: ${{ github.event.inputs.branch }}
@@ -456,6 +555,9 @@ jobs:
     name: macOS ARM64 V8
     if: github.event.inputs.enable_v8 == 'true'
     needs: mac_arm64
+    permissions:
+      contents: read
+      actions: write # Upload workflow artifacts
     uses: ./.github/workflows/build.yml
     with:
       branch: ${{ github.event.inputs.branch }}
@@ -467,6 +569,9 @@ jobs:
 
   mac_x64:
     name: macOS x64
+    permissions:
+      contents: read
+      actions: write # Upload workflow artifacts
     uses: ./.github/workflows/build.yml
     with:
       branch: ${{ github.event.inputs.branch }}
@@ -480,6 +585,9 @@ jobs:
     name: macOS x64 V8
     if: github.event.inputs.enable_v8 == 'true'
     needs: mac_x64
+    permissions:
+      contents: read
+      actions: write # Upload workflow artifacts
     uses: ./.github/workflows/build.yml
     with:
       branch: ${{ github.event.inputs.branch }}
@@ -491,6 +599,9 @@ jobs:
 
   win_arm64:
     name: Windows ARM64
+    permissions:
+      contents: read
+      actions: write # Upload workflow artifacts
     uses: ./.github/workflows/build.yml
     with:
       branch: ${{ github.event.inputs.branch }}
@@ -504,6 +615,9 @@ jobs:
     name: Windows ARM64 V8
     if: github.event.inputs.enable_v8 == 'true'
     needs: win_arm64
+    permissions:
+      contents: read
+      actions: write # Upload workflow artifacts
     uses: ./.github/workflows/build.yml
     with:
       branch: ${{ github.event.inputs.branch }}
@@ -515,6 +629,9 @@ jobs:
 
   win_x64:
     name: Windows x64
+    permissions:
+      contents: read
+      actions: write # Upload workflow artifacts
     uses: ./.github/workflows/build.yml
     with:
       branch: ${{ github.event.inputs.branch }}
@@ -528,6 +645,9 @@ jobs:
     name: Windows x64 V8
     if: github.event.inputs.enable_v8 == 'true'
     needs: win_x64
+    permissions:
+      contents: read
+      actions: write # Upload workflow artifacts
     uses: ./.github/workflows/build.yml
     with:
       branch: ${{ github.event.inputs.branch }}
@@ -539,6 +659,9 @@ jobs:
 
   win_x86:
     name: Windows x86
+    permissions:
+      contents: read
+      actions: write # Upload workflow artifacts
     uses: ./.github/workflows/build.yml
     with:
       branch: ${{ github.event.inputs.branch }}
@@ -552,6 +675,9 @@ jobs:
     name: Windows x86 V8
     if: github.event.inputs.enable_v8 == 'true'
     needs: win_x86
+    permissions:
+      contents: read
+      actions: write # Upload workflow artifacts
     uses: ./.github/workflows/build.yml
     with:
       branch: ${{ github.event.inputs.branch }}
@@ -563,6 +689,9 @@ jobs:
 
   wasm:
     name: WASM
+    permissions:
+      contents: read
+      actions: write # Upload workflow artifacts
     uses: ./.github/workflows/build.yml
     with:
       branch: ${{ github.event.inputs.branch }}
@@ -577,6 +706,9 @@ jobs:
     needs:
       - mac_arm64
       - mac_x64
+    permissions:
+      contents: read
+      actions: write # Download/upload workflow artifacts
     uses: ./.github/workflows/mac-univ.yml
     with:
       artifact_x64: ${{ needs.mac_x64.outputs.artifact }}
@@ -587,6 +719,9 @@ jobs:
     needs:
       - mac_arm64_v8
       - mac_x64_v8
+    permissions:
+      contents: read
+      actions: write # Download/upload workflow artifacts
     uses: ./.github/workflows/mac-univ.yml
     with:
       artifact_x64: ${{ needs.mac_x64_v8.outputs.artifact }}
