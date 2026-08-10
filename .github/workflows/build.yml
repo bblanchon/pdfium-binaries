@@ -41,6 +41,10 @@ on:
         type: string
         required: false
         default: 3.1.72
+    secrets:
+      MUSL_URL:
+        description: Optional mirror of musl.cc
+        required: false
     outputs:
       artifact:
         description: "The name of the artifact"
