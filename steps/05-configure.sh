@@ -44,6 +44,11 @@ mkdir -p "$BUILD"
       ;;
     ios)
       [ -n "$TARGET_ENVIRONMENT" ] && echo "target_environment = \"$TARGET_ENVIRONMENT\""
+      if [ "$ENABLE_V8" == "true" ]; then
+        echo 'ios_deployment_target = "17.4"'
+      else
+        echo 'ios_deployment_target = "17.0"'
+      fi
       echo "ios_enable_code_signing = false"
       echo "use_blink = true"
       [ "$ENABLE_V8" == "true" ] && [ "$TARGET_CPU" == "arm64" ] && echo 'arm_control_flow_integrity = "none"'
