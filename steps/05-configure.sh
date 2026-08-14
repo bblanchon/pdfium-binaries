@@ -44,6 +44,14 @@ mkdir -p "$BUILD"
       ;;
     ios)
       [ -n "$TARGET_ENVIRONMENT" ] && echo "target_environment = \"$TARGET_ENVIRONMENT\""
+      # Chromium defaults this to 26.0 when use_blink is true, which is not a pdfium
+      # requirement (build/config/ios/ios_sdk_overrides.gni). V8 builds hard-link
+      # BrowserEngineKit, which is iOS 17.4+, so the two do not share a floor.
+      if [ "$ENABLE_V8" == "true" ]; then
+        echo 'ios_deployment_target = "17.4"'
+      else
+        echo 'ios_deployment_target = "17.0"'
+      fi
       echo "ios_enable_code_signing = false"
       echo "use_blink = true"
       [ "$ENABLE_V8" == "true" ] && [ "$TARGET_CPU" == "arm64" ] && echo 'arm_control_flow_integrity = "none"'
