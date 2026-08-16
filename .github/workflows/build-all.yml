@@ -733,6 +733,7 @@ jobs:
     permissions:
       contents: read
       actions: write # Download/upload artifacts
+      id-token: write  # OIDC token to log in to nuget.org
     needs:
       - android_arm
       - android_arm_v8
@@ -812,11 +813,16 @@ jobs:
         with:
           name: NuGet packages
           path: '*.nupkg'
+      - name: Log in to nuget.org
+        uses: NuGet/login@v1
+        id: login
+        with:
+          user: ${{ vars.NUGET_USER }}
       - name: Push to nuget.org
-        if: env.NUGET_API_KEY && startsWith(github.event.inputs.branch, 'chromium/') && github.event.inputs.version && github.event.inputs.nuget == 'true'
+        if: startsWith(github.event.inputs.branch, 'chromium/') && github.event.inputs.version && github.event.inputs.nuget == 'true'
         run: nuget push -Source nuget.org -ApiKey "$NUGET_API_KEY" *.nupkg
         env:
-          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+          NUGET_API_KEY: ${{ steps.login.outputs.NUGET_API_KEY }}
 
   conda:
     name: Conda packages
