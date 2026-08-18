@@ -1,0 +1,129 @@
+--- a/core/fxcodec/flate/flatemodule.cpp
++++ b/core/fxcodec/flate/flatemodule.cpp
+@@ -304,25 +304,6 @@
+     old_code = code;
+   }
+   return dest_byte_pos_ != 0;
+-}
+-
+-uint8_t GetLeftValue(pdfium::span<const uint8_t> span,
+-                     size_t i,
+-                     uint32_t bytes_per_pixel) {
+-  return i >= bytes_per_pixel ? span[i - bytes_per_pixel] : 0;
+-}
+-
+-uint8_t GetUpValue(pdfium::span<const uint8_t> span, size_t i) {
+-  return span.empty() ? 0 : span[i];
+-}
+-
+-uint8_t GetUpperLeftValue(pdfium::span<const uint8_t> span,
+-                          size_t i,
+-                          uint32_t bytes_per_pixel) {
+-  if (i >= bytes_per_pixel && !span.empty()) {
+-    return span[i - bytes_per_pixel];
+-  }
+-  return 0;
+ }
+ 
+ uint8_t PathPredictor(uint8_t a, uint8_t b, uint8_t c) {
+@@ -344,37 +325,84 @@
+   const uint8_t tag = src_span.front();
+   pdfium::span<const uint8_t> remaining_src_span =
+       src_span.subspan(1u, row_size);
++
++  // The loops below run on raw pointers with the row boundary (the first
++  // bytes_per_pixel bytes, where the left/upper-left neighbors are zero) and
++  // the first row (no previous row, all up/upper-left neighbors are zero)
++  // hoisted out, instead of per-byte bounds-checked span indexing and
++  // neighbor helpers with per-byte branches: this function dominates
++  // FlateDecode time on predictor-encoded streams. Validate the sizes once
++  // up front to keep the accesses in bounds.
++  const size_t n = remaining_src_span.size();
++  CHECK_GE(dest_span.size(), n);
++  CHECK(last_span.empty() || last_span.size() >= n);
++  const uint8_t* src = remaining_src_span.data();
++  uint8_t* dest = dest_span.data();
++  const uint8_t* up_row = last_span.empty() ? nullptr : last_span.data();
++  const size_t bpp = bytes_per_pixel;
++  const size_t lead = std::min<size_t>(bpp, n);
++
+   switch (tag) {
+     case 1: {
+-      for (size_t i = 0; i < remaining_src_span.size(); ++i) {
+-        uint8_t left = GetLeftValue(dest_span, i, bytes_per_pixel);
+-        dest_span[i] = remaining_src_span[i] + left;
++      // Sub: left neighbor only.
++      for (size_t i = 0; i < lead; ++i) {
++        dest[i] = src[i];
+       }
++      for (size_t i = lead; i < n; ++i) {
++        dest[i] = src[i] + dest[i - bpp];
++      }
+       break;
+     }
+     case 2: {
+-      for (size_t i = 0; i < remaining_src_span.size(); ++i) {
+-        uint8_t up = GetUpValue(last_span, i);
+-        dest_span[i] = remaining_src_span[i] + up;
++      // Up: previous-row neighbor only. No loop-carried dependency, so this
++      // auto-vectorizes.
++      if (!up_row) {
++        fxcrt::Copy(remaining_src_span, dest_span);
++        break;
+       }
++      for (size_t i = 0; i < n; ++i) {
++        dest[i] = src[i] + up_row[i];
++      }
+       break;
+     }
+     case 3: {
+-      for (size_t i = 0; i < remaining_src_span.size(); ++i) {
+-        uint8_t left = GetLeftValue(dest_span, i, bytes_per_pixel);
+-        uint8_t up = GetUpValue(last_span, i);
+-        dest_span[i] = remaining_src_span[i] + (up + left) / 2;
++      // Average of the left and previous-row neighbors.
++      if (!up_row) {
++        for (size_t i = 0; i < lead; ++i) {
++          dest[i] = src[i];
++        }
++        for (size_t i = lead; i < n; ++i) {
++          dest[i] = src[i] + dest[i - bpp] / 2;
++        }
++        break;
++      }
++      for (size_t i = 0; i < lead; ++i) {
++        dest[i] = src[i] + up_row[i] / 2;
++      }
++      for (size_t i = lead; i < n; ++i) {
++        dest[i] = src[i] + (dest[i - bpp] + up_row[i]) / 2;
+       }
+       break;
+     }
+     case 4: {
+-      for (size_t i = 0; i < remaining_src_span.size(); ++i) {
+-        uint8_t left = GetLeftValue(dest_span, i, bytes_per_pixel);
+-        uint8_t up = GetUpValue(last_span, i);
+-        uint8_t upper_left = GetUpperLeftValue(last_span, i, bytes_per_pixel);
+-        dest_span[i] =
+-            remaining_src_span[i] + PathPredictor(left, up, upper_left);
++      // Paeth. With both up neighbors zero the predictor selects the left
++      // value, and with both left neighbors zero it selects the up value.
++      if (!up_row) {
++        for (size_t i = 0; i < lead; ++i) {
++          dest[i] = src[i];
++        }
++        for (size_t i = lead; i < n; ++i) {
++          dest[i] = src[i] + dest[i - bpp];
++        }
++        break;
+       }
++      for (size_t i = 0; i < lead; ++i) {
++        dest[i] = src[i] + up_row[i];
++      }
++      for (size_t i = lead; i < n; ++i) {
++        dest[i] =
++            src[i] + PathPredictor(dest[i - bpp], up_row[i], up_row[i - bpp]);
++      }
+       break;
+     }
+     default: {
