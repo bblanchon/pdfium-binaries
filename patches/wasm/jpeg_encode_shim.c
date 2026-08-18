@@ -39,16 +39,18 @@ static void gopdfium_jpeg_error_exit(j_common_ptr cinfo)
 #define GOPDFIUM_JPEG_FORMAT_GRAY  3  /* 1 byte per pixel */
 
 /*
- * Encode packed pixel data to a baseline JPEG.
+ * Encode packed pixel data to JPEG.
  *
  * data/stride describe the input rows; quality is 1..100 (libjpeg
- * semantics, chroma subsampling per libjpeg defaults). On success returns 1
- * and stores a malloc()ed buffer pointer and its size in *out_buf/*out_size;
- * the caller must release it with gopdfium_jpeg_free(). Returns 0 on failure.
+ * semantics, chroma subsampling per libjpeg defaults); a non-zero
+ * progressive selects libjpeg's standard progressive scan script instead of
+ * baseline output. On success returns 1 and stores a malloc()ed buffer
+ * pointer and its size in *out_buf/*out_size; the caller must release it
+ * with gopdfium_jpeg_free(). Returns 0 on failure.
  */
 __attribute__((used, visibility("default")))
 int gopdfium_jpeg_encode(const unsigned char *data, int width, int height,
-                         int stride, int format, int quality,
+                         int stride, int format, int quality, int progressive,
                          unsigned char **out_buf, unsigned long *out_size)
 {
   struct jpeg_compress_struct cinfo;
@@ -98,6 +100,8 @@ int gopdfium_jpeg_encode(const unsigned char *data, int width, int height,
 
   jpeg_set_defaults(&cinfo);
   jpeg_set_quality(&cinfo, quality, TRUE);
+  if (progressive)
+    jpeg_simple_progression(&cinfo);
   jpeg_start_compress(&cinfo, TRUE);
 
   for (y = 0; y < height; y++) {
