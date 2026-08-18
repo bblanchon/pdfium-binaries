@@ -13,7 +13,7 @@ if [[ "$TARGET_CPU" == "wasm" || "$TARGET_CPU" == "wasm-standalone" ]]; then
   EMCC_ARGS=(
     -s ALLOW_MEMORY_GROWTH=1
     -s ALLOW_TABLE_GROWTH=1
-    -s EXPORTED_FUNCTIONS="$EXPORTED_FUNCTIONS,_free,_malloc,_calloc,_realloc,_memset"
+    -s EXPORTED_FUNCTIONS="$EXPORTED_FUNCTIONS,_free,_malloc,_calloc,_realloc,_memset,_gopdfium_jpeg_encode,_gopdfium_jpeg_free"
     -s EXPORTED_RUNTIME_METHODS="ccall,cwrap,addFunction,removeFunction"
     -s LLD_REPORT_UNDEFINED
     -s WASM=1
@@ -28,6 +28,12 @@ if [[ "$TARGET_CPU" == "wasm" || "$TARGET_CPU" == "wasm-standalone" ]]; then
     EMCC="$SOURCE/third_party/emsdk/upstream/emscripten/emcc"
     BULKMEM_S="$SOURCE/third_party/emsdk/upstream/emscripten/system/lib/libc/emscripten_memset_bulkmem.S"
     "$EMCC" -O2 -mbulk-memory -fno-builtin-memset -c patches/wasm/memset_shim.c -o "$BUILD_DIR/memset_shim.o"
+    # JPEG encode shim: exposes libjpeg-turbo's compressor (otherwise
+    # dead-stripped, since PDFium only decodes). Needs the longjmp lowering
+    # at compile time for its setjmp error handler.
+    "$EMCC" -O2 -mbulk-memory -msimd128 -sSUPPORT_LONGJMP=wasm -DMANGLE_JPEG_NAMES \
+      -I "$SOURCE/third_party/libjpeg_turbo" -I "$SOURCE/third_party/libjpeg_turbo/src" \
+      -c patches/wasm/jpeg_encode_shim.c -o "$BUILD_DIR/jpeg_encode_shim.o"
     "$EMCC" -mbulk-memory -c "$BULKMEM_S" -o "$BUILD_DIR/memset_bulkmem.o"
     EMCC_ARGS+=(
       -mbulk-memory
@@ -36,6 +42,7 @@ if [[ "$TARGET_CPU" == "wasm" || "$TARGET_CPU" == "wasm-standalone" ]]; then
       -s ERROR_ON_UNDEFINED_SYMBOLS=0
       -s STANDALONE_WASM=1
       "$BUILD_DIR/memset_shim.o"
+      "$BUILD_DIR/jpeg_encode_shim.o"
       "$BUILD_DIR/memset_bulkmem.o"
     )
   fi

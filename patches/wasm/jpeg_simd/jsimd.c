@@ -405,3 +405,30 @@ jsimd_huff_encode_one_block(void *state, JOCTET *buffer, JCOEFPTR block, int las
   return NULL;
 }
 
+GLOBAL(int)
+jsimd_can_encode_mcu_AC_first_prepare(void)
+{
+  return 0;
+}
+
+GLOBAL(void)
+jsimd_encode_mcu_AC_first_prepare(const JCOEF *block,
+                                  const int *jpeg_natural_order_start, int Sl,
+                                  int Al, UJCOEF *values, size_t *zerobits)
+{
+}
+
+GLOBAL(int)
+jsimd_can_encode_mcu_AC_refine_prepare(void)
+{
+  return 0;
+}
+
+GLOBAL(int)
+jsimd_encode_mcu_AC_refine_prepare(const JCOEF *block,
+                                   const int *jpeg_natural_order_start,
+                                   int Sl, int Al, UJCOEF *absvalues,
+                                   size_t *bits)
+{
+  return 0;
+}
