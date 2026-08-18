@@ -51,6 +51,13 @@ if [[ "$TARGET_CPU" == "wasm" || "$TARGET_CPU" == "wasm-standalone" ]]; then
       -O2
     )
   fi
+  # Keep the wasm name section (real function names) for profilers, e.g.
+  # wazero's perfmap support (build tag "perfmap"). Adds size, so opt-in.
+  if [[ "${PDFium_PROFILING_NAMES:-false}" == "true" ]]; then
+    EMCC_ARGS+=(
+      --profiling-funcs
+    )
+  fi
   em++ "${EMCC_ARGS[@]}"
 
   if [[ "$TARGET_CPU" == "wasm-standalone" ]]; then
@@ -61,7 +68,12 @@ if [[ "$TARGET_CPU" == "wasm" || "$TARGET_CPU" == "wasm-standalone" ]]; then
     # not change the output. This is the minimal set the current module
     # needs; if a future emscripten emits more features, wasm-opt fails
     # loudly and the missing --enable flag can be added.
-    "$SOURCE/third_party/emsdk/upstream/bin/wasm-opt" --translate-to-exnref \
+    WASM_OPT_ARGS=(--translate-to-exnref)
+    if [[ "${PDFium_PROFILING_NAMES:-false}" == "true" ]]; then
+      # Preserve the name section through the translation.
+      WASM_OPT_ARGS+=(-g)
+    fi
+    "$SOURCE/third_party/emsdk/upstream/bin/wasm-opt" "${WASM_OPT_ARGS[@]}" \
       --enable-exception-handling --enable-reference-types \
       --enable-bulk-memory --enable-nontrapping-float-to-int --enable-simd \
       "$BUILD_DIR/pdfium.wasm" -o "$BUILD_DIR/pdfium.wasm"
