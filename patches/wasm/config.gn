@@ -4,4 +4,9 @@ config("compiler") {
     # https://github.com/emscripten-core/emscripten/issues/4932
     "_POSIX_C_SOURCE=200112",
   ]
+
+  # Enable WebAssembly SIMD for the hand-written wasm_simd128.h kernels
+  # (e.g. in core/fxge/dib/cstretchengine.cpp). Auto-vectorization was
+  # measured performance-neutral; runtimes must support the SIMD proposal.
+  cflags = [ "-msimd128" ]
 }

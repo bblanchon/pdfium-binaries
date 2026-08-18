@@ -31,6 +31,7 @@ if [[ "$TARGET_CPU" == "wasm" || "$TARGET_CPU" == "wasm-standalone" ]]; then
     "$EMCC" -mbulk-memory -c "$BULKMEM_S" -o "$BUILD_DIR/memset_bulkmem.o"
     EMCC_ARGS+=(
       -mbulk-memory
+      -msimd128
       -s ERROR_ON_UNDEFINED_SYMBOLS=0
       -s STANDALONE_WASM=1
       "$BUILD_DIR/memset_shim.o"

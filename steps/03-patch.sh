@@ -52,6 +52,7 @@ case "$OS" in
     apply_patch "$PATCHES/wasm/pdfium.patch"
     apply_patch "$PATCHES/wasm/build.patch" build
     apply_patch "$PATCHES/wasm/fillrect_memset.patch"
+    apply_patch "$PATCHES/wasm/adler32_simd_wasm.patch"
     if [ "$TARGET_CPU" == "wasm-standalone" ]; then
       apply_patch "$PATCHES/wasm/callbacks.patch"
     fi
