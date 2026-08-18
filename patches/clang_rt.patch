@@ -1,5 +1,5 @@
 diff --git a/config/clang/BUILD.gn b/config/clang/BUILD.gn
-index c38670a..5911f4b 100644
+index bace7891b..4858de3ca 100644
 --- a/config/clang/BUILD.gn
 +++ b/config/clang/BUILD.gn
 @@ -183,7 +183,7 @@ template("clang_lib") {
@@ -29,13 +29,16 @@ index c38670a..5911f4b 100644
          }
        } else if (is_android) {
          _dir = "linux"
-@@ -228,15 +228,20 @@ template("clang_lib") {
+@@ -228,18 +228,23 @@ template("clang_lib") {
          } else if (current_cpu == "riscv64") {
            _suffix = "-riscv64-android"
          } else {
 -          assert(false)  # Unhandled cpu type
 +          # Unhandled cpu type
          }
+       } else if (current_os == "aix") {
+         _dir = "aix"
+         _suffix = "-powerpc64"
        } else {
 -        assert(false)  # Unhandled target platform
 +        # Unhandled target platform
