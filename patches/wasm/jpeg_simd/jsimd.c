@@ -88,6 +88,11 @@ extern void jsimd_extxrgb_ycc_convert_wasm(JDIMENSION image_width,
                                            JSAMPIMAGE output_buf,
                                            JDIMENSION output_row,
                                            int num_rows);
+extern void jsimd_fdct_islow_wasm(DCTELEM *data);
+extern void jsimd_convsamp_wasm(JSAMPARRAY sample_data, JDIMENSION start_col,
+                                DCTELEM *workspace);
+extern void jsimd_quantize_wasm(JCOEFPTR coef_block, DCTELEM *divisors,
+                                DCTELEM *workspace);
 
 GLOBAL(int)
 jsimd_can_rgb_ycc(void)
@@ -322,7 +327,17 @@ jsimd_h2v1_merged_upsample(j_decompress_ptr cinfo, JSAMPIMAGE input_buf, JDIMENS
 GLOBAL(int)
 jsimd_can_convsamp(void)
 {
-  return 0;
+  /* The code is optimised for these values only */
+  if (DCTSIZE != 8)
+    return 0;
+  if (BITS_IN_JSAMPLE != 8)
+    return 0;
+  if (sizeof(JDIMENSION) != 4)
+    return 0;
+  if (sizeof(DCTELEM) != 2)
+    return 0;
+
+  return 1;
 }
 
 GLOBAL(int)
@@ -334,14 +349,13 @@ jsimd_can_convsamp_float(void)
 GLOBAL(void)
 jsimd_convsamp(JSAMPARRAY sample_data, JDIMENSION start_col, DCTELEM *workspace)
 {
+  jsimd_convsamp_wasm(sample_data, start_col, workspace);
 }
 
 GLOBAL(void)
 jsimd_convsamp_float(JSAMPARRAY sample_data, JDIMENSION start_col, FAST_FLOAT *workspace)
 {
 }
-
-extern void jsimd_fdct_islow_wasm(DCTELEM *data);
 
 GLOBAL(int)
 jsimd_can_fdct_islow(void)
@@ -386,7 +400,15 @@ jsimd_fdct_float(FAST_FLOAT *data)
 GLOBAL(int)
 jsimd_can_quantize(void)
 {
-  return 0;
+  /* The code is optimised for these values only */
+  if (DCTSIZE != 8)
+    return 0;
+  if (sizeof(JCOEF) != 2)
+    return 0;
+  if (sizeof(DCTELEM) != 2)
+    return 0;
+
+  return 1;
 }
 
 GLOBAL(int)
@@ -398,6 +420,7 @@ jsimd_can_quantize_float(void)
 GLOBAL(void)
 jsimd_quantize(JCOEFPTR coef_block, DCTELEM *divisors, DCTELEM *workspace)
 {
+  jsimd_quantize_wasm(coef_block, divisors, workspace);
 }
 
 GLOBAL(void)
