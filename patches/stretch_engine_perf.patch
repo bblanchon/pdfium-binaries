@@ -1,0 +1,248 @@
+--- a/core/fxge/dib/cstretchengine.cpp
++++ b/core/fxge/dib/cstretchengine.cpp
+@@ -346,9 +346,13 @@
+       case TransformMethod::k1BppToManyBpp: {
+         for (int col = dest_clip_.left; col < dest_clip_.right; ++col) {
+           const PixelWeight* pWeights = weight_table_.GetPixelWeight(col);
++          // The loop below runs [src_start_, src_end_], so the raw weight
++          // accesses stay in range by construction.
++          const int src_start = pWeights->src_start_;
++          const uint32_t* weights = UNSAFE_TODO(pWeights->weights_);
+           uint32_t dest_a = 0;
+           for (int j = pWeights->src_start_; j <= pWeights->src_end_; ++j) {
+-            uint32_t pixel_weight = pWeights->GetWeightForPosition(j);
++            uint32_t pixel_weight = UNSAFE_TODO(weights[j - src_start]);
+             UNSAFE_TODO({
+               if (src_scan[j / 8] & (1 << (7 - j % 8))) {
+                 dest_a += pixel_weight * 255;
+@@ -362,9 +366,13 @@
+       case TransformMethod::k8BppTo8Bpp: {
+         for (int col = dest_clip_.left; col < dest_clip_.right; ++col) {
+           const PixelWeight* pWeights = weight_table_.GetPixelWeight(col);
++          // The loop below runs [src_start_, src_end_], so the raw weight
++          // accesses stay in range by construction.
++          const int src_start = pWeights->src_start_;
++          const uint32_t* weights = UNSAFE_TODO(pWeights->weights_);
+           uint32_t dest_a = 0;
+           for (int j = pWeights->src_start_; j <= pWeights->src_end_; ++j) {
+-            uint32_t pixel_weight = pWeights->GetWeightForPosition(j);
++            uint32_t pixel_weight = UNSAFE_TODO(weights[j - src_start]);
+             UNSAFE_TODO({ dest_a += pixel_weight * src_scan[j]; });
+           }
+           dest_span[dest_span_index++] = PixelFromFixed(dest_a);
+@@ -374,11 +382,15 @@
+       case TransformMethod::k8BppToManyBpp: {
+         for (int col = dest_clip_.left; col < dest_clip_.right; ++col) {
+           const PixelWeight* pWeights = weight_table_.GetPixelWeight(col);
++          // The loop below runs [src_start_, src_end_], so the raw weight
++          // accesses stay in range by construction.
++          const int src_start = pWeights->src_start_;
++          const uint32_t* weights = UNSAFE_TODO(pWeights->weights_);
+           uint32_t dest_r = 0;
+           uint32_t dest_g = 0;
+           uint32_t dest_b = 0;
+           for (int j = pWeights->src_start_; j <= pWeights->src_end_; ++j) {
+-            uint32_t pixel_weight = pWeights->GetWeightForPosition(j);
++            uint32_t pixel_weight = UNSAFE_TODO(weights[j - src_start]);
+             UNSAFE_TODO({
+               FX_ARGB argb = src_palette_[src_scan[j]];
+               if (dest_format_ == FXDIB_Format::kBgr) {
+@@ -401,11 +413,15 @@
+       case TransformMethod::kManyBpptoManyBpp: {
+         for (int col = dest_clip_.left; col < dest_clip_.right; ++col) {
+           const PixelWeight* pWeights = weight_table_.GetPixelWeight(col);
++          // The loop below runs [src_start_, src_end_], so the raw weight
++          // accesses stay in range by construction.
++          const int src_start = pWeights->src_start_;
++          const uint32_t* weights = UNSAFE_TODO(pWeights->weights_);
+           uint32_t dest_r = 0;
+           uint32_t dest_g = 0;
+           uint32_t dest_b = 0;
+           for (int j = pWeights->src_start_; j <= pWeights->src_end_; ++j) {
+-            uint32_t pixel_weight = pWeights->GetWeightForPosition(j);
++            uint32_t pixel_weight = UNSAFE_TODO(weights[j - src_start]);
+             UNSAFE_TODO({
+               const uint8_t* src_pixel = src_scan + j * Bpp;
+               dest_b += pixel_weight * (*src_pixel++);
+@@ -424,6 +440,10 @@
+         DCHECK(has_alpha_);
+         for (int col = dest_clip_.left; col < dest_clip_.right; ++col) {
+           const PixelWeight* pWeights = weight_table_.GetPixelWeight(col);
++          // The loop below runs [src_start_, src_end_], so the raw weight
++          // accesses stay in range by construction.
++          const int src_start = pWeights->src_start_;
++          const uint32_t* weights = UNSAFE_TODO(pWeights->weights_);
+           uint32_t dest_a = 0;
+           uint32_t dest_r = 0;
+           uint32_t dest_g = 0;
+@@ -432,7 +452,7 @@
+             UNSAFE_TODO({
+               const uint8_t* src_pixel = src_scan + j * Bpp;
+               uint32_t pixel_weight =
+-                  pWeights->GetWeightForPosition(j) * src_pixel[3] / 255;
++                  weights[j - src_start] * src_pixel[3] / 255;
+               dest_b += pixel_weight * (*src_pixel++);
+               dest_g += pixel_weight * (*src_pixel++);
+               dest_r += pixel_weight * (*src_pixel);
+@@ -466,89 +486,104 @@
+   }
+ 
+   const int DestBpp = dest_bpp_ / 8;
++  const int dest_cols = dest_clip_.right - dest_clip_.left;
++
++  // The hot loops below run on raw pointers instead of per-tap bounds-checked
++  // span and weight-table accesses (which cost several checked branches per
++  // multiply-accumulate); this function dominates image scaling time. The
++  // extreme offsets are validated up front, and each row's source range is
++  // validated against the clip box before the row is processed.
++  if (dest_cols > 0) {
++    FX_SAFE_SIZE_T max_offset = src_clip_.Height() - 1;
++    max_offset *= inter_pitch_;
++    max_offset += static_cast<size_t>(dest_cols - 1) * DestBpp + (DestBpp - 1);
++    CHECK_LT(max_offset.ValueOrDie(), inter_buf_.size());
++    CHECK_GE(dest_scanline_.size(), static_cast<size_t>(dest_cols) * DestBpp);
++  }
++  const uint8_t* inter_buf = inter_buf_.span().data();
++
+   for (int row = dest_clip_.top; row < dest_clip_.bottom; ++row) {
+     unsigned char* dest_scan = dest_scanline_.data();
+     const PixelWeight* pWeights = table.GetPixelWeight(row);
++    const int src_start = pWeights->src_start_;
++    const int src_end = pWeights->src_end_;
++    if (dest_cols > 0 && src_start <= src_end) {
++      CHECK_GE(src_start, src_clip_.top);
++      CHECK_LT(src_end, src_clip_.bottom);
++    }
++    const int taps = src_end - src_start + 1;
++    const uint32_t* weights = UNSAFE_TODO(pWeights->weights_);
++    const uint8_t* src_base =
++        taps > 0 ? UNSAFE_TODO(inter_buf +
++                               (src_start - src_clip_.top) * inter_pitch_)
++                 : inter_buf;
+     switch (trans_method_) {
+       case TransformMethod::k1BppTo8Bpp:
+       case TransformMethod::k1BppToManyBpp:
+       case TransformMethod::k8BppTo8Bpp: {
+-        for (int col = dest_clip_.left; col < dest_clip_.right; ++col) {
+-          pdfium::span<const uint8_t> src_span =
+-              inter_buf_.subspan((col - dest_clip_.left) * DestBpp);
+-          uint32_t dest_a = 0;
+-          for (int j = pWeights->src_start_; j <= pWeights->src_end_; ++j) {
+-            uint32_t pixel_weight = pWeights->GetWeightForPosition(j);
+-            dest_a +=
+-                pixel_weight * src_span[(j - src_clip_.top) * inter_pitch_];
+-          }
+-          UNSAFE_TODO({
++        UNSAFE_TODO({
++          for (int col = 0; col < dest_cols; ++col) {
++            const uint8_t* src_pixel = src_base + col * DestBpp;
++            uint32_t dest_a = 0;
++            for (int t = 0; t < taps; ++t, src_pixel += inter_pitch_) {
++              dest_a += weights[t] * *src_pixel;
++            }
+             *dest_scan = PixelFromFixed(dest_a);
+             dest_scan += DestBpp;
+-          });
+-        }
++          }
++        });
+         break;
+       }
+       case TransformMethod::k8BppToManyBpp:
+       case TransformMethod::kManyBpptoManyBpp: {
+-        for (int col = dest_clip_.left; col < dest_clip_.right; ++col) {
+-          pdfium::span<const uint8_t> src_span =
+-              inter_buf_.subspan((col - dest_clip_.left) * DestBpp);
+-          uint32_t dest_r = 0;
+-          uint32_t dest_g = 0;
+-          uint32_t dest_b = 0;
+-          for (int j = pWeights->src_start_; j <= pWeights->src_end_; ++j) {
+-            uint32_t pixel_weight = pWeights->GetWeightForPosition(j);
+-            pdfium::span<const uint8_t> src_pixel = src_span.subspan(
+-                static_cast<size_t>((j - src_clip_.top) * inter_pitch_), 3u);
+-            dest_b += pixel_weight * src_pixel[0];
+-            dest_g += pixel_weight * src_pixel[1];
+-            dest_r += pixel_weight * src_pixel[2];
+-          }
+-          UNSAFE_TODO({
++        UNSAFE_TODO({
++          for (int col = 0; col < dest_cols; ++col) {
++            const uint8_t* src_pixel = src_base + col * DestBpp;
++            uint32_t dest_r = 0;
++            uint32_t dest_g = 0;
++            uint32_t dest_b = 0;
++            for (int t = 0; t < taps; ++t, src_pixel += inter_pitch_) {
++              uint32_t pixel_weight = weights[t];
++              dest_b += pixel_weight * src_pixel[0];
++              dest_g += pixel_weight * src_pixel[1];
++              dest_r += pixel_weight * src_pixel[2];
++            }
+             dest_scan[0] = PixelFromFixed(dest_b);
+             dest_scan[1] = PixelFromFixed(dest_g);
+             dest_scan[2] = PixelFromFixed(dest_r);
+             dest_scan += DestBpp;
+-          });
+-        }
++          }
++        });
+         break;
+       }
+       case TransformMethod::kManyBpptoManyBppWithAlpha: {
+         DCHECK(has_alpha_);
+-        for (int col = dest_clip_.left; col < dest_clip_.right; ++col) {
+-          pdfium::span<const uint8_t> src_span =
+-              inter_buf_.subspan((col - dest_clip_.left) * DestBpp);
+-          uint32_t dest_a = 0;
+-          uint32_t dest_r = 0;
+-          uint32_t dest_g = 0;
+-          uint32_t dest_b = 0;
+-          static constexpr size_t kPixelBytes = 4;
+-          for (int j = pWeights->src_start_; j <= pWeights->src_end_; ++j) {
+-            uint32_t pixel_weight = pWeights->GetWeightForPosition(j);
+-            pdfium::span<const uint8_t> src_pixel = src_span.subspan(
+-                static_cast<size_t>((j - src_clip_.top) * inter_pitch_),
+-                kPixelBytes);
+-            dest_b += pixel_weight * src_pixel[0];
+-            dest_g += pixel_weight * src_pixel[1];
+-            dest_r += pixel_weight * src_pixel[2];
+-            dest_a += pixel_weight * src_pixel[3];
+-          }
+-          if (dest_a) {
+-            int r = static_cast<uint32_t>(dest_r) * 255 / dest_a;
+-            int g = static_cast<uint32_t>(dest_g) * 255 / dest_a;
+-            int b = static_cast<uint32_t>(dest_b) * 255 / dest_a;
+-            UNSAFE_TODO({
++        UNSAFE_TODO({
++          for (int col = 0; col < dest_cols; ++col) {
++            const uint8_t* src_pixel = src_base + col * DestBpp;
++            uint32_t dest_a = 0;
++            uint32_t dest_r = 0;
++            uint32_t dest_g = 0;
++            uint32_t dest_b = 0;
++            for (int t = 0; t < taps; ++t, src_pixel += inter_pitch_) {
++              uint32_t pixel_weight = weights[t];
++              dest_b += pixel_weight * src_pixel[0];
++              dest_g += pixel_weight * src_pixel[1];
++              dest_r += pixel_weight * src_pixel[2];
++              dest_a += pixel_weight * src_pixel[3];
++            }
++            if (dest_a) {
++              int r = static_cast<uint32_t>(dest_r) * 255 / dest_a;
++              int g = static_cast<uint32_t>(dest_g) * 255 / dest_a;
++              int b = static_cast<uint32_t>(dest_b) * 255 / dest_a;
+               dest_scan[0] = std::clamp(b, 0, 255);
+               dest_scan[1] = std::clamp(g, 0, 255);
+               dest_scan[2] = std::clamp(r, 0, 255);
+-            });
+-          }
+-          UNSAFE_TODO({
++            }
+             dest_scan[3] = PixelFromFixed(dest_a);
+             dest_scan += DestBpp;
+-          });
+-        }
++          }
++        });
+         break;
+       }
+     }

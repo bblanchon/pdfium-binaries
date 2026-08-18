@@ -27,6 +27,7 @@ esac
 
 apply_patch "$PATCHES/public_headers.patch"
 apply_patch "$PATCHES/png_predict_line_perf.patch"
+apply_patch "$PATCHES/stretch_engine_perf.patch"
 apply_patch "$PATCHES/clang_rt.patch" build
 
 [ "$ENABLE_V8" == "true" ] && apply_patch "$PATCHES/v8/pdfium.patch"
