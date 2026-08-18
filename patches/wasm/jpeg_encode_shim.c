@@ -20,23 +20,23 @@
 
 #include "jpeglib.h"
 
-struct gopdfium_jpeg_error_mgr {
+struct pdfium_jpeg_error_mgr {
   struct jpeg_error_mgr pub;
   jmp_buf setjmp_buffer;
 };
 
-static void gopdfium_jpeg_error_exit(j_common_ptr cinfo)
+static void pdfium_jpeg_error_exit(j_common_ptr cinfo)
 {
-  struct gopdfium_jpeg_error_mgr *err =
-      (struct gopdfium_jpeg_error_mgr *)cinfo->err;
+  struct pdfium_jpeg_error_mgr *err =
+      (struct pdfium_jpeg_error_mgr *)cinfo->err;
   longjmp(err->setjmp_buffer, 1);
 }
 
 /* Input pixel formats. */
-#define GOPDFIUM_JPEG_FORMAT_RGB   0  /* 3 bytes per pixel */
-#define GOPDFIUM_JPEG_FORMAT_RGBA  1  /* 4 bytes per pixel, alpha ignored */
-#define GOPDFIUM_JPEG_FORMAT_BGRA  2  /* 4 bytes per pixel, alpha ignored */
-#define GOPDFIUM_JPEG_FORMAT_GRAY  3  /* 1 byte per pixel */
+#define PDFIUM_JPEG_FORMAT_RGB   0  /* 3 bytes per pixel */
+#define PDFIUM_JPEG_FORMAT_RGBA  1  /* 4 bytes per pixel, alpha ignored */
+#define PDFIUM_JPEG_FORMAT_BGRA  2  /* 4 bytes per pixel, alpha ignored */
+#define PDFIUM_JPEG_FORMAT_GRAY  3  /* 1 byte per pixel */
 
 /*
  * Encode packed pixel data to JPEG.
@@ -46,15 +46,15 @@ static void gopdfium_jpeg_error_exit(j_common_ptr cinfo)
  * progressive selects libjpeg's standard progressive scan script instead of
  * baseline output. On success returns 1 and stores a malloc()ed buffer
  * pointer and its size in *out_buf/*out_size; the caller must release it
- * with gopdfium_jpeg_free(). Returns 0 on failure.
+ * with pdfium_jpeg_free(). Returns 0 on failure.
  */
 __attribute__((used, visibility("default")))
-int gopdfium_jpeg_encode(const unsigned char *data, int width, int height,
-                         int stride, int format, int quality, int progressive,
-                         unsigned char **out_buf, unsigned long *out_size)
+int pdfium_jpeg_encode(const unsigned char *data, int width, int height,
+                       int stride, int format, int quality, int progressive,
+                       unsigned char **out_buf, unsigned long *out_size)
 {
   struct jpeg_compress_struct cinfo;
-  struct gopdfium_jpeg_error_mgr jerr;
+  struct pdfium_jpeg_error_mgr jerr;
   JSAMPROW row;
   int y;
 
@@ -62,7 +62,7 @@ int gopdfium_jpeg_encode(const unsigned char *data, int width, int height,
   *out_size = 0;
 
   cinfo.err = jpeg_std_error(&jerr.pub);
-  jerr.pub.error_exit = gopdfium_jpeg_error_exit;
+  jerr.pub.error_exit = pdfium_jpeg_error_exit;
   if (setjmp(jerr.setjmp_buffer)) {
     jpeg_destroy_compress(&cinfo);
     if (*out_buf) {
@@ -79,19 +79,19 @@ int gopdfium_jpeg_encode(const unsigned char *data, int width, int height,
   cinfo.image_width = (JDIMENSION)width;
   cinfo.image_height = (JDIMENSION)height;
   switch (format) {
-  case GOPDFIUM_JPEG_FORMAT_RGBA:
+  case PDFIUM_JPEG_FORMAT_RGBA:
     cinfo.input_components = 4;
     cinfo.in_color_space = JCS_EXT_RGBA;
     break;
-  case GOPDFIUM_JPEG_FORMAT_BGRA:
+  case PDFIUM_JPEG_FORMAT_BGRA:
     cinfo.input_components = 4;
     cinfo.in_color_space = JCS_EXT_BGRA;
     break;
-  case GOPDFIUM_JPEG_FORMAT_GRAY:
+  case PDFIUM_JPEG_FORMAT_GRAY:
     cinfo.input_components = 1;
     cinfo.in_color_space = JCS_GRAYSCALE;
     break;
-  case GOPDFIUM_JPEG_FORMAT_RGB:
+  case PDFIUM_JPEG_FORMAT_RGB:
   default:
     cinfo.input_components = 3;
     cinfo.in_color_space = JCS_RGB;
@@ -115,7 +115,7 @@ int gopdfium_jpeg_encode(const unsigned char *data, int width, int height,
 }
 
 __attribute__((used, visibility("default")))
-void gopdfium_jpeg_free(unsigned char *buf)
+void pdfium_jpeg_free(unsigned char *buf)
 {
   free(buf);
 }
