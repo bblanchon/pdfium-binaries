@@ -1,0 +1,83 @@
+--- a/core/fxge/dib/cfx_scanlinecompositor.cpp
++++ b/core/fxge/dib/cfx_scanlinecompositor.cpp
+@@ -417,13 +417,23 @@
+     pdfium::span<DestPixelStruct> dest_span,
+     pdfium::span<const uint8_t> src_span,
+     size_t src_Bpp) {
+-  for (auto& dest : dest_span) {
+-    dest.blue = src_span[0];
+-    dest.green = src_span[1];
+-    dest.red = src_span[2];
+-    dest.alpha = 255;
+-    src_span = src_span.subspan(src_Bpp);
++  // This is the hot row when compositing opaque images: validate the source
++  // size once and run the conversion on a raw pointer instead of a
++  // bounds-checked subspan construction plus three checked reads per pixel.
++  if (dest_span.empty()) {
++    return;
+   }
++  CHECK_GE(src_span.size(), (dest_span.size() - 1) * src_Bpp + 3);
++  const uint8_t* src = src_span.data();
++  UNSAFE_TODO({
++    for (auto& dest : dest_span) {
++      dest.blue = src[0];
++      dest.green = src[1];
++      dest.red = src[2];
++      dest.alpha = 255;
++      src += src_Bpp;
++    }
++  });
+ }
+ 
+ template <typename DestPixelStruct>
+@@ -572,12 +582,49 @@
+   output.alpha = dest_alpha;
+ }
+ 
++// Exact replacement for `n / d` with d in [1, 255] and n in [0, 65025]:
++// multiply by a precomputed 24-bit reciprocal, then correct the at most one
++// unit of underestimation. This avoids a hardware integer division on the
++// per-pixel alpha compositing path (the compiler already strength-reduces
++// the constant divisions by 255).
++class AlphaRatioTable {
++ public:
++  constexpr AlphaRatioTable() {
++    for (uint32_t d = 1; d < 256; ++d) {
++      inv_[d] = (1u << 24) / d;
++    }
++  }
++
++  // floor(n / d), exact for n in [0, 65025], d in [1, 255].
++  uint32_t Divide(uint32_t n, uint32_t d) const {
++    uint32_t q = (n * inv_[d]) >> 24;
++    q += (q + 1) * d <= n ? 1 : 0;
++    return q;
++  }
++
++ private:
++  uint32_t inv_[256] = {};
++};
++
++constexpr AlphaRatioTable kAlphaRatioTable;
++
+ template <typename DestPixelStruct>
+ void CompositePixelBgra2BgraNoBlend(const FX_BGRA_STRUCT<uint8_t>& input,
+                                     uint8_t src_alpha,
+                                     DestPixelStruct& output) {
++  if (src_alpha == 255) {
++    // Fully opaque source: AlphaUnion() is 255, the ratio is 255 and
++    // AlphaMerge(..., 255) returns the source value, so this is exactly a
++    // copy - without the integer divisions the general path costs.
++    output.blue = input.blue;
++    output.green = input.green;
++    output.red = input.red;
++    output.alpha = 255;
++    return;
++  }
+   const uint8_t dest_alpha = AlphaUnion(output.alpha, src_alpha);
+-  const int alpha_ratio = src_alpha * 255 / dest_alpha;
++  const int alpha_ratio =
++      kAlphaRatioTable.Divide(src_alpha * 255, dest_alpha);
+   AlphaMergeToDest(input, output, alpha_ratio);
+   output.alpha = dest_alpha;
+ }
