@@ -93,6 +93,17 @@ extern void jsimd_extxrgb_ycc_convert_wasm(JDIMENSION image_width,
                                            JDIMENSION output_row,
                                            int num_rows);
 extern void jsimd_fdct_islow_wasm(DCTELEM *data);
+extern JOCTET *jsimd_huff_encode_one_block_wasm(void *state, JOCTET *buffer,
+                                                JCOEFPTR block,
+                                                int last_dc_val,
+                                                c_derived_tbl *dctbl,
+                                                c_derived_tbl *actbl);
+extern void jsimd_encode_mcu_AC_first_prepare_wasm(
+    const JCOEF *block, const int *jpeg_natural_order_start, int Sl, int Al,
+    UJCOEF *values, size_t *zerobits);
+extern int jsimd_encode_mcu_AC_refine_prepare_wasm(
+    const JCOEF *block, const int *jpeg_natural_order_start, int Sl, int Al,
+    UJCOEF *absvalues, size_t *bits);
 extern void jsimd_h2v1_downsample_wasm(JDIMENSION image_width,
                                        int max_v_samp_factor,
                                        JDIMENSION v_samp_factor,
@@ -549,19 +560,31 @@ jsimd_idct_float(j_decompress_ptr cinfo, jpeg_component_info *compptr, JCOEFPTR 
 GLOBAL(int)
 jsimd_can_huff_encode_one_block(void)
 {
-  return 0;
+  /* The code is optimised for these values only */
+  if (DCTSIZE != 8)
+    return 0;
+  if (sizeof(JCOEF) != 2)
+    return 0;
+
+  return 1;
 }
 
 GLOBAL(JOCTET *)
 jsimd_huff_encode_one_block(void *state, JOCTET *buffer, JCOEFPTR block, int last_dc_val, c_derived_tbl *dctbl, c_derived_tbl *actbl)
 {
-  return NULL;
+  return jsimd_huff_encode_one_block_wasm(state, buffer, block, last_dc_val,
+                                          dctbl, actbl);
 }
 
 GLOBAL(int)
 jsimd_can_encode_mcu_AC_first_prepare(void)
 {
-  return 0;
+  if (DCTSIZE != 8)
+    return 0;
+  if (sizeof(JCOEF) != 2)
+    return 0;
+
+  return 1;
 }
 
 GLOBAL(void)
@@ -569,12 +592,19 @@ jsimd_encode_mcu_AC_first_prepare(const JCOEF *block,
                                   const int *jpeg_natural_order_start, int Sl,
                                   int Al, UJCOEF *values, size_t *zerobits)
 {
+  jsimd_encode_mcu_AC_first_prepare_wasm(block, jpeg_natural_order_start,
+                                         Sl, Al, values, zerobits);
 }
 
 GLOBAL(int)
 jsimd_can_encode_mcu_AC_refine_prepare(void)
 {
-  return 0;
+  if (DCTSIZE != 8)
+    return 0;
+  if (sizeof(JCOEF) != 2)
+    return 0;
+
+  return 1;
 }
 
 GLOBAL(int)
@@ -583,5 +613,6 @@ jsimd_encode_mcu_AC_refine_prepare(const JCOEF *block,
                                    int Sl, int Al, UJCOEF *absvalues,
                                    size_t *bits)
 {
-  return 0;
+  return jsimd_encode_mcu_AC_refine_prepare_wasm(
+      block, jpeg_natural_order_start, Sl, Al, absvalues, bits);
 }
