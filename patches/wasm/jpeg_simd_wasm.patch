@@ -23,20 +23,22 @@
    }
  }
  
-@@ -231,6 +240,16 @@
- 
-     configs -= [ "//build/config/compiler:default_optimization" ]
-     configs += [ "//build/config/compiler:optimize_speed" ]
-+  } else if (jpeg_wasm_simd) {
-+    include_dirs += [ "simd/wasm/" ]
-+
-+    sources = [
-+      "simd/wasm/jdcolor-wasm.c",
-+      "simd/wasm/jsimd.c",
-+    ]
+@@ -228,7 +237,18 @@
+         "simd/arm/aarch64/jsimd.c",
+       ]
+     }
 +
 +    configs -= [ "//build/config/compiler:default_optimization" ]
 +    configs += [ "//build/config/compiler:optimize_speed" ]
-   }
++  } else if (jpeg_wasm_simd) {
++    include_dirs += [ "simd/wasm/" ]
  
-   if (is_win) {
++    sources = [
++      "simd/wasm/jdcolor-wasm.c",
++      "simd/wasm/jidctint-wasm.c",
++      "simd/wasm/jsimd.c",
++    ]
++
+     configs -= [ "//build/config/compiler:default_optimization" ]
+     configs += [ "//build/config/compiler:optimize_speed" ]
+   }

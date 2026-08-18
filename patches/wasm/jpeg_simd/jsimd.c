@@ -17,6 +17,9 @@
 #include "../jsimd.h"
 
 /* Ported kernels. */
+extern void jsimd_idct_islow_wasm(void *dct_table, JCOEFPTR coef_block,
+                                  JSAMPARRAY output_buf,
+                                  JDIMENSION output_col);
 extern void jsimd_ycc_rgb_convert_wasm(JDIMENSION output_width,
                                        JSAMPIMAGE input_buf,
                                        JDIMENSION input_row,
@@ -333,7 +336,19 @@ jsimd_idct_4x4(j_decompress_ptr cinfo, jpeg_component_info *compptr, JCOEFPTR co
 GLOBAL(int)
 jsimd_can_idct_islow(void)
 {
-  return 0;
+  /* The code is optimised for these values only */
+  if (DCTSIZE != 8)
+    return 0;
+  if (sizeof(JCOEF) != 2)
+    return 0;
+  if (BITS_IN_JSAMPLE != 8)
+    return 0;
+  if (sizeof(JDIMENSION) != 4)
+    return 0;
+  if (sizeof(ISLOW_MULT_TYPE) != 2)
+    return 0;
+
+  return 1;
 }
 
 GLOBAL(int)
@@ -351,6 +366,8 @@ jsimd_can_idct_float(void)
 GLOBAL(void)
 jsimd_idct_islow(j_decompress_ptr cinfo, jpeg_component_info *compptr, JCOEFPTR coef_block, JSAMPARRAY output_buf, JDIMENSION output_col)
 {
+  jsimd_idct_islow_wasm(compptr->dct_table, coef_block, output_buf,
+                        output_col);
 }
 
 GLOBAL(void)

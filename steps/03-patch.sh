@@ -69,6 +69,7 @@ case "$OS" in
     cp "$PATCHES/wasm/jpeg_simd/jsimd.c" third_party/libjpeg_turbo/simd/wasm/jsimd.c
     cp "$PATCHES/wasm/jpeg_simd/jdcolor-wasm.c" third_party/libjpeg_turbo/simd/wasm/jdcolor-wasm.c
     cp "$PATCHES/wasm/jpeg_simd/jdcolext-wasm.c" third_party/libjpeg_turbo/simd/wasm/jdcolext-wasm.c
+    cp "$PATCHES/wasm/jpeg_simd/jidctint-wasm.c" third_party/libjpeg_turbo/simd/wasm/jidctint-wasm.c
     if [ "$TARGET_CPU" == "wasm-standalone" ]; then
       apply_patch "$PATCHES/wasm/callbacks.patch"
     fi
