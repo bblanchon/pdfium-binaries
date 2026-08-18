@@ -30,6 +30,7 @@ apply_patch "$PATCHES/png_predict_line_perf.patch"
 apply_patch "$PATCHES/png_sub_filter_perf.patch"
 apply_patch "$PATCHES/stretch_engine_perf.patch"
 apply_patch "$PATCHES/compositor_perf.patch"
+apply_patch "$PATCHES/glyph_blend_perf.patch"
 # Only takes effect when compiling with -msimd128 (wasm-standalone), the
 # added code is guarded by __wasm_simd128__.
 apply_patch "$PATCHES/stretch_engine_wasm_simd.patch"
