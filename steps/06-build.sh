@@ -32,6 +32,7 @@ if [[ "$TARGET_CPU" == "wasm" || "$TARGET_CPU" == "wasm-standalone" ]]; then
     EMCC_ARGS+=(
       -mbulk-memory
       -msimd128
+      -sSUPPORT_LONGJMP=wasm
       -s ERROR_ON_UNDEFINED_SYMBOLS=0
       -s STANDALONE_WASM=1
       "$BUILD_DIR/memset_shim.o"
@@ -51,4 +52,18 @@ if [[ "$TARGET_CPU" == "wasm" || "$TARGET_CPU" == "wasm-standalone" ]]; then
     )
   fi
   em++ "${EMCC_ARGS[@]}"
+
+  if [[ "$TARGET_CPU" == "wasm-standalone" ]]; then
+    # Translate the LLVM legacy exception handling encoding to the
+    # standardized exnref encoding (required by e.g. wazero). The --enable
+    # flags only gate binaryen's validator (emscripten strips the
+    # target_features section, so they must be passed explicitly); they do
+    # not change the output. This is the minimal set the current module
+    # needs; if a future emscripten emits more features, wasm-opt fails
+    # loudly and the missing --enable flag can be added.
+    "$SOURCE/third_party/emsdk/upstream/bin/wasm-opt" --translate-to-exnref \
+      --enable-exception-handling --enable-reference-types \
+      --enable-bulk-memory --enable-nontrapping-float-to-int --enable-simd \
+      "$BUILD_DIR/pdfium.wasm" -o "$BUILD_DIR/pdfium.wasm"
+  fi
 fi

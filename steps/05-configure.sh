@@ -17,6 +17,8 @@ mkdir -p "$BUILD"
   echo "pdf_use_partition_alloc = false"
   if [ "$TARGET_CPU" == "wasm-standalone" ]; then
     echo "target_cpu = \"wasm\""
+    echo "wasm_standalone = true"
+    echo "zlib_wasm_simd = true"
   else
     echo "target_cpu = \"$TARGET_CPU\""
   fi

@@ -1,18 +1,23 @@
 diff --git a/third_party/zlib/BUILD.gn b/third_party/zlib/BUILD.gn
-index eff72b2..13ad9c0 100644
+index eff72b2..9a8e88e 100644
 --- a/third_party/zlib/BUILD.gn
 +++ b/third_party/zlib/BUILD.gn
-@@ -75,6 +75,9 @@ use_arm_neon_optimizations =
+@@ -75,6 +75,14 @@ use_arm_neon_optimizations =
  use_x86_x64_optimizations =
      (current_cpu == "x86" || current_cpu == "x64") && !is_ios
  
-+# The wasm build enables -msimd128 globally (see build/config/wasm).
-+use_wasm_simd_optimizations = current_cpu == "wasm"
++declare_args() {
++  # Enabled for wasm builds that compile with -msimd128 (the pdfium-binaries
++  # wasm-standalone target, see build/config/wasm and steps/05-configure.sh).
++  zlib_wasm_simd = false
++}
++
++use_wasm_simd_optimizations = zlib_wasm_simd
 +
  config("zlib_adler32_simd_config") {
    if (use_x86_x64_optimizations) {
      defines = [ "ADLER32_SIMD_SSSE3" ]
-@@ -88,6 +91,10 @@ config("zlib_adler32_simd_config") {
+@@ -88,6 +96,10 @@ config("zlib_adler32_simd_config") {
    if (use_arm_neon_optimizations) {
      defines = [ "ADLER32_SIMD_NEON" ]
    }
@@ -23,7 +28,7 @@ index eff72b2..13ad9c0 100644
  }
  
  source_set("zlib_adler32_simd") {
-@@ -104,7 +111,7 @@ source_set("zlib_adler32_simd") {
+@@ -104,7 +116,7 @@ source_set("zlib_adler32_simd") {
      }
    }
  
@@ -32,7 +37,7 @@ index eff72b2..13ad9c0 100644
      sources = [
        "adler32_simd.c",
        "adler32_simd.h",
-@@ -328,12 +335,17 @@ component("zlib") {
+@@ -328,12 +340,17 @@ component("zlib") {
    defines = []
    deps = []
  
