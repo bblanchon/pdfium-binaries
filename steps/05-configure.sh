@@ -19,6 +19,7 @@ mkdir -p "$BUILD"
     echo "target_cpu = \"wasm\""
     echo "wasm_standalone = true"
     echo "zlib_wasm_simd = true"
+    echo "jpeg_wasm_simd = true"
   else
     echo "target_cpu = \"$TARGET_CPU\""
   fi
