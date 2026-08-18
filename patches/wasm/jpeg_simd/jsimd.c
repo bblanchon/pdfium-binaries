@@ -56,10 +56,51 @@ extern void jsimd_ycc_extxrgb_convert_wasm(JDIMENSION output_width,
                                            JDIMENSION input_row,
                                            JSAMPARRAY output_buf,
                                            int num_rows);
+extern void jsimd_rgb_ycc_convert_wasm(JDIMENSION image_width,
+                                       JSAMPARRAY input_buf,
+                                       JSAMPIMAGE output_buf,
+                                       JDIMENSION output_row, int num_rows);
+extern void jsimd_extrgb_ycc_convert_wasm(JDIMENSION image_width,
+                                          JSAMPARRAY input_buf,
+                                          JSAMPIMAGE output_buf,
+                                          JDIMENSION output_row, int num_rows);
+extern void jsimd_extrgbx_ycc_convert_wasm(JDIMENSION image_width,
+                                           JSAMPARRAY input_buf,
+                                           JSAMPIMAGE output_buf,
+                                           JDIMENSION output_row,
+                                           int num_rows);
+extern void jsimd_extbgr_ycc_convert_wasm(JDIMENSION image_width,
+                                          JSAMPARRAY input_buf,
+                                          JSAMPIMAGE output_buf,
+                                          JDIMENSION output_row, int num_rows);
+extern void jsimd_extbgrx_ycc_convert_wasm(JDIMENSION image_width,
+                                           JSAMPARRAY input_buf,
+                                           JSAMPIMAGE output_buf,
+                                           JDIMENSION output_row,
+                                           int num_rows);
+extern void jsimd_extxbgr_ycc_convert_wasm(JDIMENSION image_width,
+                                           JSAMPARRAY input_buf,
+                                           JSAMPIMAGE output_buf,
+                                           JDIMENSION output_row,
+                                           int num_rows);
+extern void jsimd_extxrgb_ycc_convert_wasm(JDIMENSION image_width,
+                                           JSAMPARRAY input_buf,
+                                           JSAMPIMAGE output_buf,
+                                           JDIMENSION output_row,
+                                           int num_rows);
+
 GLOBAL(int)
 jsimd_can_rgb_ycc(void)
 {
-  return 0;
+  /* Same preconditions as the other SIMD backends. */
+  if (BITS_IN_JSAMPLE != 8)
+    return 0;
+  if (sizeof(JDIMENSION) != 4)
+    return 0;
+  if ((RGB_PIXELSIZE != 3) && (RGB_PIXELSIZE != 4))
+    return 0;
+
+  return 1;
 }
 
 GLOBAL(int)
@@ -91,6 +132,37 @@ jsimd_can_ycc_rgb565(void)
 GLOBAL(void)
 jsimd_rgb_ycc_convert(j_compress_ptr cinfo, JSAMPARRAY input_buf, JSAMPIMAGE output_buf, JDIMENSION output_row, int num_rows)
 {
+  void (*wasmfct) (JDIMENSION, JSAMPARRAY, JSAMPIMAGE, JDIMENSION, int);
+
+  switch (cinfo->in_color_space) {
+  case JCS_EXT_RGB:
+    wasmfct = jsimd_extrgb_ycc_convert_wasm;
+    break;
+  case JCS_EXT_RGBX:
+  case JCS_EXT_RGBA:
+    wasmfct = jsimd_extrgbx_ycc_convert_wasm;
+    break;
+  case JCS_EXT_BGR:
+    wasmfct = jsimd_extbgr_ycc_convert_wasm;
+    break;
+  case JCS_EXT_BGRX:
+  case JCS_EXT_BGRA:
+    wasmfct = jsimd_extbgrx_ycc_convert_wasm;
+    break;
+  case JCS_EXT_XBGR:
+  case JCS_EXT_ABGR:
+    wasmfct = jsimd_extxbgr_ycc_convert_wasm;
+    break;
+  case JCS_EXT_XRGB:
+  case JCS_EXT_ARGB:
+    wasmfct = jsimd_extxrgb_ycc_convert_wasm;
+    break;
+  default:
+    wasmfct = jsimd_rgb_ycc_convert_wasm;
+    break;
+  }
+
+  wasmfct(cinfo->image_width, input_buf, output_buf, output_row, num_rows);
 }
 
 GLOBAL(void)
