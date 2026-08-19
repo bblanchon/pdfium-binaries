@@ -31,6 +31,7 @@ apply_patch "$PATCHES/png_sub_filter_perf.patch"
 apply_patch "$PATCHES/stretch_engine_perf.patch"
 apply_patch "$PATCHES/compositor_perf.patch"
 apply_patch "$PATCHES/glyph_blend_perf.patch"
+apply_patch "$PATCHES/fillrect_memset_perf.patch"
 # Only takes effect when compiling with -msimd128 (wasm-standalone), the
 # added code is guarded by __wasm_simd128__.
 apply_patch "$PATCHES/stretch_engine_wasm_simd.patch"
@@ -61,7 +62,6 @@ case "$OS" in
   emscripten)
     apply_patch "$PATCHES/wasm/pdfium.patch"
     apply_patch "$PATCHES/wasm/build.patch" build
-    apply_patch "$PATCHES/wasm/fillrect_memset.patch"
     apply_patch "$PATCHES/wasm/adler32_simd_wasm.patch"
     apply_patch "$PATCHES/wasm/inflate_chunk_wasm.patch"
     apply_patch "$PATCHES/wasm/jpeg_simd_wasm.patch"
