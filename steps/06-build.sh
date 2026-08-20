@@ -53,9 +53,23 @@ if [[ "$TARGET_CPU" == "wasm" || "$TARGET_CPU" == "wasm-standalone" ]]; then
       -g
     )
   else
-    # O3 does not work! Strips out too much!
+    # This is binaryen's post-link level; the objects in libpdfium.a are
+    # already compiled at GN's -O2. -O3 keeps every export (the export
+    # sections are identical to -O2's), renders bit-identically, and is worth
+    # a small but reliable ~0.5-1% of total render wall-clock across an
+    # 8-document corpus while making the module ~8 KB smaller. The old
+    # "O3 strips out too much" warning here predated -s EXPORTED_FUNCTIONS,
+    # without which nothing marked the FPDF_* symbols as
+    # dead-code-elimination roots.
+    #
+    # Raising the per-translation-unit level (config("optimize") in
+    # build/config/compiler/BUILD.gn) is a separate lever, deliberately not
+    # taken: measured over the same corpus it is a wash (-0.09% total, i.e.
+    # indistinguishable from leaving it alone) for +188 KB of module size.
+    # Its one large win, -9% on a trivial text page, does not generalize to
+    # text-heavy documents, and it costs ~2 ms on transparency compositing.
     EMCC_ARGS+=(
-      -O2
+      -O3
     )
   fi
   # Keep the wasm name section (real function names) for profilers, e.g.
