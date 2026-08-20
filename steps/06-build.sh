@@ -68,8 +68,25 @@ if [[ "$TARGET_CPU" == "wasm" || "$TARGET_CPU" == "wasm-standalone" ]]; then
     # indistinguishable from leaving it alone) for +188 KB of module size.
     # Its one large win, -9% on a trivial text page, does not generalize to
     # text-heavy documents, and it costs ~2 ms on transparency compositing.
+    #
+    # -flto here applies only to the link, so PDFium's own objects (compiled
+    # by ninja without it) are unaffected and it LTOs emscripten's bitcode
+    # sysroot instead. Worth about 1% of corpus wall-clock, regresses no
+    # document, and the module comes out marginally smaller. It also lets
+    # more memset calls fold into memory.fill.
+    #
+    # Compiling PDFium itself with -flto was measured and rejected, so this
+    # is not an untried avenue: thin LTO is a net +2.6% *regression* and full
+    # LTO gives half of link-only's gain while peaking at 3.5 GB of link
+    # memory. Both re-decide inlining inside the hand-tuned stretch and
+    # composite loops and lose vectorization doing it - wasm SIMD op counts
+    # rank in the same order as the benchmarks (thin < baseline < full).
+    # Chromium's use_thin_lto arg cannot express any of this: it asserts on
+    # use_lld, which is false for emscripten even though it links with
+    # wasm-ld.
     EMCC_ARGS+=(
       -O3
+      -flto
     )
   fi
   # Keep the wasm name section (real function names) for profilers, e.g.
