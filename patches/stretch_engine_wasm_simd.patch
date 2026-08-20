@@ -1,161 +1,70 @@
 --- a/core/fxge/dib/cstretchengine.cpp
 +++ b/core/fxge/dib/cstretchengine.cpp
-@@ -22,6 +22,12 @@
+@@ -25,6 +25,10 @@
  #include "core/fxge/dib/fx_dib.h"
  #include "core/fxge/dib/scanlinecomposer_iface.h"
  
 +#if defined(__wasm_simd128__)
 +#include <wasm_simd128.h>
-+
-+#include "core/fxcrt/data_vector.h"
 +#endif
 +
  static_assert(
      std::is_trivially_destructible<CStretchEngine::PixelWeight>::value,
      "PixelWeight storage may be re-used without invoking its destructor");
-@@ -39,6 +45,46 @@
+@@ -42,6 +46,45 @@
    return total_bytes.ValueOrDie();
  }
  
-+#if defined(__wasm_simd128__)
-+// Accumulate weight * src[i] into acc[i] for n bytes, 16 bytes per step:
-+// widen u8 -> u32 and multiply-add against the splatted weight. Products fit
-+// comfortably in 32 bits (weight sums are 1 << kFixedPointBits, so a full
-+// accumulator is at most 255 << kFixedPointBits).
-+void AccumulateWeightedRow(uint32_t* acc,
-+                           const uint8_t* src,
-+                           size_t n,
++// Accumulates `weight * src[i]` into `acc[i]`. StretchVert() calls this once
++// per tap with a whole destination row, so it is the innermost loop of the
++// vertical pass.
++//
++// The scalar form below is what every other target gets, and it
++// auto-vectorizes there. LLVM's wasm backend does not widen it as
++// aggressively, so under -msimd128 drive the widening directly: load 16
++// source bytes, extend u8 -> u32 in four steps, and multiply-add against the
++// splatted weight. Products fit in 32 bits (a full accumulator is at most
++// 255 << kFixedPointBits), and per byte the additions happen in the same
++// order either way, so both forms produce identical output.
++void AccumulateWeightedRow(pdfium::span<uint32_t> acc,
++                           pdfium::span<const uint8_t> src,
 +                           uint32_t weight) {
-+  UNSAFE_TODO({
-+    size_t i = 0;
-+    const v128_t vw = wasm_i32x4_splat(static_cast<int32_t>(weight));
-+    for (; i + 16 <= n; i += 16) {
-+      const v128_t bytes = wasm_v128_load(src + i);
-+      const v128_t lo16 = wasm_u16x8_extend_low_u8x16(bytes);
-+      const v128_t hi16 = wasm_u16x8_extend_high_u8x16(bytes);
-+      const v128_t w0 = wasm_u32x4_extend_low_u16x8(lo16);
-+      const v128_t w1 = wasm_u32x4_extend_high_u16x8(lo16);
-+      const v128_t w2 = wasm_u32x4_extend_low_u16x8(hi16);
-+      const v128_t w3 = wasm_u32x4_extend_high_u16x8(hi16);
-+      wasm_v128_store(
-+          acc + i, wasm_i32x4_add(wasm_v128_load(acc + i),
-+                                  wasm_i32x4_mul(w0, vw)));
-+      wasm_v128_store(
-+          acc + i + 4, wasm_i32x4_add(wasm_v128_load(acc + i + 4),
-+                                      wasm_i32x4_mul(w1, vw)));
-+      wasm_v128_store(
-+          acc + i + 8, wasm_i32x4_add(wasm_v128_load(acc + i + 8),
-+                                      wasm_i32x4_mul(w2, vw)));
-+      wasm_v128_store(
-+          acc + i + 12, wasm_i32x4_add(wasm_v128_load(acc + i + 12),
-+                                       wasm_i32x4_mul(w3, vw)));
++#if defined(__wasm_simd128__)
++  constexpr size_t kStep = 16;
++  const size_t vector_len = src.size() - src.size() % kStep;
++  const v128_t vw = wasm_i32x4_splat(static_cast<int32_t>(weight));
++  for (size_t i = 0; i < vector_len; i += kStep) {
++    const v128_t bytes = wasm_v128_load(src.subspan(i, kStep).data());
++    const v128_t lo16 = wasm_u16x8_extend_low_u8x16(bytes);
++    const v128_t hi16 = wasm_u16x8_extend_high_u8x16(bytes);
++    const v128_t widened[4] = {
++        wasm_u32x4_extend_low_u16x8(lo16), wasm_u32x4_extend_high_u16x8(lo16),
++        wasm_u32x4_extend_low_u16x8(hi16), wasm_u32x4_extend_high_u16x8(hi16)};
++    for (size_t lane = 0; lane < 4; ++lane) {
++      uint32_t* dest = acc.subspan(i + lane * 4, 4u).data();
++      wasm_v128_store(dest, wasm_i32x4_add(wasm_v128_load(dest),
++                                           wasm_i32x4_mul(widened[lane], vw)));
 +    }
-+    for (; i < n; ++i) {
-+      acc[i] += weight * src[i];
-+    }
-+  });
++  }
++  acc = acc.subspan(vector_len);
++  src = src.subspan(vector_len);
++#endif
++  for (auto [dest, src_byte] : fxcrt::Zip(acc, src)) {
++    dest += weight * src_byte;
++  }
 +}
-+#endif  // defined(__wasm_simd128__)
 +
  }  // namespace
  
  // static
-@@ -501,6 +547,19 @@
-     CHECK_GE(dest_scanline_.size(), static_cast<size_t>(dest_cols) * DestBpp);
-   }
-   const uint8_t* inter_buf = inter_buf_.span().data();
-+
-+#if defined(__wasm_simd128__)
-+  // Elementwise row accumulation: instead of iterating the taps per
-+  // destination pixel, accumulate weight * source-row into a uint32 row
-+  // accumulator with 128-bit SIMD (see AccumulateWeightedRow), then convert
-+  // per pixel. Exactly the same arithmetic in the same order as the scalar
-+  // path, and the per-pixel epilogues only write the bytes the scalar path
-+  // writes (the unused alpha slot of 32-bpp non-alpha destinations stays
-+  // untouched), so the output is bit-identical.
-+  const size_t row_bytes =
-+      dest_cols > 0 ? static_cast<size_t>(dest_cols) * DestBpp : 0;
-+  DataVector<uint32_t> accum(row_bytes);
-+#endif
- 
-   for (int row = dest_clip_.top; row < dest_clip_.bottom; ++row) {
-     unsigned char* dest_scan = dest_scanline_.data();
-@@ -517,12 +576,70 @@
-         taps > 0 ? UNSAFE_TODO(inter_buf +
-                                (src_start - src_clip_.top) * inter_pitch_)
-                  : inter_buf;
-+#if defined(__wasm_simd128__)
-+    std::ranges::fill(accum, 0u);
-+    {
-+      const uint8_t* src_row = src_base;
-+      for (int t = 0; t < taps; ++t) {
-+        AccumulateWeightedRow(accum.data(), src_row, row_bytes,
-+                              UNSAFE_TODO(weights[t]));
-+        src_row = UNSAFE_TODO(src_row + inter_pitch_);
-+      }
-+    }
-+    const uint32_t* acc = accum.data();
-     switch (trans_method_) {
-       case TransformMethod::k1BppTo8Bpp:
-       case TransformMethod::k1BppToManyBpp:
-       case TransformMethod::k8BppTo8Bpp: {
-         UNSAFE_TODO({
-           for (int col = 0; col < dest_cols; ++col) {
-+            *dest_scan = PixelFromFixed(acc[static_cast<size_t>(col) * DestBpp]);
-+            dest_scan += DestBpp;
-+          }
-+        });
-+        break;
-+      }
-+      case TransformMethod::k8BppToManyBpp:
-+      case TransformMethod::kManyBpptoManyBpp: {
-+        UNSAFE_TODO({
-+          for (int col = 0; col < dest_cols; ++col) {
-+            const uint32_t* pixel = acc + static_cast<size_t>(col) * DestBpp;
-+            dest_scan[0] = PixelFromFixed(pixel[0]);
-+            dest_scan[1] = PixelFromFixed(pixel[1]);
-+            dest_scan[2] = PixelFromFixed(pixel[2]);
-+            dest_scan += DestBpp;
-+          }
-+        });
-+        break;
-+      }
-+      case TransformMethod::kManyBpptoManyBppWithAlpha: {
-+        DCHECK(has_alpha_);
-+        UNSAFE_TODO({
-+          for (int col = 0; col < dest_cols; ++col) {
-+            const uint32_t* pixel = acc + static_cast<size_t>(col) * DestBpp;
-+            const uint32_t dest_a = pixel[3];
-+            if (dest_a) {
-+              int r = pixel[2] * 255 / dest_a;
-+              int g = pixel[1] * 255 / dest_a;
-+              int b = pixel[0] * 255 / dest_a;
-+              dest_scan[0] = std::clamp(b, 0, 255);
-+              dest_scan[1] = std::clamp(g, 0, 255);
-+              dest_scan[2] = std::clamp(r, 0, 255);
-+            }
-+            dest_scan[3] = PixelFromFixed(dest_a);
-+            dest_scan += DestBpp;
-+          }
-+        });
-+        break;
-+      }
-+    }
-+#else
-+    switch (trans_method_) {
-+      case TransformMethod::k1BppTo8Bpp:
-+      case TransformMethod::k1BppToManyBpp:
-+      case TransformMethod::k8BppTo8Bpp: {
-+        UNSAFE_TODO({
-+          for (int col = 0; col < dest_cols; ++col) {
-             const uint8_t* src_pixel = src_base + col * DestBpp;
-             uint32_t dest_a = 0;
-             for (int t = 0; t < taps; ++t, src_pixel += inter_pitch_) {
-@@ -587,6 +704,7 @@
-         break;
-       }
+@@ -532,9 +575,7 @@
+           (static_cast<size_t>(pWeights->src_start_ - src_clip_.top) + t) *
+               inter_pitch_,
+           row_bytes);
+-      for (auto [acc, src_byte] : fxcrt::Zip(accum_span, src_row)) {
+-        acc += pixel_weight * src_byte;
+-      }
++      AccumulateWeightedRow(accum_span, src_row, pixel_weight);
      }
-+#endif  // defined(__wasm_simd128__)
-     dest_bitmap_->ComposeScanline(row - dest_clip_.top, dest_scanline_);
-   }
- }
+ 
+     auto dest_row = pdfium::span(dest_scanline_).first(row_bytes);

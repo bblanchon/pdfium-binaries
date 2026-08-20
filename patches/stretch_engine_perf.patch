@@ -1,124 +1,263 @@
 --- a/core/fxge/dib/cstretchengine.cpp
 +++ b/core/fxge/dib/cstretchengine.cpp
-@@ -346,9 +346,13 @@
+@@ -16,6 +16,8 @@
+ #include "core/fxcrt/fx_safe_types.h"
+ #include "core/fxcrt/fx_system.h"
+ #include "core/fxcrt/pauseindicator_iface.h"
++#include "core/fxcrt/span_util.h"
++#include "core/fxcrt/zip.h"
+ #include "core/fxge/calculate_pitch.h"
+ #include "core/fxge/dib/cfx_dibbase.h"
+ #include "core/fxge/dib/cfx_dibitmap.h"
+@@ -113,12 +115,12 @@ bool CStretchEngine::WeightTable::CalculateWeights(
+           // Always room for one weight per size calculation.
+           pixel_weights.weights_[0] = kFixedPointOne;
+         } else {
+-          UNSAFE_TODO({
+-            pixel_weights.weights_[1] =
+-                FixedFromDouble(src_pos - pixel_weights.src_start_ - 0.5f);
+-            pixel_weights.weights_[0] =
+-                kFixedPointOne - pixel_weights.weights_[1];
+-          });
++          const uint32_t second_weight =
++              FixedFromDouble(src_pos - pixel_weights.src_start_ - 0.5f);
++          pixel_weights.SetWeightForPosition(pixel_weights.src_start_ + 1,
++                                             second_weight);
++          pixel_weights.SetWeightForPosition(pixel_weights.src_start_,
++                                             kFixedPointOne - second_weight);
+         }
+       } else {
+         int pixel_pos = static_cast<int>(floor(src_pos));
+@@ -336,7 +338,7 @@ bool CStretchEngine::ContinueStretchHorz(PauseIndicatorIface* pPause) {
+       rows_to_go = kStrechPauseRows;
+     }
+ 
+-    const uint8_t* src_scan = source_->GetScanline(cur_row_).data();
++    pdfium::span<const uint8_t> src_row_span = source_->GetScanline(cur_row_);
+     pdfium::span<uint8_t> dest_span = inter_buf_.subspan(
+         (cur_row_ - src_clip_.top) * inter_pitch_, inter_pitch_);
+     size_t dest_span_index = 0;
+@@ -346,14 +348,14 @@ bool CStretchEngine::ContinueStretchHorz(PauseIndicatorIface* pPause) {
        case TransformMethod::k1BppToManyBpp: {
          for (int col = dest_clip_.left; col < dest_clip_.right; ++col) {
            const PixelWeight* pWeights = weight_table_.GetPixelWeight(col);
-+          // The loop below runs [src_start_, src_end_], so the raw weight
-+          // accesses stay in range by construction.
-+          const int src_start = pWeights->src_start_;
-+          const uint32_t* weights = UNSAFE_TODO(pWeights->weights_);
++          const size_t src_start = static_cast<size_t>(pWeights->src_start_);
++          auto weights = pWeights->weights();
            uint32_t dest_a = 0;
-           for (int j = pWeights->src_start_; j <= pWeights->src_end_; ++j) {
+-          for (int j = pWeights->src_start_; j <= pWeights->src_end_; ++j) {
 -            uint32_t pixel_weight = pWeights->GetWeightForPosition(j);
-+            uint32_t pixel_weight = UNSAFE_TODO(weights[j - src_start]);
-             UNSAFE_TODO({
-               if (src_scan[j / 8] & (1 << (7 - j % 8))) {
-                 dest_a += pixel_weight * 255;
-@@ -362,9 +366,13 @@
+-            UNSAFE_TODO({
+-              if (src_scan[j / 8] & (1 << (7 - j % 8))) {
+-                dest_a += pixel_weight * 255;
+-              }
+-            });
++          for (size_t k = 0; k < weights.size(); ++k) {
++            if (src_row_span[(src_start + k) / 8] &
++                (1 << (7 - (src_start + k) % 8))) {
++              dest_a += weights[k] * 255;
++            }
+           }
+           dest_span[dest_span_index++] = PixelFromFixed(dest_a);
+         }
+@@ -362,10 +364,16 @@ bool CStretchEngine::ContinueStretchHorz(PauseIndicatorIface* pPause) {
        case TransformMethod::k8BppTo8Bpp: {
          for (int col = dest_clip_.left; col < dest_clip_.right; ++col) {
            const PixelWeight* pWeights = weight_table_.GetPixelWeight(col);
-+          // The loop below runs [src_start_, src_end_], so the raw weight
-+          // accesses stay in range by construction.
-+          const int src_start = pWeights->src_start_;
-+          const uint32_t* weights = UNSAFE_TODO(pWeights->weights_);
++          auto weights = pWeights->weights();
++          // One validated view of exactly the source bytes this column
++          // taps: both `weights` and `src_window` are then walked via
++          // fxcrt::Zip, which bounds-checks their relative sizes once (in
++          // its constructor) rather than per iteration.
++          auto src_window = src_row_span.subspan(
++              static_cast<size_t>(pWeights->src_start_), weights.size());
            uint32_t dest_a = 0;
-           for (int j = pWeights->src_start_; j <= pWeights->src_end_; ++j) {
+-          for (int j = pWeights->src_start_; j <= pWeights->src_end_; ++j) {
 -            uint32_t pixel_weight = pWeights->GetWeightForPosition(j);
-+            uint32_t pixel_weight = UNSAFE_TODO(weights[j - src_start]);
-             UNSAFE_TODO({ dest_a += pixel_weight * src_scan[j]; });
+-            UNSAFE_TODO({ dest_a += pixel_weight * src_scan[j]; });
++          for (auto [pixel_weight, src_byte] : fxcrt::Zip(weights, src_window)) {
++            dest_a += pixel_weight * src_byte;
            }
            dest_span[dest_span_index++] = PixelFromFixed(dest_a);
-@@ -374,11 +382,15 @@
+         }
+@@ -374,23 +382,23 @@ bool CStretchEngine::ContinueStretchHorz(PauseIndicatorIface* pPause) {
        case TransformMethod::k8BppToManyBpp: {
          for (int col = dest_clip_.left; col < dest_clip_.right; ++col) {
            const PixelWeight* pWeights = weight_table_.GetPixelWeight(col);
-+          // The loop below runs [src_start_, src_end_], so the raw weight
-+          // accesses stay in range by construction.
-+          const int src_start = pWeights->src_start_;
-+          const uint32_t* weights = UNSAFE_TODO(pWeights->weights_);
++          auto weights = pWeights->weights();
++          auto src_window = src_row_span.subspan(
++              static_cast<size_t>(pWeights->src_start_), weights.size());
            uint32_t dest_r = 0;
            uint32_t dest_g = 0;
            uint32_t dest_b = 0;
-           for (int j = pWeights->src_start_; j <= pWeights->src_end_; ++j) {
+-          for (int j = pWeights->src_start_; j <= pWeights->src_end_; ++j) {
 -            uint32_t pixel_weight = pWeights->GetWeightForPosition(j);
-+            uint32_t pixel_weight = UNSAFE_TODO(weights[j - src_start]);
-             UNSAFE_TODO({
-               FX_ARGB argb = src_palette_[src_scan[j]];
-               if (dest_format_ == FXDIB_Format::kBgr) {
-@@ -401,11 +413,15 @@
+-            UNSAFE_TODO({
+-              FX_ARGB argb = src_palette_[src_scan[j]];
+-              if (dest_format_ == FXDIB_Format::kBgr) {
+-                dest_r += pixel_weight * static_cast<uint8_t>(argb >> 16);
+-                dest_g += pixel_weight * static_cast<uint8_t>(argb >> 8);
+-                dest_b += pixel_weight * static_cast<uint8_t>(argb);
+-              } else {
+-                dest_b += pixel_weight * static_cast<uint8_t>(argb >> 24);
+-                dest_g += pixel_weight * static_cast<uint8_t>(argb >> 16);
+-                dest_r += pixel_weight * static_cast<uint8_t>(argb >> 8);
+-              }
+-            });
++          for (auto [pixel_weight, src_byte] : fxcrt::Zip(weights, src_window)) {
++            FX_ARGB argb = src_palette_[src_byte];
++            if (dest_format_ == FXDIB_Format::kBgr) {
++              dest_r += pixel_weight * static_cast<uint8_t>(argb >> 16);
++              dest_g += pixel_weight * static_cast<uint8_t>(argb >> 8);
++              dest_b += pixel_weight * static_cast<uint8_t>(argb);
++            } else {
++              dest_b += pixel_weight * static_cast<uint8_t>(argb >> 24);
++              dest_g += pixel_weight * static_cast<uint8_t>(argb >> 16);
++              dest_r += pixel_weight * static_cast<uint8_t>(argb >> 8);
++            }
+           }
+           dest_span[dest_span_index++] = PixelFromFixed(dest_b);
+           dest_span[dest_span_index++] = PixelFromFixed(dest_g);
+@@ -399,45 +407,71 @@ bool CStretchEngine::ContinueStretchHorz(PauseIndicatorIface* pPause) {
+         break;
+       }
        case TransformMethod::kManyBpptoManyBpp: {
-         for (int col = dest_clip_.left; col < dest_clip_.right; ++col) {
-           const PixelWeight* pWeights = weight_table_.GetPixelWeight(col);
-+          // The loop below runs [src_start_, src_end_], so the raw weight
-+          // accesses stay in range by construction.
-+          const int src_start = pWeights->src_start_;
-+          const uint32_t* weights = UNSAFE_TODO(pWeights->weights_);
-           uint32_t dest_r = 0;
-           uint32_t dest_g = 0;
-           uint32_t dest_b = 0;
-           for (int j = pWeights->src_start_; j <= pWeights->src_end_; ++j) {
+-        for (int col = dest_clip_.left; col < dest_clip_.right; ++col) {
+-          const PixelWeight* pWeights = weight_table_.GetPixelWeight(col);
+-          uint32_t dest_r = 0;
+-          uint32_t dest_g = 0;
+-          uint32_t dest_b = 0;
+-          for (int j = pWeights->src_start_; j <= pWeights->src_end_; ++j) {
 -            uint32_t pixel_weight = pWeights->GetWeightForPosition(j);
-+            uint32_t pixel_weight = UNSAFE_TODO(weights[j - src_start]);
-             UNSAFE_TODO({
-               const uint8_t* src_pixel = src_scan + j * Bpp;
-               dest_b += pixel_weight * (*src_pixel++);
-@@ -424,6 +440,10 @@
+-            UNSAFE_TODO({
+-              const uint8_t* src_pixel = src_scan + j * Bpp;
+-              dest_b += pixel_weight * (*src_pixel++);
+-              dest_g += pixel_weight * (*src_pixel++);
+-              dest_r += pixel_weight * (*src_pixel);
+-            });
++        // `Bpp` (destination bytes per pixel) doubles as the source pixel
++        // stride here: this method is only selected for >8bpp sources, and
++        // CFX_ImageStretcher::GetStretchedFormat() maps such sources to the
++        // same format on the destination side, so both sides are kBgr (3
++        // bytes) or kBgrx (4 bytes, 4th byte ignored). Assert it since the
++        // dispatch below relies on it to pick the source pixel layout, then
++        // give each branch a compile-time pixel size so each column can
++        // walk its weights and source pixels via fxcrt::Zip() (one size
++        // comparison per column instead of several checks per tap).
++        CHECK(Bpp == 3 || Bpp == 4);
++        auto stretch_row_from = [&](auto src_pixels) {
++          for (int col = dest_clip_.left; col < dest_clip_.right; ++col) {
++            const PixelWeight* pWeights = weight_table_.GetPixelWeight(col);
++            auto weights = pWeights->weights();
++            auto window = src_pixels.subspan(
++                static_cast<size_t>(pWeights->src_start_), weights.size());
++            uint32_t dest_r = 0;
++            uint32_t dest_g = 0;
++            uint32_t dest_b = 0;
++            for (auto [pixel_weight, src] : fxcrt::Zip(weights, window)) {
++              dest_b += pixel_weight * src.blue;
++              dest_g += pixel_weight * src.green;
++              dest_r += pixel_weight * src.red;
++            }
++            dest_span[dest_span_index++] = PixelFromFixed(dest_b);
++            dest_span[dest_span_index++] = PixelFromFixed(dest_g);
++            dest_span[dest_span_index++] = PixelFromFixed(dest_r);
++            dest_span_index += Bpp - 3;
+           }
+-          dest_span[dest_span_index++] = PixelFromFixed(dest_b);
+-          dest_span[dest_span_index++] = PixelFromFixed(dest_g);
+-          dest_span[dest_span_index++] = PixelFromFixed(dest_r);
+-          dest_span_index += Bpp - 3;
++        };
++        if (Bpp == 3) {
++          stretch_row_from(
++              fxcrt::reinterpret_span<const FX_BGR_STRUCT<uint8_t>>(
++                  src_row_span));
++        } else {
++          stretch_row_from(
++              fxcrt::reinterpret_span<const FX_BGRA_STRUCT<uint8_t>>(
++                  src_row_span));
+         }
+         break;
+       }
+       case TransformMethod::kManyBpptoManyBppWithAlpha: {
          DCHECK(has_alpha_);
++        // `has_alpha_` implies both source and destination are kBgra
++        // (asserted in the constructor), so the source pixels are 4-byte
++        // BGRA structs.
++        CHECK_EQ(Bpp, 4);
++        auto src_pixels =
++            fxcrt::reinterpret_span<const FX_BGRA_STRUCT<uint8_t>>(
++                src_row_span);
          for (int col = dest_clip_.left; col < dest_clip_.right; ++col) {
            const PixelWeight* pWeights = weight_table_.GetPixelWeight(col);
-+          // The loop below runs [src_start_, src_end_], so the raw weight
-+          // accesses stay in range by construction.
-+          const int src_start = pWeights->src_start_;
-+          const uint32_t* weights = UNSAFE_TODO(pWeights->weights_);
++          auto weights = pWeights->weights();
++          auto window = src_pixels.subspan(
++              static_cast<size_t>(pWeights->src_start_), weights.size());
            uint32_t dest_a = 0;
            uint32_t dest_r = 0;
            uint32_t dest_g = 0;
-@@ -432,7 +452,7 @@
-             UNSAFE_TODO({
-               const uint8_t* src_pixel = src_scan + j * Bpp;
-               uint32_t pixel_weight =
+           uint32_t dest_b = 0;
+-          for (int j = pWeights->src_start_; j <= pWeights->src_end_; ++j) {
+-            UNSAFE_TODO({
+-              const uint8_t* src_pixel = src_scan + j * Bpp;
+-              uint32_t pixel_weight =
 -                  pWeights->GetWeightForPosition(j) * src_pixel[3] / 255;
-+                  weights[j - src_start] * src_pixel[3] / 255;
-               dest_b += pixel_weight * (*src_pixel++);
-               dest_g += pixel_weight * (*src_pixel++);
-               dest_r += pixel_weight * (*src_pixel);
-@@ -466,89 +486,104 @@
+-              dest_b += pixel_weight * (*src_pixel++);
+-              dest_g += pixel_weight * (*src_pixel++);
+-              dest_r += pixel_weight * (*src_pixel);
+-              dest_a += pixel_weight;
+-            });
++          for (auto [weight, src] : fxcrt::Zip(weights, window)) {
++            uint32_t pixel_weight = weight * src.alpha / 255;
++            dest_b += pixel_weight * src.blue;
++            dest_g += pixel_weight * src.green;
++            dest_r += pixel_weight * src.red;
++            dest_a += pixel_weight;
+           }
+           dest_span[dest_span_index++] = PixelFromFixed(dest_b);
+           dest_span[dest_span_index++] = PixelFromFixed(dest_g);
+@@ -466,88 +500,104 @@ void CStretchEngine::StretchVert() {
    }
  
    const int DestBpp = dest_bpp_ / 8;
 +  const int dest_cols = dest_clip_.right - dest_clip_.left;
++  const size_t row_bytes = static_cast<size_t>(std::max(dest_cols, 0)) *
++                           static_cast<size_t>(DestBpp);
 +
-+  // The hot loops below run on raw pointers instead of per-tap bounds-checked
-+  // span and weight-table accesses (which cost several checked branches per
-+  // multiply-accumulate); this function dominates image scaling time. The
-+  // extreme offsets are validated up front, and each row's source range is
-+  // validated against the clip box before the row is processed.
-+  if (dest_cols > 0) {
-+    FX_SAFE_SIZE_T max_offset = src_clip_.Height() - 1;
-+    max_offset *= inter_pitch_;
-+    max_offset += static_cast<size_t>(dest_cols - 1) * DestBpp + (DestBpp - 1);
-+    CHECK_LT(max_offset.ValueOrDie(), inter_buf_.size());
-+    CHECK_GE(dest_scanline_.size(), static_cast<size_t>(dest_cols) * DestBpp);
-+  }
-+  const uint8_t* inter_buf = inter_buf_.span().data();
++  // This function dominates image scaling time. The previous implementation
++  // walked column-major (per destination pixel, striding down the taps by
++  // `inter_pitch_` through raw pointers). Interchanging the loops - taps
++  // outer, bytes inner - makes every tap's source data one contiguous row,
++  // so each row pair can be walked via fxcrt::Zip() (a single size
++  // comparison per tap instead of several checked or unchecked accesses per
++  // multiply-accumulate), the access pattern becomes cache-friendly, and the
++  // accumulation loop vectorizes. Per byte, the taps are still summed in the
++  // same order, so the output is bit-identical.
++  DataVector<uint32_t> accum(row_bytes);
++  pdfium::span<uint32_t> accum_span(accum);
 +
    for (int row = dest_clip_.top; row < dest_clip_.bottom; ++row) {
-     unsigned char* dest_scan = dest_scanline_.data();
+-    unsigned char* dest_scan = dest_scanline_.data();
      const PixelWeight* pWeights = table.GetPixelWeight(row);
-+    const int src_start = pWeights->src_start_;
-+    const int src_end = pWeights->src_end_;
-+    if (dest_cols > 0 && src_start <= src_end) {
-+      CHECK_GE(src_start, src_clip_.top);
-+      CHECK_LT(src_end, src_clip_.bottom);
++    auto weights = pWeights->weights();
++    if (dest_cols > 0 && !weights.empty()) {
++      CHECK_GE(pWeights->src_start_, src_clip_.top);
++      CHECK_LT(pWeights->src_end_, src_clip_.bottom);
 +    }
-+    const int taps = src_end - src_start + 1;
-+    const uint32_t* weights = UNSAFE_TODO(pWeights->weights_);
-+    const uint8_t* src_base =
-+        taps > 0 ? UNSAFE_TODO(inter_buf +
-+                               (src_start - src_clip_.top) * inter_pitch_)
-+                 : inter_buf;
++
++    std::ranges::fill(accum_span, 0u);
++    for (size_t t = 0; t < weights.size(); ++t) {
++      const uint32_t pixel_weight = weights[t];
++      auto src_row = inter_buf_.subspan(
++          (static_cast<size_t>(pWeights->src_start_ - src_clip_.top) + t) *
++              inter_pitch_,
++          row_bytes);
++      for (auto [acc, src_byte] : fxcrt::Zip(accum_span, src_row)) {
++        acc += pixel_weight * src_byte;
++      }
++    }
++
++    auto dest_row = pdfium::span(dest_scanline_).first(row_bytes);
      switch (trans_method_) {
        case TransformMethod::k1BppTo8Bpp:
        case TransformMethod::k1BppToManyBpp:
@@ -131,21 +270,23 @@
 -            uint32_t pixel_weight = pWeights->GetWeightForPosition(j);
 -            dest_a +=
 -                pixel_weight * src_span[(j - src_clip_.top) * inter_pitch_];
--          }
--          UNSAFE_TODO({
-+        UNSAFE_TODO({
-+          for (int col = 0; col < dest_cols; ++col) {
-+            const uint8_t* src_pixel = src_base + col * DestBpp;
-+            uint32_t dest_a = 0;
-+            for (int t = 0; t < taps; ++t, src_pixel += inter_pitch_) {
-+              dest_a += weights[t] * *src_pixel;
-+            }
-             *dest_scan = PixelFromFixed(dest_a);
-             dest_scan += DestBpp;
--          });
--        }
++        // Only the first byte of each destination pixel carries data on
++        // these paths; any remaining bytes are left untouched.
++        if (DestBpp == 1) {
++          for (auto [dest, acc] : fxcrt::Zip(dest_row, accum_span)) {
++            dest = PixelFromFixed(acc);
 +          }
-+        });
++        } else {
++          size_t offset = 0;
++          for (int col = 0; col < dest_cols; ++col) {
++            dest_row[offset] = PixelFromFixed(accum_span[offset]);
++            offset += DestBpp;
+           }
+-          UNSAFE_TODO({
+-            *dest_scan = PixelFromFixed(dest_a);
+-            dest_scan += DestBpp;
+-          });
+         }
          break;
        }
        case TransformMethod::k8BppToManyBpp:
@@ -163,28 +304,32 @@
 -            dest_b += pixel_weight * src_pixel[0];
 -            dest_g += pixel_weight * src_pixel[1];
 -            dest_r += pixel_weight * src_pixel[2];
--          }
--          UNSAFE_TODO({
-+        UNSAFE_TODO({
-+          for (int col = 0; col < dest_cols; ++col) {
-+            const uint8_t* src_pixel = src_base + col * DestBpp;
-+            uint32_t dest_r = 0;
-+            uint32_t dest_g = 0;
-+            uint32_t dest_b = 0;
-+            for (int t = 0; t < taps; ++t, src_pixel += inter_pitch_) {
-+              uint32_t pixel_weight = weights[t];
-+              dest_b += pixel_weight * src_pixel[0];
-+              dest_g += pixel_weight * src_pixel[1];
-+              dest_r += pixel_weight * src_pixel[2];
-+            }
-             dest_scan[0] = PixelFromFixed(dest_b);
-             dest_scan[1] = PixelFromFixed(dest_g);
-             dest_scan[2] = PixelFromFixed(dest_r);
-             dest_scan += DestBpp;
--          });
--        }
++        // The destination is kBgr (3 bytes per pixel, fully written) or
++        // kBgrx (4 bytes per pixel, 4th byte left untouched); see the
++        // matching dispatch in ContinueStretchHorz().
++        CHECK(DestBpp == 3 || DestBpp == 4);
++        if (DestBpp == 3) {
++          for (auto [dest, acc] : fxcrt::Zip(dest_row, accum_span)) {
++            dest = PixelFromFixed(acc);
 +          }
-+        });
++        } else {
++          auto dest_pixels =
++              fxcrt::reinterpret_span<FX_BGRA_STRUCT<uint8_t>>(dest_row);
++          auto acc_pixels =
++              fxcrt::reinterpret_span<const FX_BGRA_STRUCT<uint32_t>>(
++                  accum_span);
++          for (auto [dest, acc] : fxcrt::Zip(dest_pixels, acc_pixels)) {
++            dest.blue = PixelFromFixed(acc.blue);
++            dest.green = PixelFromFixed(acc.green);
++            dest.red = PixelFromFixed(acc.red);
+           }
+-          UNSAFE_TODO({
+-            dest_scan[0] = PixelFromFixed(dest_b);
+-            dest_scan[1] = PixelFromFixed(dest_g);
+-            dest_scan[2] = PixelFromFixed(dest_r);
+-            dest_scan += DestBpp;
+-          });
+         }
          break;
        }
        case TransformMethod::kManyBpptoManyBppWithAlpha: {
@@ -212,37 +357,52 @@
 -            int g = static_cast<uint32_t>(dest_g) * 255 / dest_a;
 -            int b = static_cast<uint32_t>(dest_b) * 255 / dest_a;
 -            UNSAFE_TODO({
-+        UNSAFE_TODO({
-+          for (int col = 0; col < dest_cols; ++col) {
-+            const uint8_t* src_pixel = src_base + col * DestBpp;
-+            uint32_t dest_a = 0;
-+            uint32_t dest_r = 0;
-+            uint32_t dest_g = 0;
-+            uint32_t dest_b = 0;
-+            for (int t = 0; t < taps; ++t, src_pixel += inter_pitch_) {
-+              uint32_t pixel_weight = weights[t];
-+              dest_b += pixel_weight * src_pixel[0];
-+              dest_g += pixel_weight * src_pixel[1];
-+              dest_r += pixel_weight * src_pixel[2];
-+              dest_a += pixel_weight * src_pixel[3];
-+            }
-+            if (dest_a) {
-+              int r = static_cast<uint32_t>(dest_r) * 255 / dest_a;
-+              int g = static_cast<uint32_t>(dest_g) * 255 / dest_a;
-+              int b = static_cast<uint32_t>(dest_b) * 255 / dest_a;
-               dest_scan[0] = std::clamp(b, 0, 255);
-               dest_scan[1] = std::clamp(g, 0, 255);
-               dest_scan[2] = std::clamp(r, 0, 255);
+-              dest_scan[0] = std::clamp(b, 0, 255);
+-              dest_scan[1] = std::clamp(g, 0, 255);
+-              dest_scan[2] = std::clamp(r, 0, 255);
 -            });
--          }
++        CHECK_EQ(DestBpp, 4);
++        auto dest_pixels =
++            fxcrt::reinterpret_span<FX_BGRA_STRUCT<uint8_t>>(dest_row);
++        auto acc_pixels =
++            fxcrt::reinterpret_span<const FX_BGRA_STRUCT<uint32_t>>(
++                accum_span);
++        for (auto [dest, acc] : fxcrt::Zip(dest_pixels, acc_pixels)) {
++          if (acc.alpha) {
++            int r = acc.red * 255 / acc.alpha;
++            int g = acc.green * 255 / acc.alpha;
++            int b = acc.blue * 255 / acc.alpha;
++            dest.blue = std::clamp(b, 0, 255);
++            dest.green = std::clamp(g, 0, 255);
++            dest.red = std::clamp(r, 0, 255);
+           }
 -          UNSAFE_TODO({
-+            }
-             dest_scan[3] = PixelFromFixed(dest_a);
-             dest_scan += DestBpp;
+-            dest_scan[3] = PixelFromFixed(dest_a);
+-            dest_scan += DestBpp;
 -          });
--        }
-+          }
-+        });
++          dest.alpha = PixelFromFixed(acc.alpha);
+         }
          break;
        }
+--- a/core/fxge/dib/cstretchengine.h
++++ b/core/fxge/dib/cstretchengine.h
+@@ -66,6 +66,19 @@ class CStretchEngine {
+       return UNSAFE_BUFFERS(weights_[position - src_start_]);
      }
+ 
++    // A checked view over all of this pixel's weights, one per source
++    // position in [src_start_, src_end_]. Empty for an empty range.
++    pdfium::span<const uint32_t> weights() const {
++      if (src_end_ < src_start_) {
++        return {};
++      }
++      // SAFETY: WeightTable::CalculateWeights() sizes each PixelWeight for
++      // exactly `src_end_ - src_start_ + 1` trailing weights, and
++      // SetStartEnd() CHECKs the range fits the allocation.
++      return UNSAFE_BUFFERS(pdfium::span(
++          weights_, static_cast<size_t>(src_end_ - src_start_ + 1)));
++    }
++
+     void SetWeightForPosition(int position, uint32_t weight) {
+       CHECK_GE(position, src_start_);
+       CHECK_LE(position, src_end_);

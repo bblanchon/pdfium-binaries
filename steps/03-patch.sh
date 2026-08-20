@@ -26,17 +26,25 @@ case "$BUILD_TYPE" in
 esac
 
 apply_patch "$PATCHES/public_headers.patch"
-apply_patch "$PATCHES/png_predict_line_perf.patch"
-apply_patch "$PATCHES/png_sub_filter_perf.patch"
+# Under upstream review (CLs 155510, 155530, 155550). These use spans and
+# fxcrt::Zip() rather than raw pointers, so they carry no UNSAFE_BUFFERS;
+# drop each one once its CL lands.
+apply_patch "$PATCHES/png_predictor_perf.patch"
 apply_patch "$PATCHES/stretch_engine_perf.patch"
 apply_patch "$PATCHES/compositor_perf.patch"
-apply_patch "$PATCHES/glyph_blend_perf.patch"
-apply_patch "$PATCHES/fillrect_memset_perf.patch"
-# Only takes effect when compiling with -msimd128 (wasm-standalone), the
-# added code is guarded by __wasm_simd128__.
-apply_patch "$PATCHES/stretch_engine_wasm_simd.patch"
-apply_patch "$PATCHES/stretch_horz_wasm_simd.patch"
-apply_patch "$PATCHES/compositor_wasm_simd.patch"
+# Wasm-only. Both measure neutral on native (fillrect even regresses small
+# cache-resident fills there, where libc memset switches to non-temporal
+# stores), and only pay off under a runtime that neither vectorizes nor
+# elides the bounds checks itself. See PERFORMANCE.md.
+if [ "$OS" == "emscripten" ]; then
+  apply_patch "$PATCHES/glyph_blend_perf.patch"
+  apply_patch "$PATCHES/fillrect_memset_perf.patch"
+  # Only take effect when compiling with -msimd128 (wasm-standalone); the
+  # added code is guarded by __wasm_simd128__.
+  apply_patch "$PATCHES/stretch_engine_wasm_simd.patch"
+  apply_patch "$PATCHES/stretch_horz_wasm_simd.patch"
+  apply_patch "$PATCHES/compositor_wasm_simd.patch"
+fi
 apply_patch "$PATCHES/clang_rt.patch" build
 
 [ "$ENABLE_V8" == "true" ] && apply_patch "$PATCHES/v8/pdfium.patch"

@@ -1,6 +1,6 @@
 --- a/core/fxge/dib/cfx_scanlinecompositor.cpp
 +++ b/core/fxge/dib/cfx_scanlinecompositor.cpp
-@@ -417,13 +417,23 @@
+@@ -417,12 +417,45 @@ void CompositeRow_Bgr2Bgra_NoBlend_NoClip(
      pdfium::span<DestPixelStruct> dest_span,
      pdfium::span<const uint8_t> src_span,
      size_t src_Bpp) {
@@ -10,27 +10,49 @@
 -    dest.red = src_span[2];
 -    dest.alpha = 255;
 -    src_span = src_span.subspan(src_Bpp);
-+  // This is the hot row when compositing opaque images: validate the source
-+  // size once and run the conversion on a raw pointer instead of a
-+  // bounds-checked subspan construction plus three checked reads per pixel.
++  // This is the hot row when compositing opaque images. Rather than
++  // reassigning `src_span` via `subspan(src_Bpp)` once per pixel (which
++  // bounds-checks against the shrinking span's own size on every iteration),
++  // validate the whole access range once up front and reinterpret it as a
++  // span of fixed-size source pixel structs. `src_Bpp` only ever takes two
++  // values (3 for a BGR source, 4 for BGRx, whose 4th byte this function
++  // ignores), so the runtime dispatch below gives each branch a compile-time
++  // pixel size, at which point fxcrt::Zip() walks both spans via their own
++  // (checkless) iteration and does the single required size comparison once,
++  // in its constructor, instead of once per pixel.
 +  if (dest_span.empty()) {
 +    return;
-   }
++  }
++  // The only caller (CompositeRgbBitmapLineSrcBgrx()) CHECKs that
++  // `src_format_` is kBgr or kBgrx before computing `src_Bpp` from it, so
++  // this is not merely today's usage but a structural guarantee; assert it
++  // explicitly since, unlike the previous stride-generic implementation,
++  // the dispatch below depends on `src_Bpp` being exactly one of these two
++  // values to pick the correct source pixel layout.
++  CHECK(src_Bpp == 3 || src_Bpp == 4);
 +  CHECK_GE(src_span.size(), (dest_span.size() - 1) * src_Bpp + 3);
-+  const uint8_t* src = src_span.data();
-+  UNSAFE_TODO({
-+    for (auto& dest : dest_span) {
-+      dest.blue = src[0];
-+      dest.green = src[1];
-+      dest.red = src[2];
++  // Only the source pixel type (and thus the reinterpret_span() below) needs
++  // to vary between the two possible values of `src_Bpp`; the composite step
++  // itself is identical either way, so it is factored into one generic
++  // lambda instantiated for both source pixel types instead of duplicated.
++  auto composite_from = [&](auto src_pixels) {
++    for (auto [dest, src] : fxcrt::Zip(dest_span, src_pixels)) {
++      dest.blue = src.blue;
++      dest.green = src.green;
++      dest.red = src.red;
 +      dest.alpha = 255;
-+      src += src_Bpp;
 +    }
-+  });
++  };
++  if (src_Bpp == 3) {
++    composite_from(fxcrt::reinterpret_span<const FX_BGR_STRUCT<uint8_t>>(
++        src_span.first(dest_span.size() * 3)));
++  } else {
++    composite_from(fxcrt::reinterpret_span<const FX_BGRA_STRUCT<uint8_t>>(
++        src_span.first(dest_span.size() * 4)));
+   }
  }
  
- template <typename DestPixelStruct>
-@@ -572,12 +582,49 @@
+@@ -572,12 +605,49 @@ void CompositePixelBgra2BgraBlend(const FX_BGRA_STRUCT<uint8_t>& input,
    output.alpha = dest_alpha;
  }
  

@@ -1,109 +1,78 @@
 --- a/core/fxge/dib/cstretchengine.cpp
 +++ b/core/fxge/dib/cstretchengine.cpp
-@@ -382,10 +382,20 @@
-       rows_to_go = kStrechPauseRows;
-     }
- 
--    const uint8_t* src_scan = source_->GetScanline(cur_row_).data();
-+    pdfium::span<const uint8_t> src_scan_span = source_->GetScanline(cur_row_);
-+    const uint8_t* src_scan = src_scan_span.data();
-     pdfium::span<uint8_t> dest_span = inter_buf_.subspan(
-         (cur_row_ - src_clip_.top) * inter_pitch_, inter_pitch_);
-     size_t dest_span_index = 0;
+@@ -470,10 +470,35 @@
+             uint32_t dest_r = 0;
+             uint32_t dest_g = 0;
+             uint32_t dest_b = 0;
+-            for (auto [pixel_weight, src] : fxcrt::Zip(weights, window)) {
+-              dest_b += pixel_weight * src.blue;
+-              dest_g += pixel_weight * src.green;
+-              dest_r += pixel_weight * src.red;
 +#if defined(__wasm_simd128__)
-+    // The vectorized ManyBpp cases below load 4 bytes per source pixel; with
-+    // 3 bytes per pixel the last pixel of the row would read one byte past
-+    // the scanline, so fall back to the scalar loops unless the row has room.
-+    const bool can_simd_scanline =
-+        src_clip_.right > 0 &&
-+        static_cast<size_t>(src_clip_.right - 1) * Bpp + 4 <=
-+            src_scan_span.size();
-+#endif
-     // TODO(npm): reduce duplicated code here
-     switch (trans_method_) {
-       case TransformMethod::k1BppTo8Bpp:
-@@ -457,6 +467,40 @@
-         break;
-       }
-       case TransformMethod::kManyBpptoManyBpp: {
-+#if defined(__wasm_simd128__)
-+        if (can_simd_scanline) {
-+          // Vectorized across channels: each tap loads the source pixel's 4
-+          // bytes, widens u8 -> u32 and multiply-accumulates with the
-+          // splatted weight, so lanes 0-2 hold exactly dest_b/g/r of the
-+          // scalar path (lane 3 is unused). Same math, same order.
-+          for (int col = dest_clip_.left; col < dest_clip_.right; ++col) {
-+            const PixelWeight* pWeights = weight_table_.GetPixelWeight(col);
-+            const int src_start = pWeights->src_start_;
-+            const int taps = pWeights->src_end_ - src_start + 1;
-+            const uint32_t* weights = UNSAFE_TODO(pWeights->weights_);
-+            v128_t acc = wasm_i64x2_const(0, 0);
-+            UNSAFE_TODO({
-+              const uint8_t* src_pixel = src_scan + src_start * Bpp;
-+              for (int t = 0; t < taps; ++t, src_pixel += Bpp) {
-+                v128_t px = wasm_v128_load32_zero(src_pixel);
-+                px = wasm_u32x4_extend_low_u16x8(
-+                    wasm_u16x8_extend_low_u8x16(px));
++            // Vectorize the tap loop across channels rather than across
++            // pixels: each tap loads the source pixel's 4 bytes, extends
++            // u8 -> u32 and multiply-accumulates against the splatted
++            // weight, so lanes 0-2 end up holding exactly the scalar
++            // path's dest_b/dest_g/dest_r (lane 3 is the ignored 4th
++            // byte). Same arithmetic in the same order. Only available
++            // for 4-byte source pixels, since the load reads 4 bytes.
++            if constexpr (sizeof(*window.data()) == 4) {
++              v128_t acc = wasm_i64x2_const(0, 0);
++              for (auto [pixel_weight, src] : fxcrt::Zip(weights, window)) {
++                const v128_t px = wasm_u32x4_extend_low_u16x8(
++                    wasm_u16x8_extend_low_u8x16(wasm_v128_load32_zero(&src)));
 +                acc = wasm_i32x4_add(
-+                    acc, wasm_i32x4_mul(px, wasm_i32x4_splat(weights[t])));
++                    acc,
++                    wasm_i32x4_mul(px, wasm_i32x4_splat(
++                                           static_cast<int32_t>(pixel_weight))));
 +              }
-+            });
-+            acc = wasm_u32x4_shr(acc, kFixedPointBits);
-+            dest_span[dest_span_index++] =
-+                static_cast<uint8_t>(wasm_i32x4_extract_lane(acc, 0));
-+            dest_span[dest_span_index++] =
-+                static_cast<uint8_t>(wasm_i32x4_extract_lane(acc, 1));
-+            dest_span[dest_span_index++] =
-+                static_cast<uint8_t>(wasm_i32x4_extract_lane(acc, 2));
-+            dest_span_index += Bpp - 3;
-+          }
-+          break;
-+        }
++              dest_b = static_cast<uint32_t>(wasm_i32x4_extract_lane(acc, 0));
++              dest_g = static_cast<uint32_t>(wasm_i32x4_extract_lane(acc, 1));
++              dest_r = static_cast<uint32_t>(wasm_i32x4_extract_lane(acc, 2));
++            } else
 +#endif
-         for (int col = dest_clip_.left; col < dest_clip_.right; ++col) {
-           const PixelWeight* pWeights = weight_table_.GetPixelWeight(col);
-           // The loop below runs [src_start_, src_end_], so the raw weight
-@@ -484,6 +528,43 @@
-       }
-       case TransformMethod::kManyBpptoManyBppWithAlpha: {
-         DCHECK(has_alpha_);
++            {
++              for (auto [pixel_weight, src] : fxcrt::Zip(weights, window)) {
++                dest_b += pixel_weight * src.blue;
++                dest_g += pixel_weight * src.green;
++                dest_r += pixel_weight * src.red;
++              }
+             }
+             dest_span[dest_span_index++] = PixelFromFixed(dest_b);
+             dest_span[dest_span_index++] = PixelFromFixed(dest_g);
+@@ -510,6 +535,27 @@
+           uint32_t dest_r = 0;
+           uint32_t dest_g = 0;
+           uint32_t dest_b = 0;
 +#if defined(__wasm_simd128__)
-+        if (can_simd_scanline) {
-+          // Same channel vectorization as kManyBpptoManyBpp; the
-+          // alpha-scaled weight and the alpha accumulator stay scalar (the
-+          // division by 255 is strength-reduced by the compiler).
-+          for (int col = dest_clip_.left; col < dest_clip_.right; ++col) {
-+            const PixelWeight* pWeights = weight_table_.GetPixelWeight(col);
-+            const int src_start = pWeights->src_start_;
-+            const int taps = pWeights->src_end_ - src_start + 1;
-+            const uint32_t* weights = UNSAFE_TODO(pWeights->weights_);
++          // As in kManyBpptoManyBpp above, but the per-tap weight is scaled
++          // by the source alpha first, so the splatted value varies per tap
++          // and `dest_a` still accumulates scalars.
++          {
 +            v128_t acc = wasm_i64x2_const(0, 0);
-+            uint32_t dest_a = 0;
-+            UNSAFE_TODO({
-+              const uint8_t* src_pixel = src_scan + src_start * Bpp;
-+              for (int t = 0; t < taps; ++t, src_pixel += Bpp) {
-+                uint32_t pixel_weight = weights[t] * src_pixel[3] / 255;
-+                v128_t px = wasm_v128_load32_zero(src_pixel);
-+                px = wasm_u32x4_extend_low_u16x8(
-+                    wasm_u16x8_extend_low_u8x16(px));
-+                acc = wasm_i32x4_add(
-+                    acc, wasm_i32x4_mul(px, wasm_i32x4_splat(pixel_weight)));
-+                dest_a += pixel_weight;
-+              }
-+            });
-+            acc = wasm_u32x4_shr(acc, kFixedPointBits);
-+            dest_span[dest_span_index++] =
-+                static_cast<uint8_t>(wasm_i32x4_extract_lane(acc, 0));
-+            dest_span[dest_span_index++] =
-+                static_cast<uint8_t>(wasm_i32x4_extract_lane(acc, 1));
-+            dest_span[dest_span_index++] =
-+                static_cast<uint8_t>(wasm_i32x4_extract_lane(acc, 2));
-+            dest_span[dest_span_index] = PixelFromFixed(255 * dest_a);
-+            dest_span_index += Bpp - 3;
++            for (auto [weight, src] : fxcrt::Zip(weights, window)) {
++              const uint32_t pixel_weight = weight * src.alpha / 255;
++              const v128_t px = wasm_u32x4_extend_low_u16x8(
++                  wasm_u16x8_extend_low_u8x16(wasm_v128_load32_zero(&src)));
++              acc = wasm_i32x4_add(
++                  acc,
++                  wasm_i32x4_mul(px, wasm_i32x4_splat(
++                                         static_cast<int32_t>(pixel_weight))));
++              dest_a += pixel_weight;
++            }
++            dest_b = static_cast<uint32_t>(wasm_i32x4_extract_lane(acc, 0));
++            dest_g = static_cast<uint32_t>(wasm_i32x4_extract_lane(acc, 1));
++            dest_r = static_cast<uint32_t>(wasm_i32x4_extract_lane(acc, 2));
 +          }
-+          break;
-+        }
++#else
+           for (auto [weight, src] : fxcrt::Zip(weights, window)) {
+             uint32_t pixel_weight = weight * src.alpha / 255;
+             dest_b += pixel_weight * src.blue;
+@@ -517,6 +563,7 @@
+             dest_r += pixel_weight * src.red;
+             dest_a += pixel_weight;
+           }
 +#endif
-         for (int col = dest_clip_.left; col < dest_clip_.right; ++col) {
-           const PixelWeight* pWeights = weight_table_.GetPixelWeight(col);
-           // The loop below runs [src_start_, src_end_], so the raw weight
+           dest_span[dest_span_index++] = PixelFromFixed(dest_b);
+           dest_span[dest_span_index++] = PixelFromFixed(dest_g);
+           dest_span[dest_span_index++] = PixelFromFixed(dest_r);

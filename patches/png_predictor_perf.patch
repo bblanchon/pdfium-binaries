@@ -1,0 +1,187 @@
+--- a/core/fxcodec/flate/flatemodule.cpp
++++ b/core/fxcodec/flate/flatemodule.cpp
+@@ -29,6 +29,7 @@
+ #include "core/fxcrt/span.h"
+ #include "core/fxcrt/span_util.h"
+ #include "core/fxcrt/stl_util.h"
++#include "core/fxcrt/zip.h"
+ #include "core/fxge/calculate_pitch.h"
+ 
+ #if defined(USE_SYSTEM_ZLIB)
+@@ -306,24 +307,21 @@ bool CLZWDecoder::Decode() {
+   return dest_byte_pos_ != 0;
+ }
+ 
+-uint8_t GetLeftValue(pdfium::span<const uint8_t> span,
+-                     size_t i,
+-                     uint32_t bytes_per_pixel) {
+-  return i >= bytes_per_pixel ? span[i - bytes_per_pixel] : 0;
+-}
+-
+-uint8_t GetUpValue(pdfium::span<const uint8_t> span, size_t i) {
+-  return span.empty() ? 0 : span[i];
+-}
++// Fixed-size pixel views for the Sub filter's per-channel fast paths. The
++// channel names are deliberately positional: PNG predictors operate on raw
++// bytes and never care about color order.
++struct Pixel3 {
++  uint8_t c0;
++  uint8_t c1;
++  uint8_t c2;
++};
+ 
+-uint8_t GetUpperLeftValue(pdfium::span<const uint8_t> span,
+-                          size_t i,
+-                          uint32_t bytes_per_pixel) {
+-  if (i >= bytes_per_pixel && !span.empty()) {
+-    return span[i - bytes_per_pixel];
+-  }
+-  return 0;
+-}
++struct Pixel4 {
++  uint8_t c0;
++  uint8_t c1;
++  uint8_t c2;
++  uint8_t c3;
++};
+ 
+ uint8_t PathPredictor(uint8_t a, uint8_t b, uint8_t c) {
+   int p = static_cast<int>(a) + b - c;
+@@ -342,43 +340,118 @@ void PNG_PredictLine(pdfium::span<uint8_t> dest_span,
+                      size_t row_size,
+                      uint32_t bytes_per_pixel) {
+   const uint8_t tag = src_span.front();
+-  pdfium::span<const uint8_t> remaining_src_span =
+-      src_span.subspan(1u, row_size);
++  pdfium::span<const uint8_t> src = src_span.subspan(1u, row_size);
++  // This function dominates FlateDecode time on predictor-encoded streams.
++  // Rather than reading every neighbor through a per-byte helper (each a
++  // bounds check plus an `i >= bytes_per_pixel` or `empty()` branch), size
++  // the row views once up front and hoist the two special cases out of the
++  // loops: the first `bytes_per_pixel` bytes of a row (left and upper-left
++  // neighbors are zero) and the first row of the image (up and upper-left
++  // neighbors are zero, i.e. `last` is empty).
++  const size_t n = src.size();
++  pdfium::span<uint8_t> dest = dest_span.first(n);
++  pdfium::span<const uint8_t> up_row =
++      last_span.empty() ? last_span : last_span.first(n);
++  const size_t bpp = bytes_per_pixel;
++  const size_t lead = std::min(bpp, n);
+   switch (tag) {
+     case 1: {
+-      for (size_t i = 0; i < remaining_src_span.size(); ++i) {
+-        uint8_t left = GetLeftValue(dest_span, i, bytes_per_pixel);
+-        dest_span[i] = remaining_src_span[i] + left;
++      // Sub: left neighbor only, so the first row needs no special casing.
++      // The lead bytes have a zero left neighbor.
++      fxcrt::Copy(src.first(lead), dest);
++      // A Sub-filtered row's channels form independent additive chains; the
++      // generic loop below re-reads dest[i - bpp], a value it stored `bpp`
++      // iterations earlier, which serializes the loop on store-to-load
++      // forwarding. For the common 3- and 4-byte pixel sizes, walking the
++      // row as pixel structs and carrying the running channel values in a
++      // local removes that dependency (and, via fxcrt::Zip(), all
++      // per-element bounds checks).
++      if (bpp == 3 && n >= 3) {
++        auto src_px = fxcrt::reinterpret_span<const Pixel3>(src);
++        auto dest_px = fxcrt::reinterpret_span<Pixel3>(dest);
++        Pixel3 carry = dest_px.front();
++        for (auto [s, d] : fxcrt::Zip(src_px.subspan(1u), dest_px.subspan(1u))) {
++          carry.c0 += s.c0;
++          carry.c1 += s.c1;
++          carry.c2 += s.c2;
++          d = carry;
++        }
++        for (size_t i = n - n % 3; i < n; ++i) {
++          dest[i] = src[i] + dest[i - 3];
++        }
++        break;
++      }
++      if (bpp == 4 && n >= 4) {
++        auto src_px = fxcrt::reinterpret_span<const Pixel4>(src);
++        auto dest_px = fxcrt::reinterpret_span<Pixel4>(dest);
++        Pixel4 carry = dest_px.front();
++        for (auto [s, d] : fxcrt::Zip(src_px.subspan(1u), dest_px.subspan(1u))) {
++          carry.c0 += s.c0;
++          carry.c1 += s.c1;
++          carry.c2 += s.c2;
++          carry.c3 += s.c3;
++          d = carry;
++        }
++        for (size_t i = n - n % 4; i < n; ++i) {
++          dest[i] = src[i] + dest[i - 4];
++        }
++        break;
++      }
++      for (size_t i = lead; i < n; ++i) {
++        dest[i] = src[i] + dest[i - bpp];
+       }
+       break;
+     }
+     case 2: {
+-      for (size_t i = 0; i < remaining_src_span.size(); ++i) {
+-        uint8_t up = GetUpValue(last_span, i);
+-        dest_span[i] = remaining_src_span[i] + up;
++      // Up: previous-row neighbor only, zero on the first row.
++      if (up_row.empty()) {
++        fxcrt::Copy(src, dest);
++        break;
++      }
++      for (auto [s, u, d] : fxcrt::Zip(src, up_row, dest)) {
++        d = s + u;
+       }
+       break;
+     }
+     case 3: {
+-      for (size_t i = 0; i < remaining_src_span.size(); ++i) {
+-        uint8_t left = GetLeftValue(dest_span, i, bytes_per_pixel);
+-        uint8_t up = GetUpValue(last_span, i);
+-        dest_span[i] = remaining_src_span[i] + (up + left) / 2;
++      // Average: (left + up) / 2, with the zero cases hoisted.
++      if (up_row.empty()) {
++        fxcrt::Copy(src.first(lead), dest);
++        for (size_t i = lead; i < n; ++i) {
++          dest[i] = src[i] + dest[i - bpp] / 2;
++        }
++        break;
++      }
++      for (size_t i = 0; i < lead; ++i) {
++        dest[i] = src[i] + up_row[i] / 2;
++      }
++      for (size_t i = lead; i < n; ++i) {
++        dest[i] = src[i] + (up_row[i] + dest[i - bpp]) / 2;
+       }
+       break;
+     }
+     case 4: {
+-      for (size_t i = 0; i < remaining_src_span.size(); ++i) {
+-        uint8_t left = GetLeftValue(dest_span, i, bytes_per_pixel);
+-        uint8_t up = GetUpValue(last_span, i);
+-        uint8_t upper_left = GetUpperLeftValue(last_span, i, bytes_per_pixel);
+-        dest_span[i] =
+-            remaining_src_span[i] + PathPredictor(left, up, upper_left);
++      // Paeth. With up == upper_left == 0 (first row) the predictor always
++      // selects the left neighbor, so the first row reduces to Sub; with
++      // left == upper_left == 0 (lead bytes) it always selects up.
++      if (up_row.empty()) {
++        fxcrt::Copy(src.first(lead), dest);
++        for (size_t i = lead; i < n; ++i) {
++          dest[i] = src[i] + dest[i - bpp];
++        }
++        break;
++      }
++      for (size_t i = 0; i < lead; ++i) {
++        dest[i] = src[i] + up_row[i];
++      }
++      for (size_t i = lead; i < n; ++i) {
++        dest[i] = src[i] +
++                  PathPredictor(dest[i - bpp], up_row[i], up_row[i - bpp]);
+       }
+       break;
+     }
+     default: {
+-      fxcrt::Copy(remaining_src_span, dest_span);
++      fxcrt::Copy(src, dest);
+       break;
+     }
+   }
