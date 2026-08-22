@@ -1,6 +1,6 @@
 --- a/core/fxge/dib/cstretchengine.cpp
 +++ b/core/fxge/dib/cstretchengine.cpp
-@@ -25,6 +25,10 @@
+@@ -26,6 +26,10 @@
  #include "core/fxge/dib/fx_dib.h"
  #include "core/fxge/dib/scanlinecomposer_iface.h"
  
@@ -11,21 +11,26 @@
  static_assert(
      std::is_trivially_destructible<CStretchEngine::PixelWeight>::value,
      "PixelWeight storage may be re-used without invoking its destructor");
-@@ -42,6 +46,45 @@
+@@ -43,6 +47,59 @@
    return total_bytes.ValueOrDie();
  }
  
-+// Accumulates `weight * src[i]` into `acc[i]`. StretchVert() calls this once
-+// per tap with a whole destination row, so it is the innermost loop of the
-+// vertical pass.
++// Writes `weight * src[i]` into `acc[i]` (kFirstTap) or adds it to `acc[i]`
++// (!kFirstTap). StretchVert() calls this once per tap with a whole
++// destination row, so it is the innermost loop of the vertical pass. The
++// first tap MUST assign rather than accumulate: the accumulator is allocated
++// uninitialised and is reused across rows, so before tap 0 it holds either
++// garbage or the previous row's sums.
 +//
 +// The scalar form below is what every other target gets, and it
 +// auto-vectorizes there. LLVM's wasm backend does not widen it as
 +// aggressively, so under -msimd128 drive the widening directly: load 16
-+// source bytes, extend u8 -> u32 in four steps, and multiply-add against the
-+// splatted weight. Products fit in 32 bits (a full accumulator is at most
-+// 255 << kFixedPointBits), and per byte the additions happen in the same
-+// order either way, so both forms produce identical output.
++// source bytes, extend u8 -> u32 in four steps, and multiply (kFirstTap) or
++// multiply-add (!kFirstTap) against the splatted weight. Products fit in 32
++// bits (a full accumulator is at most 255 << kFixedPointBits), and per byte
++// the operations happen in the same order either way, so both forms produce
++// identical output.
++template <bool kFirstTap>
 +void AccumulateWeightedRow(pdfium::span<uint32_t> acc,
 +                           pdfium::span<const uint8_t> src,
 +                           uint32_t weight) {
@@ -42,29 +47,45 @@
 +        wasm_u32x4_extend_low_u16x8(hi16), wasm_u32x4_extend_high_u16x8(hi16)};
 +    for (size_t lane = 0; lane < 4; ++lane) {
 +      uint32_t* dest = acc.subspan(i + lane * 4, 4u).data();
-+      wasm_v128_store(dest, wasm_i32x4_add(wasm_v128_load(dest),
-+                                           wasm_i32x4_mul(widened[lane], vw)));
++      const v128_t product = wasm_i32x4_mul(widened[lane], vw);
++      if constexpr (kFirstTap) {
++        wasm_v128_store(dest, product);
++      } else {
++        wasm_v128_store(dest,
++                        wasm_i32x4_add(wasm_v128_load(dest), product));
++      }
 +    }
 +  }
 +  acc = acc.subspan(vector_len);
 +  src = src.subspan(vector_len);
 +#endif
 +  for (auto [dest, src_byte] : fxcrt::Zip(acc, src)) {
-+    dest += weight * src_byte;
++    if constexpr (kFirstTap) {
++      dest = weight * src_byte;
++    } else {
++      dest += weight * src_byte;
++    }
 +  }
 +}
 +
  }  // namespace
  
  // static
-@@ -532,9 +575,7 @@
-           (static_cast<size_t>(pWeights->src_start_ - src_clip_.top) + t) *
-               inter_pitch_,
-           row_bytes);
--      for (auto [acc, src_byte] : fxcrt::Zip(accum_span, src_row)) {
--        acc += pixel_weight * src_byte;
--      }
-+      AccumulateWeightedRow(accum_span, src_row, pixel_weight);
+@@ -590,13 +647,11 @@
+       // needed -- one full-width write instead of a write plus a
+       // read-modify-write.
+       if (i == 0) {
+-        for (auto [acc, src_byte] : fxcrt::Zip(accum_span, src_row)) {
+-          acc = pixel_weight * src_byte;
+-        }
++        AccumulateWeightedRow</*kFirstTap=*/true>(accum_span, src_row,
++                                                  pixel_weight);
+       } else {
+-        for (auto [acc, src_byte] : fxcrt::Zip(accum_span, src_row)) {
+-          acc += pixel_weight * src_byte;
+-        }
++        AccumulateWeightedRow</*kFirstTap=*/false>(accum_span, src_row,
++                                                   pixel_weight);
+       }
      }
  
-     auto dest_row = pdfium::span(dest_scanline_).first(row_bytes);

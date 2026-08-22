@@ -13,8 +13,8 @@
  
  #if defined(PDF_USE_SKIA)
  #include <type_traits>
-@@ -627,7 +633,127 @@
-       kAlphaRatioTable.Divide(src_alpha * 255, dest_alpha);
+@@ -608,7 +614,137 @@
+   const int alpha_ratio = src_alpha * 255 / dest_alpha;
    AlphaMergeToDest(input, output, alpha_ratio);
    output.alpha = dest_alpha;
 +}
@@ -35,9 +35,15 @@
 +}
 +
 +// Vectorized CompositeRowBgra2Bgra for BlendMode::kNormal without a clip
-+// mask, four pixels per iteration. Exactly the scalar semantics:
++// mask, four pixels per iteration. It replaces the whole scalar loop,
++// including its src_alpha == 255 fast path (CopyPixelToOpaqueBgra): a
++// vector of four fully-opaque source pixels stores the source verbatim,
++// and in a mixed vector an opaque lane falls out of the general arithmetic
++// (dest_alpha = 255, ratio = 255, AlphaMerge(..., 255) returns the source),
++// so every lane matches the scalar path exactly:
 +//   - dest.alpha == 0        -> dest = src (rgb + src alpha)
 +//   - src.alpha == 0         -> dest unchanged
++//   - src.alpha == 255       -> dest = src rgb, alpha 255
 +//   - otherwise              -> dest_alpha = AlphaUnion(dest.alpha, src.alpha)
 +//                               ratio = floor(src.alpha * 255 / dest_alpha)
 +//                               rgb = AlphaMerge(dest, src, ratio)
@@ -129,10 +135,14 @@
 +    }
 +  });
 +
++  // Scalar tail: mirrors the loop this function replaces, fast path
++  // included.
 +  for (; i < total; ++i) {
 +    const uint8_t src_alpha = CompositePixelBgra2BgraCommon(
 +        src_span[i], /*clip=*/255, dest_span[i]);
-+    if (src_alpha != 0) {
++    if (src_alpha == 255) {
++      CopyPixelToOpaqueBgra(src_span[i], dest_span[i]);
++    } else if (src_alpha != 0) {
 +      CompositePixelBgra2BgraNoBlend(src_span[i], src_alpha, dest_span[i]);
 +    }
 +  }
@@ -141,7 +151,7 @@
  
  template <typename DestPixelStruct>
  void CompositeRowBgra2Bgra(pdfium::span<const FX_BGRA_STRUCT<uint8_t>> src_span,
-@@ -657,6 +783,12 @@
+@@ -638,6 +774,12 @@
        }
        return;
      }

@@ -1,105 +1,80 @@
+diff --git a/core/fxge/dib/cfx_scanlinecompositor.cpp b/core/fxge/dib/cfx_scanlinecompositor.cpp
+index 2849e73d2..0aaac8e04 100644
 --- a/core/fxge/dib/cfx_scanlinecompositor.cpp
 +++ b/core/fxge/dib/cfx_scanlinecompositor.cpp
-@@ -417,12 +417,45 @@ void CompositeRow_Bgr2Bgra_NoBlend_NoClip(
+@@ -412,18 +412,46 @@ void CompositeRow_Bgr2Bgra_NoBlend_Clip(pdfium::span<uint8_t> dest_span,
+   });
+ }
+ 
++// Copies a source pixel into a BGRA destination, forcing it opaque. The
++// source may carry an alpha channel or not; it is ignored either way. Where
++// the source is known opaque, AlphaUnion() would be 255, the ratio 255, and
++// AlphaMerge(..., 255) returns the source, so the general path in
++// CompositePixelBgra2BgraNoBlend() reduces to this without its divisions.
++template <typename SrcPixelStruct, typename DestPixelStruct>
++void CopyPixelToOpaqueBgra(const SrcPixelStruct& input,
++                           DestPixelStruct& output) {
++  output.blue = input.blue;
++  output.green = input.green;
++  output.red = input.red;
++  output.alpha = 255;
++}
++
++template <typename DestPixelStruct, typename SrcPixelStruct>
++void CopyRowToOpaqueBgra(pdfium::span<DestPixelStruct> dest_span,
++                         pdfium::span<const SrcPixelStruct> src_span) {
++  for (auto [dest, src] : fxcrt::Zip(dest_span, src_span)) {
++    CopyPixelToOpaqueBgra(src, dest);
++  }
++}
++
++// Picks the source pixel layout for the row above. A kBgr source has 3-byte
++// pixels and a kBgrx source 4-byte ones, whose 4th byte is ignored.
+ template <typename DestPixelStruct>
+ void CompositeRow_Bgr2Bgra_NoBlend_NoClip(
      pdfium::span<DestPixelStruct> dest_span,
      pdfium::span<const uint8_t> src_span,
-     size_t src_Bpp) {
+-    size_t src_Bpp) {
 -  for (auto& dest : dest_span) {
 -    dest.blue = src_span[0];
 -    dest.green = src_span[1];
 -    dest.red = src_span[2];
 -    dest.alpha = 255;
 -    src_span = src_span.subspan(src_Bpp);
-+  // This is the hot row when compositing opaque images. Rather than
-+  // reassigning `src_span` via `subspan(src_Bpp)` once per pixel (which
-+  // bounds-checks against the shrinking span's own size on every iteration),
-+  // validate the whole access range once up front and reinterpret it as a
-+  // span of fixed-size source pixel structs. `src_Bpp` only ever takes two
-+  // values (3 for a BGR source, 4 for BGRx, whose 4th byte this function
-+  // ignores), so the runtime dispatch below gives each branch a compile-time
-+  // pixel size, at which point fxcrt::Zip() walks both spans via their own
-+  // (checkless) iteration and does the single required size comparison once,
-+  // in its constructor, instead of once per pixel.
-+  if (dest_span.empty()) {
-+    return;
-+  }
-+  // The only caller (CompositeRgbBitmapLineSrcBgrx()) CHECKs that
-+  // `src_format_` is kBgr or kBgrx before computing `src_Bpp` from it, so
-+  // this is not merely today's usage but a structural guarantee; assert it
-+  // explicitly since, unlike the previous stride-generic implementation,
-+  // the dispatch below depends on `src_Bpp` being exactly one of these two
-+  // values to pick the correct source pixel layout.
-+  CHECK(src_Bpp == 3 || src_Bpp == 4);
-+  CHECK_GE(src_span.size(), (dest_span.size() - 1) * src_Bpp + 3);
-+  // Only the source pixel type (and thus the reinterpret_span() below) needs
-+  // to vary between the two possible values of `src_Bpp`; the composite step
-+  // itself is identical either way, so it is factored into one generic
-+  // lambda instantiated for both source pixel types instead of duplicated.
-+  auto composite_from = [&](auto src_pixels) {
-+    for (auto [dest, src] : fxcrt::Zip(dest_span, src_pixels)) {
-+      dest.blue = src.blue;
-+      dest.green = src.green;
-+      dest.red = src.red;
-+      dest.alpha = 255;
-+    }
-+  };
++    int src_Bpp) {
++  const size_t width = dest_span.size();
 +  if (src_Bpp == 3) {
-+    composite_from(fxcrt::reinterpret_span<const FX_BGR_STRUCT<uint8_t>>(
-+        src_span.first(dest_span.size() * 3)));
-+  } else {
-+    composite_from(fxcrt::reinterpret_span<const FX_BGRA_STRUCT<uint8_t>>(
-+        src_span.first(dest_span.size() * 4)));
-   }
- }
- 
-@@ -572,12 +605,49 @@ void CompositePixelBgra2BgraBlend(const FX_BGRA_STRUCT<uint8_t>& input,
-   output.alpha = dest_alpha;
- }
- 
-+// Exact replacement for `n / d` with d in [1, 255] and n in [0, 65025]:
-+// multiply by a precomputed 24-bit reciprocal, then correct the at most one
-+// unit of underestimation. This avoids a hardware integer division on the
-+// per-pixel alpha compositing path (the compiler already strength-reduces
-+// the constant divisions by 255).
-+class AlphaRatioTable {
-+ public:
-+  constexpr AlphaRatioTable() {
-+    for (uint32_t d = 1; d < 256; ++d) {
-+      inv_[d] = (1u << 24) / d;
-+    }
-+  }
-+
-+  // floor(n / d), exact for n in [0, 65025], d in [1, 255].
-+  uint32_t Divide(uint32_t n, uint32_t d) const {
-+    uint32_t q = (n * inv_[d]) >> 24;
-+    q += (q + 1) * d <= n ? 1 : 0;
-+    return q;
-+  }
-+
-+ private:
-+  uint32_t inv_[256] = {};
-+};
-+
-+constexpr AlphaRatioTable kAlphaRatioTable;
-+
- template <typename DestPixelStruct>
- void CompositePixelBgra2BgraNoBlend(const FX_BGRA_STRUCT<uint8_t>& input,
-                                     uint8_t src_alpha,
-                                     DestPixelStruct& output) {
-+  if (src_alpha == 255) {
-+    // Fully opaque source: AlphaUnion() is 255, the ratio is 255 and
-+    // AlphaMerge(..., 255) returns the source value, so this is exactly a
-+    // copy - without the integer divisions the general path costs.
-+    output.blue = input.blue;
-+    output.green = input.green;
-+    output.red = input.red;
-+    output.alpha = 255;
++    CopyRowToOpaqueBgra(dest_span,
++                        fxcrt::reinterpret_span<const FX_BGR_STRUCT<uint8_t>>(
++                            src_span.first(width * 3)));
 +    return;
-+  }
-   const uint8_t dest_alpha = AlphaUnion(output.alpha, src_alpha);
--  const int alpha_ratio = src_alpha * 255 / dest_alpha;
-+  const int alpha_ratio =
-+      kAlphaRatioTable.Divide(src_alpha * 255, dest_alpha);
-   AlphaMergeToDest(input, output, alpha_ratio);
-   output.alpha = dest_alpha;
+   }
++  CHECK_EQ(src_Bpp, 4);
++  CopyRowToOpaqueBgra(dest_span,
++                      fxcrt::reinterpret_span<const FX_BGRA_STRUCT<uint8_t>>(
++                          src_span.first(width * 4)));
  }
+ 
+ template <typename DestPixelStruct>
+@@ -613,7 +641,9 @@ void CompositeRowBgra2Bgra(pdfium::span<const FX_BGRA_STRUCT<uint8_t>> src_span,
+     for (auto [input, output] : fxcrt::Zip(src_span, dest_span)) {
+       const uint8_t src_alpha =
+           CompositePixelBgra2BgraCommon(input, /*clip=*/255, output);
+-      if (src_alpha != 0) {
++      if (src_alpha == 255) {
++        CopyPixelToOpaqueBgra(input, output);
++      } else if (src_alpha != 0) {
+         CompositePixelBgra2BgraNoBlend(input, src_alpha, output);
+       }
+     }
+@@ -647,7 +677,9 @@ void CompositeRowBgra2Bgra(pdfium::span<const FX_BGRA_STRUCT<uint8_t>> src_span,
+        fxcrt::Zip(src_span, clip_span, dest_span)) {
+     const uint8_t src_alpha =
+         CompositePixelBgra2BgraCommon(input, clip, output);
+-    if (src_alpha != 0) {
++    if (src_alpha == 255) {
++      CopyPixelToOpaqueBgra(input, output);
++    } else if (src_alpha != 0) {
+       CompositePixelBgra2BgraNoBlend(input, src_alpha, output);
+     }
+   }

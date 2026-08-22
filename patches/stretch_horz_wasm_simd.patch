@@ -1,46 +1,55 @@
 --- a/core/fxge/dib/cstretchengine.cpp
 +++ b/core/fxge/dib/cstretchengine.cpp
-@@ -470,10 +470,35 @@
-             uint32_t dest_r = 0;
-             uint32_t dest_g = 0;
-             uint32_t dest_b = 0;
--            for (auto [pixel_weight, src] : fxcrt::Zip(weights, window)) {
--              dest_b += pixel_weight * src.blue;
--              dest_g += pixel_weight * src.green;
--              dest_r += pixel_weight * src.red;
+@@ -519,10 +519,44 @@
+                 break;
+               }
+               default:
+-                for (auto [pixel_weight, src] : fxcrt::Zip(weights, window)) {
+-                  dest_b += pixel_weight * src.blue;
+-                  dest_g += pixel_weight * src.green;
+-                  dest_r += pixel_weight * src.red;
 +#if defined(__wasm_simd128__)
-+            // Vectorize the tap loop across channels rather than across
-+            // pixels: each tap loads the source pixel's 4 bytes, extends
-+            // u8 -> u32 and multiply-accumulates against the splatted
-+            // weight, so lanes 0-2 end up holding exactly the scalar
-+            // path's dest_b/dest_g/dest_r (lane 3 is the ignored 4th
-+            // byte). Same arithmetic in the same order. Only available
-+            // for 4-byte source pixels, since the load reads 4 bytes.
-+            if constexpr (sizeof(*window.data()) == 4) {
-+              v128_t acc = wasm_i64x2_const(0, 0);
-+              for (auto [pixel_weight, src] : fxcrt::Zip(weights, window)) {
-+                const v128_t px = wasm_u32x4_extend_low_u16x8(
-+                    wasm_u16x8_extend_low_u8x16(wasm_v128_load32_zero(&src)));
-+                acc = wasm_i32x4_add(
-+                    acc,
-+                    wasm_i32x4_mul(px, wasm_i32x4_splat(
-+                                           static_cast<int32_t>(pixel_weight))));
-+              }
-+              dest_b = static_cast<uint32_t>(wasm_i32x4_extract_lane(acc, 0));
-+              dest_g = static_cast<uint32_t>(wasm_i32x4_extract_lane(acc, 1));
-+              dest_r = static_cast<uint32_t>(wasm_i32x4_extract_lane(acc, 2));
-+            } else
++                // Vectorize the tap loop across channels rather than across
++                // pixels: each tap loads the source pixel's 4 bytes, extends
++                // u8 -> u32 and multiply-accumulates against the splatted
++                // weight, so lanes 0-2 end up holding exactly the scalar
++                // path's dest_b/dest_g/dest_r (lane 3 is the ignored 4th
++                // byte). Same arithmetic in the same order. Only available
++                // for 4-byte source pixels, since the load reads 4 bytes.
++                // The 1- and 2-tap unrolls above stay scalar: at those trip
++                // counts the SIMD setup is all overhead.
++                if constexpr (sizeof(*window.data()) == 4) {
++                  v128_t acc = wasm_i64x2_const(0, 0);
++                  for (auto [pixel_weight, src] :
++                       fxcrt::Zip(weights, window)) {
++                    const v128_t px = wasm_u32x4_extend_low_u16x8(
++                        wasm_u16x8_extend_low_u8x16(
++                            wasm_v128_load32_zero(&src)));
++                    acc = wasm_i32x4_add(
++                        acc,
++                        wasm_i32x4_mul(
++                            px, wasm_i32x4_splat(
++                                    static_cast<int32_t>(pixel_weight))));
++                  }
++                  dest_b =
++                      static_cast<uint32_t>(wasm_i32x4_extract_lane(acc, 0));
++                  dest_g =
++                      static_cast<uint32_t>(wasm_i32x4_extract_lane(acc, 1));
++                  dest_r =
++                      static_cast<uint32_t>(wasm_i32x4_extract_lane(acc, 2));
++                } else
 +#endif
-+            {
-+              for (auto [pixel_weight, src] : fxcrt::Zip(weights, window)) {
-+                dest_b += pixel_weight * src.blue;
-+                dest_g += pixel_weight * src.green;
-+                dest_r += pixel_weight * src.red;
-+              }
++                {
++                  for (auto [pixel_weight, src] :
++                       fxcrt::Zip(weights, window)) {
++                    dest_b += pixel_weight * src.blue;
++                    dest_g += pixel_weight * src.green;
++                    dest_r += pixel_weight * src.red;
++                  }
+                 }
+                 break;
              }
-             dest_span[dest_span_index++] = PixelFromFixed(dest_b);
-             dest_span[dest_span_index++] = PixelFromFixed(dest_g);
-@@ -510,6 +535,27 @@
+@@ -562,6 +596,27 @@
            uint32_t dest_r = 0;
            uint32_t dest_g = 0;
            uint32_t dest_b = 0;
@@ -68,7 +77,7 @@
            for (auto [weight, src] : fxcrt::Zip(weights, window)) {
              uint32_t pixel_weight = weight * src.alpha / 255;
              dest_b += pixel_weight * src.blue;
-@@ -517,6 +563,7 @@
+@@ -569,6 +624,7 @@
              dest_r += pixel_weight * src.red;
              dest_a += pixel_weight;
            }
