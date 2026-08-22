@@ -1,0 +1,225 @@
+diff --git a/core/fpdfapi/page/cpdf_dib.cpp b/core/fpdfapi/page/cpdf_dib.cpp
+index 925f22d09..6db61a59d 100644
+--- a/core/fpdfapi/page/cpdf_dib.cpp
++++ b/core/fpdfapi/page/cpdf_dib.cpp
+@@ -500,6 +500,21 @@ CPDF_DIB::LoadState CPDF_DIB::CreateDecoder(uint8_t resolution_levels_to_skip) {
+   return LoadState::kSuccess;
+ }
+ 
++// Whether the JPEG decoder should be asked to emit BGR-ordered scanlines.
++// Only true when GetScanline()'s only transformation of the decoded RGB
++// scanline would be TranslateScanline24bppDefaultDecode()'s per-pixel
++// RGB-to-BGR swap, which a BGR decode makes a pass-through:
++// - a default Decode array (no per-component decode arithmetic),
++// - no color key mask (its comparisons read components in R,G,B order),
++// - plain DeviceRGB or CalRGB (both translate as the bare swap; every
++//   other family goes through CPDF_ColorSpace::TranslateImageLine()),
++// - 3 components at 8 bpc (the swap case).
++bool CPDF_DIB::ShouldDecodeJpegToBgr() const {
++  return default_decode_ && !color_key_ && components_ == 3 && bpc_ == 8 &&
++         (family_ == CPDF_ColorSpace::Family::kDeviceRGB ||
++          family_ == CPDF_ColorSpace::Family::kCalRGB);
++}
++
+ bool CPDF_DIB::CreateDCTDecoder(pdfium::span<const uint8_t> src_span,
+                                 const CPDF_Dictionary* pParams,
+                                 uint8_t resolution_levels_to_skip) {
+@@ -510,7 +525,8 @@ bool CPDF_DIB::CreateDCTDecoder(pdfium::span<const uint8_t> src_span,
+                                << std::min<int>(resolution_levels_to_skip, 3);
+   decoder_ = JpegModule::CreateDecoder(
+       src_span, GetWidth(), GetHeight(), components_,
+-      !pParams || pParams->GetIntegerFor("ColorTransform", 1), scale_denom);
++      !pParams || pParams->GetIntegerFor("ColorTransform", 1), scale_denom,
++      ShouldDecodeJpegToBgr());
+   if (decoder_) {
+     // Adopt the decoder's dimensions. libjpeg may have decoded at a reduced
+     // size (scale_denom above), and its dimensions are authoritative in any
+@@ -541,7 +557,7 @@ bool CPDF_DIB::CreateDCTDecoder(pdfium::span<const uint8_t> src_span,
+     bpc_ = info.bits_per_components;
+     decoder_ = JpegModule::CreateDecoder(src_span, GetWidth(), GetHeight(),
+                                          components_, info.color_transform,
+-                                         scale_denom);
++                                         scale_denom, ShouldDecodeJpegToBgr());
+     if (decoder_) {
+       SetWidth(decoder_->GetWidth());
+       SetHeight(decoder_->GetHeight());
+@@ -598,7 +614,8 @@ bool CPDF_DIB::CreateDCTDecoder(pdfium::span<const uint8_t> src_span,
+   bpc_ = info.bits_per_components;
+   decoder_ =
+       JpegModule::CreateDecoder(src_span, GetWidth(), GetHeight(), components_,
+-                                info.color_transform, scale_denom);
++                                info.color_transform, scale_denom,
++                                ShouldDecodeJpegToBgr());
+   if (decoder_) {
+     SetWidth(decoder_->GetWidth());
+     SetHeight(decoder_->GetHeight());
+@@ -1231,9 +1248,18 @@ pdfium::span<const uint8_t> CPDF_DIB::GetScanline(int line) const {
+     }
+   }
+   if (color_space_) {
+-    TranslateScanline24bpp(line_buf_, pSrcLine);
+-    src_pitch_value = 3 * GetWidth();
+-    pSrcLine = pdfium::span(line_buf_).first(src_pitch_value);
++    if (decoder_ && decoder_->ScanlinesAreBgr()) {
++      // The scanline already left the JPEG decoder in B,G,R order.
++      // CreateDCTDecoder() requests that precisely when the translation
++      // below would be the default-decode RGB-to-BGR swap and nothing
++      // else, so the decoded scanline is the output.
++      src_pitch_value = 3 * GetWidth();
++      pSrcLine = pSrcLine.first(src_pitch_value);
++    } else {
++      TranslateScanline24bpp(line_buf_, pSrcLine);
++      src_pitch_value = 3 * GetWidth();
++      pSrcLine = pdfium::span(line_buf_).first(src_pitch_value);
++    }
+   }
+   if (!color_key_) {
+     return pSrcLine;
+diff --git a/core/fpdfapi/page/cpdf_dib.h b/core/fpdfapi/page/cpdf_dib.h
+index c2eccec7c..6458336e4 100644
+--- a/core/fpdfapi/page/cpdf_dib.h
++++ b/core/fpdfapi/page/cpdf_dib.h
+@@ -97,6 +97,7 @@ class CPDF_DIB final : public CFX_DIBBase {
+   bool CreateDCTDecoder(pdfium::span<const uint8_t> src_span,
+                         const CPDF_Dictionary* pParams,
+                         uint8_t resolution_levels_to_skip);
++  bool ShouldDecodeJpegToBgr() const;
+   void TranslateScanline24bpp(pdfium::span<uint8_t> dest_scan,
+                               pdfium::span<const uint8_t> src_scan) const;
+   bool TranslateScanline24bppDefaultDecode(
+diff --git a/core/fpdfapi/page/cpdf_streamparser.cpp b/core/fpdfapi/page/cpdf_streamparser.cpp
+index 97e663c6b..4845d497b 100644
+--- a/core/fpdfapi/page/cpdf_streamparser.cpp
++++ b/core/fpdfapi/page/cpdf_streamparser.cpp
+@@ -115,7 +115,7 @@ uint32_t DecodeInlineStream(pdfium::span<const uint8_t> src_span,
+     std::unique_ptr<ScanlineDecoder> pDecoder = JpegModule::CreateDecoder(
+         src_span, width, height, 0,
+         !pParam || pParam->GetIntegerFor("ColorTransform", 1),
+-        /*scale_denom=*/1);
++        /*scale_denom=*/1, /*prefer_bgr_output=*/false);
+     return DecodeAllScanlines(std::move(pDecoder));
+   }
+   if (decoder == "CCITTFaxDecode") {
+diff --git a/core/fxcodec/jpeg/jpegmodule.cpp b/core/fxcodec/jpeg/jpegmodule.cpp
+index 031c5bab3..f55ae06fa 100644
+--- a/core/fxcodec/jpeg/jpegmodule.cpp
++++ b/core/fxcodec/jpeg/jpegmodule.cpp
+@@ -92,7 +92,8 @@ class JpegDecoder final : public ScanlineDecoder {
+               uint32_t height,
+               int nComps,
+               bool ColorTransform,
+-              uint32_t scale_denom);
++              uint32_t scale_denom,
++              bool prefer_bgr_output);
+ 
+   // ScanlineDecoder:
+   [[nodiscard]] bool Rewind() override;
+@@ -130,6 +131,7 @@ class JpegDecoder final : public ScanlineDecoder {
+   bool decompress_created_ = false;
+   bool started_ = false;
+   bool jpeg_transform_ = false;
++  bool prefer_bgr_output_ = false;
+   uint32_t scale_denom_ = 1;
+ };
+ 
+@@ -199,6 +201,22 @@ bool JpegDecoder::InitDecode(bool bAcceptKnownBadHeader) {
+     common_.cinfo.out_color_space = common_.cinfo.jpeg_color_space;
+   }
+ 
++#ifdef JCS_EXTENSIONS
++  // When the caller asked for BGR scanlines and the output would otherwise
++  // be plain 3-component RGB, have libjpeg-turbo emit the swapped order
++  // directly (JCS_EXT_BGR): the same decode pipeline, storing the three
++  // converted samples at exchanged offsets, so the per-sample values are
++  // identical to a JCS_RGB decode. Deliberately not done when the output
++  // is anything else (grayscale, CMYK, or the raw non-JCS_RGB pass-through
++  // selected above), where no swap exists to fold in.
++  scanlines_are_bgr_ = prefer_bgr_output_ &&
++                       common_.cinfo.num_components == 3 &&
++                       common_.cinfo.out_color_space == JCS_RGB;
++  if (scanlines_are_bgr_) {
++    common_.cinfo.out_color_space = JCS_EXT_BGR;
++  }
++#endif  // JCS_EXTENSIONS
++
+   orig_width_ = common_.cinfo.image_width;
+   orig_height_ = common_.cinfo.image_height;
+ 
+@@ -243,7 +261,9 @@ bool JpegDecoder::Create(pdfium::span<const uint8_t> src_span,
+                          uint32_t height,
+                          int nComps,
+                          bool ColorTransform,
+-                         uint32_t scale_denom) {
++                         uint32_t scale_denom,
++                         bool prefer_bgr_output) {
++  prefer_bgr_output_ = prefer_bgr_output;
+   // Only power-of-two scalings up to 1/8 are supported: ScaledJpegSize() (which
+   // sizes the scanline buffer via CalcPitch()) only matches libjpeg's actual
+   // output dimensions for these. A different value would desynchronize the two
+@@ -412,12 +432,13 @@ std::unique_ptr<ScanlineDecoder> JpegModule::CreateDecoder(
+     uint32_t height,
+     int nComps,
+     bool ColorTransform,
+-    uint32_t scale_denom) {
++    uint32_t scale_denom,
++    bool prefer_bgr_output) {
+   DCHECK(!src_span.empty());
+ 
+   auto pDecoder = std::make_unique<JpegDecoder>();
+   if (!pDecoder->Create(src_span, width, height, nComps, ColorTransform,
+-                        scale_denom)) {
++                        scale_denom, prefer_bgr_output)) {
+     return nullptr;
+   }
+ 
+diff --git a/core/fxcodec/jpeg/jpegmodule.h b/core/fxcodec/jpeg/jpegmodule.h
+index 94874668b..f9f2d9aa9 100644
+--- a/core/fxcodec/jpeg/jpegmodule.h
++++ b/core/fxcodec/jpeg/jpegmodule.h
+@@ -41,13 +41,21 @@ class JpegModule {
+   // 1/`scale_denom` in each dimension. Must be one of 1, 2, 4, or 8 (libjpeg's
+   // supported power-of-two DCT scalings). The resulting decoder reports the
+   // scaled-down dimensions via GetWidth()/GetHeight().
++  //
++  // `prefer_bgr_output` requests scanlines with the red and blue samples
++  // swapped, i.e. in B,G,R order. The request is honored only when the
++  // decode output would otherwise be plain 3-component RGB; whether it took
++  // effect is reported by ScanlineDecoder::ScanlinesAreBgr() on the result.
++  // libjpeg-turbo emits the swapped order at no cost (JCS_EXT_BGR), which
++  // lets a caller whose destination is BGR skip a per-pixel swap.
+   static std::unique_ptr<ScanlineDecoder> CreateDecoder(
+       pdfium::span<const uint8_t> src_span,
+       uint32_t width,
+       uint32_t height,
+       int nComps,
+       bool ColorTransform,
+-      uint32_t scale_denom);
++      uint32_t scale_denom,
++      bool prefer_bgr_output);
+ 
+   static std::optional<ImageInfo> LoadInfo(
+       pdfium::span<const uint8_t> src_span);
+diff --git a/core/fxcodec/scanlinedecoder.h b/core/fxcodec/scanlinedecoder.h
+index d59030763..18e15ed89 100644
+--- a/core/fxcodec/scanlinedecoder.h
++++ b/core/fxcodec/scanlinedecoder.h
+@@ -36,6 +36,11 @@ class ScanlineDecoder {
+   int CountComps() const { return comps_; }
+   int GetBPC() const { return bpc_; }
+ 
++  // True when 3-component scanlines are returned in B,G,R sample order
++  // instead of the natural R,G,B order. Decoders only set this when they
++  // were asked to and could comply; see JpegModule::CreateDecoder().
++  bool ScanlinesAreBgr() const { return scanlines_are_bgr_; }
++
+   virtual uint32_t GetSrcOffset() = 0;
+ 
+  protected:
+@@ -49,6 +54,7 @@ class ScanlineDecoder {
+   int comps_;
+   int bpc_;
+   uint32_t pitch_;
++  bool scanlines_are_bgr_ = false;
+   int next_line_ = -1;
+   pdfium::raw_span<uint8_t> last_scanline_;
+ };

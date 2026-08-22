@@ -30,8 +30,14 @@ apply_patch "$PATCHES/public_headers.patch"
 # fxcrt::Zip() rather than raw pointers, so they carry no UNSAFE_BUFFERS;
 # drop each one once its CL lands.
 apply_patch "$PATCHES/png_predictor_perf.patch"
+# Includes the not-yet-uploaded run-planning follow-up (branch
+# stretch-bilinear-rows: 1/2-tap column runs + tiny-work bail-out).
 apply_patch "$PATCHES/stretch_engine_perf.patch"
 apply_patch "$PATCHES/compositor_perf.patch"
+# Decode 3-component JPEGs straight to BGR (branch jpeg-decode-bgr, not yet
+# uploaded). Portable; helps native and wasm. The wasm jpeg_simd kernels
+# already dispatch on JCS_EXT_BGR, so no wasm-side change is needed.
+apply_patch "$PATCHES/jpeg_decode_bgr.patch"
 # Wasm-only. Both measure neutral on native (fillrect even regresses small
 # cache-resident fills there, where libc memset switches to non-temporal
 # stores), and only pay off under a runtime that neither vectorizes nor
@@ -42,6 +48,9 @@ if [ "$OS" == "emscripten" ]; then
   # Only take effect when compiling with -msimd128 (wasm-standalone); the
   # added code is guarded by __wasm_simd128__.
   apply_patch "$PATCHES/stretch_engine_wasm_simd.patch"
+  # Swizzle kernels for the planned 1/2-tap runs (16B and 32B window
+  # variants, per-run gated) and for CopyRowToOpaqueBgra (all four
+  # BGR/BGRx -> BGRA/RGBA instantiations).
   apply_patch "$PATCHES/stretch_horz_wasm_simd.patch"
   apply_patch "$PATCHES/compositor_wasm_simd.patch"
 fi

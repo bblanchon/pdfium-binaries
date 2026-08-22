@@ -54,7 +54,120 @@
    return reinterpret_cast<const PixelWeight*>(
        &weight_tables_[(pixel - dest_min_) * item_size_bytes_]);
  }
-@@ -324,7 +331,7 @@
+@@ -311,9 +318,112 @@
+           src_clip_.left, src_clip_.right, resample_options_)) {
+     return false;
+   }
++  PlanHorzRuns();
+   cur_row_ = src_clip_.top;
+   state_ = State::kHorizontal;
+   return true;
++}
++
++void CStretchEngine::PlanHorzRuns() {
++  horz_runs_.clear();
++  horz_run_columns_.clear();
++  // Only the two transform methods below have run kernels in
++  // ContinueStretchHorz(); the others keep their original per-column loops
++  // and need no plan.
++  if (trans_method_ != TransformMethod::k8BppTo8Bpp &&
++      trans_method_ != TransformMethod::kManyBpptoManyBpp) {
++    return;
++  }
++
++  // Planning pays a fixed per-engine cost -- two walks of the weight table
++  // and the plan allocations -- that only the row loop can amortize, one
++  // replay per source row. An engine whose total work (destination columns
++  // times source rows) is small never earns that back, so such engines stay
++  // wholly on the generic path: a single generic run covering every column.
++  // Documents drawing many one-row engines otherwise pay the plan cost per
++  // engine and regress by double digits.
++  static constexpr uint32_t kMinPlanWork = 4096;
++  const uint32_t dest_cols =
++      static_cast<uint32_t>(dest_clip_.right - dest_clip_.left);
++  const uint32_t src_rows =
++      static_cast<uint32_t>(src_clip_.bottom - src_clip_.top);
++  if (static_cast<uint64_t>(dest_cols) * src_rows < kMinPlanWork) {
++    horz_runs_.push_back({dest_cols, 0, 0, 0});
++    return;
++  }
++
++  // A run shorter than this stays on the generic path: its per-row setup --
++  // three span constructions -- would cost more than the per-column dispatch
++  // it replaces.
++  static constexpr uint32_t kMinRunLength = 4;
++
++  // First pass: partition the destination columns into maximal runs of
++  // columns sharing a tap count of 1 or 2; every other tap count (including
++  // an empty weight range) goes to the generic path. Then demote runs
++  // shorter than `kMinRunLength` and merge neighboring generic runs.
++  DataVector<StretchHorzRun> runs;
++  for (int col = dest_clip_.left; col < dest_clip_.right; ++col) {
++    const size_t weight_count =
++        weight_table_.GetPixelWeight(col)->GetWeights().size();
++    const uint32_t taps = weight_count == 1 || weight_count == 2
++                              ? static_cast<uint32_t>(weight_count)
++                              : 0;
++    if (!runs.empty() && runs.back().taps == taps) {
++      ++runs.back().length;
++    } else {
++      runs.push_back({/*length=*/1, taps, /*src_first=*/0, /*src_count=*/0});
++    }
++  }
++  horz_runs_.reserve(runs.size());
++  for (const StretchHorzRun& run : runs) {
++    const uint32_t taps = run.length < kMinRunLength ? 0u : run.taps;
++    if (taps == 0 && !horz_runs_.empty() && horz_runs_.back().taps == 0) {
++      horz_runs_.back().length += run.length;
++    } else {
++      horz_runs_.push_back({run.length, taps, 0, 0});
++    }
++  }
++
++  // Second pass: for each remaining 1- or 2-tap run, bound the window of
++  // source pixels its columns read -- mirrored destinations walk the source
++  // backwards, so this is a min/max, not first/last -- and record each
++  // column's window offset and weights. The offsets and weights are copied
++  // verbatim from `weight_table_`, so a run kernel taps exactly the pixels,
++  // with exactly the weights, that the generic path taps.
++  size_t planned_columns = 0;
++  for (const StretchHorzRun& run : horz_runs_) {
++    if (run.taps != 0) {
++      planned_columns += run.length;
++    }
++  }
++  horz_run_columns_.reserve(planned_columns);
++  int col = dest_clip_.left;
++  for (StretchHorzRun& run : horz_runs_) {
++    if (run.taps == 0) {
++      col += static_cast<int>(run.length);
++      continue;
++    }
++    size_t src_first = weight_table_.GetPixelWeight(col)->GetSrcStart();
++    size_t src_last = src_first;
++    for (uint32_t i = 1; i < run.length; ++i) {
++      const size_t src_start =
++          weight_table_.GetPixelWeight(col + static_cast<int>(i))
++              ->GetSrcStart();
++      src_first = std::min(src_first, src_start);
++      src_last = std::max(src_last, src_start);
++    }
++    run.src_first = static_cast<uint32_t>(src_first);
++    run.src_count = static_cast<uint32_t>(src_last - src_first + run.taps);
++    for (uint32_t i = 0; i < run.length; ++i) {
++      const PixelWeight* pWeights =
++          weight_table_.GetPixelWeight(col + static_cast<int>(i));
++      pdfium::span<const uint32_t> weights = pWeights->GetWeights();
++      horz_run_columns_.push_back(
++          {static_cast<uint32_t>(pWeights->GetSrcStart() - src_first),
++           weights[0], run.taps == 2 ? weights[1] : 0u});
++    }
++    col += static_cast<int>(run.length);
++  }
+ }
+ 
+ bool CStretchEngine::ContinueStretchHorz(PauseIndicatorIface* pPause) {
+@@ -324,7 +434,7 @@
      return true;
    }
  
@@ -63,7 +176,7 @@
    static const int kStrechPauseRows = 10;
    int rows_to_go = kStrechPauseRows;
    for (; cur_row_ < src_clip_.bottom; ++cur_row_) {
-@@ -336,7 +343,7 @@
+@@ -336,7 +446,7 @@
        rows_to_go = kStrechPauseRows;
      }
  
@@ -72,7 +185,7 @@
      pdfium::span<uint8_t> dest_span = inter_buf_.subspan(
          (cur_row_ - src_clip_.top) * inter_pitch_, inter_pitch_);
      size_t dest_span_index = 0;
-@@ -346,14 +353,14 @@
+@@ -346,51 +456,103 @@
        case TransformMethod::k1BppToManyBpp: {
          for (int col = dest_clip_.left; col < dest_clip_.right; ++col) {
            const PixelWeight* pWeights = weight_table_.GetPixelWeight(col);
@@ -94,38 +207,78 @@
            }
            dest_span[dest_span_index++] = PixelFromFixed(dest_a);
          }
-@@ -362,10 +369,27 @@
+         break;
+       }
        case TransformMethod::k8BppTo8Bpp: {
-         for (int col = dest_clip_.left; col < dest_clip_.right; ++col) {
-           const PixelWeight* pWeights = weight_table_.GetPixelWeight(col);
-+          pdfium::span<const uint32_t> weights = pWeights->GetWeights();
-+          // One validated view of exactly the source bytes this column taps.
-+          auto src_window =
-+              src_row_span.subspan(pWeights->GetSrcStart(), weights.size());
-           uint32_t dest_a = 0;
+-        for (int col = dest_clip_.left; col < dest_clip_.right; ++col) {
+-          const PixelWeight* pWeights = weight_table_.GetPixelWeight(col);
+-          uint32_t dest_a = 0;
 -          for (int j = pWeights->src_start_; j <= pWeights->src_end_; ++j) {
 -            uint32_t pixel_weight = pWeights->GetWeightForPosition(j);
 -            UNSAFE_TODO({ dest_a += pixel_weight * src_scan[j]; });
-+          // See the matching unrolls in the kManyBpptoManyBpp case below:
-+          // one and two taps are the common trip counts and the loop is all
-+          // overhead there. Tap order is unchanged.
-+          switch (weights.size()) {
-+            case 1:
-+              dest_a = weights[0] * src_window[0];
-+              break;
-+            case 2:
-+              dest_a = weights[0] * src_window[0] + weights[1] * src_window[1];
-+              break;
-+            default:
-+              for (auto [pixel_weight, src_byte] :
-+                   fxcrt::Zip(weights, src_window)) {
-+                dest_a += pixel_weight * src_byte;
++        pdfium::span<const StretchHorzRunColumn> run_columns(horz_run_columns_);
++        int col = dest_clip_.left;
++        for (const StretchHorzRun& run : horz_runs_) {
++          if (run.taps != 0) {
++            // Straight-line kernels for the planned runs: the per-column
++            // tap-count dispatch, weight-table walk and span constructions
++            // happen once per run per row instead of once per column. The
++            // window offsets and weights come from the plan, which copied
++            // them verbatim from `weight_table_`, and the terms are summed
++            // in tap order, so the output matches the generic path below
++            // bit for bit.
++            auto columns = run_columns.first(run.length);
++            run_columns = run_columns.subspan(run.length);
++            auto window = src_row_span.subspan(run.src_first, run.src_count);
++            auto dest_run = dest_span.subspan(dest_span_index, run.length);
++            if (run.taps == 1) {
++              for (auto [column, dest] : fxcrt::Zip(columns, dest_run)) {
++                dest = PixelFromFixed(column.weight0 * window[column.rel_src]);
 +              }
-+              break;
++            } else {
++              for (auto [column, dest] : fxcrt::Zip(columns, dest_run)) {
++                dest =
++                    PixelFromFixed(column.weight0 * window[column.rel_src] +
++                                   column.weight1 * window[column.rel_src + 1]);
++              }
++            }
++            dest_span_index += run.length;
++            col += static_cast<int>(run.length);
++            continue;
            }
-           dest_span[dest_span_index++] = PixelFromFixed(dest_a);
+-          dest_span[dest_span_index++] = PixelFromFixed(dest_a);
++          const int run_end = col + static_cast<int>(run.length);
++          for (; col < run_end; ++col) {
++            const PixelWeight* pWeights = weight_table_.GetPixelWeight(col);
++            pdfium::span<const uint32_t> weights = pWeights->GetWeights();
++            // One validated view of exactly the source bytes this column
++            // taps.
++            auto src_window =
++                src_row_span.subspan(pWeights->GetSrcStart(), weights.size());
++            uint32_t dest_a = 0;
++            // See the matching unrolls in the kManyBpptoManyBpp case below:
++            // one and two taps are the common trip counts and the loop is
++            // all overhead there. Tap order is unchanged.
++            switch (weights.size()) {
++              case 1:
++                dest_a = weights[0] * src_window[0];
++                break;
++              case 2:
++                dest_a =
++                    weights[0] * src_window[0] + weights[1] * src_window[1];
++                break;
++              default:
++                for (auto [pixel_weight, src_byte] :
++                     fxcrt::Zip(weights, src_window)) {
++                  dest_a += pixel_weight * src_byte;
++                }
++                break;
++            }
++            dest_span[dest_span_index++] = PixelFromFixed(dest_a);
++          }
          }
-@@ -374,23 +398,24 @@
+         break;
+       }
        case TransformMethod::k8BppToManyBpp: {
          for (int col = dest_clip_.left; col < dest_clip_.right; ++col) {
            const PixelWeight* pWeights = weight_table_.GetPixelWeight(col);
@@ -164,7 +317,7 @@
            }
            dest_span[dest_span_index++] = PixelFromFixed(dest_b);
            dest_span[dest_span_index++] = PixelFromFixed(dest_g);
-@@ -399,45 +424,93 @@
+@@ -399,45 +561,149 @@
          break;
        }
        case TransformMethod::kManyBpptoManyBpp: {
@@ -190,46 +343,102 @@
 +        // compile-time source pixel size.
 +        auto stretch_row_from = [this, &dest_span, &dest_span_index,
 +                                 Bpp](auto src_pixels) {
-+          for (int col = dest_clip_.left; col < dest_clip_.right; ++col) {
-+            const PixelWeight* pWeights = weight_table_.GetPixelWeight(col);
-+            pdfium::span<const uint32_t> weights = pWeights->GetWeights();
-+            auto window =
-+                src_pixels.subspan(pWeights->GetSrcStart(), weights.size());
-+            uint32_t dest_r = 0;
-+            uint32_t dest_g = 0;
-+            uint32_t dest_b = 0;
-+            // One and two taps are the overwhelmingly common cases -- one is
-+            // no scaling in this axis, two is bilinear -- and at that trip
-+            // count the loop is all overhead. Unrolled explicitly; the terms
-+            // are summed in tap order, so the result is identical.
-+            switch (weights.size()) {
-+              case 1: {
-+                const auto& src0 = window[0];
-+                dest_b = weights[0] * src0.blue;
-+                dest_g = weights[0] * src0.green;
-+                dest_r = weights[0] * src0.red;
-+                break;
-+              }
-+              case 2: {
-+                const auto& src0 = window[0];
-+                const auto& src1 = window[1];
-+                dest_b = weights[0] * src0.blue + weights[1] * src1.blue;
-+                dest_g = weights[0] * src0.green + weights[1] * src1.green;
-+                dest_r = weights[0] * src0.red + weights[1] * src1.red;
-+                break;
-+              }
-+              default:
-+                for (auto [pixel_weight, src] : fxcrt::Zip(weights, window)) {
-+                  dest_b += pixel_weight * src.blue;
-+                  dest_g += pixel_weight * src.green;
-+                  dest_r += pixel_weight * src.red;
++          // The destination pixels have the same layout as the source
++          // pixels: 3 bytes fully written, or 4 bytes of which the 4th is
++          // left untouched (both here and on the generic path below).
++          using DestPixel =
++              std::remove_const_t<typename decltype(src_pixels)::element_type>;
++          pdfium::span<const StretchHorzRunColumn> run_columns(
++              horz_run_columns_);
++          int col = dest_clip_.left;
++          for (const StretchHorzRun& run : horz_runs_) {
++            if (run.taps != 0) {
++              // See the matching kernels in the k8BppTo8Bpp case above: the
++              // per-column tap-count dispatch, weight-table walk and span
++              // constructions happen once per run per row, the offsets and
++              // weights come verbatim from `weight_table_`, and the terms
++              // are summed in tap order, so the output matches the generic
++              // path below bit for bit.
++              auto columns = run_columns.first(run.length);
++              run_columns = run_columns.subspan(run.length);
++              auto window = src_pixels.subspan(run.src_first, run.src_count);
++              auto dest_run =
++                  fxcrt::reinterpret_span<DestPixel>(dest_span.subspan(
++                      dest_span_index, run.length * sizeof(DestPixel)));
++              if (run.taps == 1) {
++                for (auto [column, dest] : fxcrt::Zip(columns, dest_run)) {
++                  // Hoisted deliberately: the destination stores below are
++                  // writes the compiler cannot prove distinct from the plan
++                  // data, so it would otherwise reload the weight per
++                  // channel.
++                  const uint32_t weight0 = column.weight0;
++                  const auto& src0 = window[column.rel_src];
++                  dest.blue = PixelFromFixed(weight0 * src0.blue);
++                  dest.green = PixelFromFixed(weight0 * src0.green);
++                  dest.red = PixelFromFixed(weight0 * src0.red);
 +                }
-+                break;
++              } else {
++                for (auto [column, dest] : fxcrt::Zip(columns, dest_run)) {
++                  // Hoisted for the same reason as in the 1-tap kernel.
++                  const uint32_t weight0 = column.weight0;
++                  const uint32_t weight1 = column.weight1;
++                  const auto& src0 = window[column.rel_src];
++                  const auto& src1 = window[column.rel_src + 1];
++                  dest.blue =
++                      PixelFromFixed(weight0 * src0.blue + weight1 * src1.blue);
++                  dest.green = PixelFromFixed(weight0 * src0.green +
++                                              weight1 * src1.green);
++                  dest.red =
++                      PixelFromFixed(weight0 * src0.red + weight1 * src1.red);
++                }
++              }
++              dest_span_index += run.length * sizeof(DestPixel);
++              col += static_cast<int>(run.length);
++              continue;
 +            }
-+            dest_span[dest_span_index++] = PixelFromFixed(dest_b);
-+            dest_span[dest_span_index++] = PixelFromFixed(dest_g);
-+            dest_span[dest_span_index++] = PixelFromFixed(dest_r);
-+            dest_span_index += Bpp - 3;
++            const int run_end = col + static_cast<int>(run.length);
++            for (; col < run_end; ++col) {
++              const PixelWeight* pWeights = weight_table_.GetPixelWeight(col);
++              pdfium::span<const uint32_t> weights = pWeights->GetWeights();
++              auto window =
++                  src_pixels.subspan(pWeights->GetSrcStart(), weights.size());
++              uint32_t dest_r = 0;
++              uint32_t dest_g = 0;
++              uint32_t dest_b = 0;
++              // One and two taps are the overwhelmingly common cases -- one
++              // is no scaling in this axis, two is bilinear -- and at that
++              // trip count the loop is all overhead. Unrolled explicitly;
++              // the terms are summed in tap order, so the result is
++              // identical.
++              switch (weights.size()) {
++                case 1: {
++                  const auto& src0 = window[0];
++                  dest_b = weights[0] * src0.blue;
++                  dest_g = weights[0] * src0.green;
++                  dest_r = weights[0] * src0.red;
++                  break;
++                }
++                case 2: {
++                  const auto& src0 = window[0];
++                  const auto& src1 = window[1];
++                  dest_b = weights[0] * src0.blue + weights[1] * src1.blue;
++                  dest_g = weights[0] * src0.green + weights[1] * src1.green;
++                  dest_r = weights[0] * src0.red + weights[1] * src1.red;
++                  break;
++                }
++                default:
++                  for (auto [pixel_weight, src] : fxcrt::Zip(weights, window)) {
++                    dest_b += pixel_weight * src.blue;
++                    dest_g += pixel_weight * src.green;
++                    dest_r += pixel_weight * src.red;
++                  }
++                  break;
++              }
++              dest_span[dest_span_index++] = PixelFromFixed(dest_b);
++              dest_span[dest_span_index++] = PixelFromFixed(dest_g);
++              dest_span[dest_span_index++] = PixelFromFixed(dest_r);
++              dest_span_index += Bpp - 3;
++            }
            }
 -          dest_span[dest_span_index++] = PixelFromFixed(dest_b);
 -          dest_span[dest_span_index++] = PixelFromFixed(dest_g);
@@ -286,7 +495,7 @@
            }
            dest_span[dest_span_index++] = PixelFromFixed(dest_b);
            dest_span[dest_span_index++] = PixelFromFixed(dest_g);
-@@ -465,89 +538,129 @@
+@@ -465,89 +731,129 @@
      return;
    }
  
@@ -482,7 +691,51 @@
        }
 --- a/core/fxge/dib/cstretchengine.h
 +++ b/core/fxge/dib/cstretchengine.h
-@@ -54,18 +54,12 @@
+@@ -13,6 +13,7 @@
+ #include "core/fxcrt/data_vector.h"
+ #include "core/fxcrt/fixed_size_data_vector.h"
+ #include "core/fxcrt/fx_coordinates.h"
++#include "core/fxcrt/fx_memory_wrappers.h"
+ #include "core/fxcrt/fx_system.h"
+ #include "core/fxcrt/raw_span.h"
+ #include "core/fxcrt/retain_ptr.h"
+@@ -23,6 +24,35 @@
+ class PauseIndicatorIface;
+ class ScanlineComposerIface;
+ 
++// The horizontal stretch pass visits every destination column once per
++// source row, and the modal tap counts per column are 1 (no scaling in this
++// axis) and 2 (bilinear interpolation). At those trip counts the per-column
++// work around the multiply-adds -- dispatching on the tap count and building
++// a checked source window -- costs more than the multiply-adds themselves,
++// and the weight table does not change between rows, so
++// CStretchEngine::PlanHorzRuns() hoists that work out of the row loop: it
++// partitions the columns once into maximal runs of 1-tap and 2-tap columns,
++// and ContinueStretchHorz() replays the runs for every row as straight-line
++// loops. Columns with any other tap count, and runs too short to pay for
++// their setup, stay on the generic per-column path (`taps == 0`).
++struct StretchHorzRun {
++  uint32_t length;     // Destination columns this run covers.
++  uint32_t taps;       // Taps per column: 1 or 2, or 0 for the generic path.
++  uint32_t src_first;  // taps != 0: the first source pixel the run reads.
++  uint32_t src_count;  // taps != 0: source pixels covering all its windows.
++};
++FX_DATA_PARTITION_EXCEPTION(StretchHorzRun);
++
++// Per-column data for the `taps != 0` runs, in destination-column order: the
++// column's first tapped source pixel relative to its run's `src_first`, and
++// its weights, copied verbatim from the weight table.
++struct StretchHorzRunColumn {
++  uint32_t rel_src;
++  uint32_t weight0;
++  uint32_t weight1;  // Zero (and unread) in 1-tap runs.
++};
++FX_DATA_PARTITION_EXCEPTION(StretchHorzRunColumn);
++
+ class CStretchEngine {
+  public:
+   static constexpr uint32_t kFixedPointBits = 16;
+@@ -54,18 +84,12 @@
  
    struct PixelWeight {
      void SetStartEnd(int src_start, int src_end, size_t weight_count) {
@@ -502,7 +755,7 @@
      void SetWeightForPosition(int position, uint32_t weight) {
        CHECK_GE(position, src_start_);
        CHECK_LE(position, src_end_);
-@@ -73,6 +67,23 @@
+@@ -73,6 +97,23 @@
        UNSAFE_BUFFERS(weights_[position - src_start_] = weight);
      }
  
@@ -526,3 +779,21 @@
      // NOTE: relies on defined behaviour for unsigned overflow to
      // decrement the previous position, as needed.
      void RemoveLastWeightAndAdjust(uint32_t weight_change) {
+@@ -142,6 +183,8 @@
+     kManyBpptoManyBppWithAlpha
+   };
+ 
++  void PlanHorzRuns();
++
+   const FXDIB_Format dest_format_;
+   const int dest_bpp_;
+   const int src_bpp_;
+@@ -164,6 +207,8 @@
+   State state_ = State::kInitial;
+   int cur_row_ = 0;
+   WeightTable weight_table_;
++  DataVector<StretchHorzRun> horz_runs_;
++  DataVector<StretchHorzRunColumn> horz_run_columns_;
+ };
+ 
+ #endif  // CORE_FXGE_DIB_CSTRETCHENGINE_H_

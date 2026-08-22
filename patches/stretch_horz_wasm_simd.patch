@@ -1,55 +1,435 @@
 --- a/core/fxge/dib/cstretchengine.cpp
 +++ b/core/fxge/dib/cstretchengine.cpp
-@@ -519,10 +519,44 @@
-                 break;
-               }
-               default:
--                for (auto [pixel_weight, src] : fxcrt::Zip(weights, window)) {
--                  dest_b += pixel_weight * src.blue;
--                  dest_g += pixel_weight * src.green;
--                  dest_r += pixel_weight * src.red;
+@@ -384,6 +384,10 @@
+ void CStretchEngine::PlanHorzRuns() {
+   horz_runs_.clear();
+   horz_run_columns_.clear();
 +#if defined(__wasm_simd128__)
-+                // Vectorize the tap loop across channels rather than across
-+                // pixels: each tap loads the source pixel's 4 bytes, extends
-+                // u8 -> u32 and multiply-accumulates against the splatted
-+                // weight, so lanes 0-2 end up holding exactly the scalar
-+                // path's dest_b/dest_g/dest_r (lane 3 is the ignored 4th
-+                // byte). Same arithmetic in the same order. Only available
-+                // for 4-byte source pixels, since the load reads 4 bytes.
-+                // The 1- and 2-tap unrolls above stay scalar: at those trip
-+                // counts the SIMD setup is all overhead.
-+                if constexpr (sizeof(*window.data()) == 4) {
-+                  v128_t acc = wasm_i64x2_const(0, 0);
-+                  for (auto [pixel_weight, src] :
-+                       fxcrt::Zip(weights, window)) {
-+                    const v128_t px = wasm_u32x4_extend_low_u16x8(
-+                        wasm_u16x8_extend_low_u8x16(
-+                            wasm_v128_load32_zero(&src)));
-+                    acc = wasm_i32x4_add(
-+                        acc,
-+                        wasm_i32x4_mul(
-+                            px, wasm_i32x4_splat(
-+                                    static_cast<int32_t>(pixel_weight))));
-+                  }
-+                  dest_b =
-+                      static_cast<uint32_t>(wasm_i32x4_extract_lane(acc, 0));
-+                  dest_g =
-+                      static_cast<uint32_t>(wasm_i32x4_extract_lane(acc, 1));
-+                  dest_r =
-+                      static_cast<uint32_t>(wasm_i32x4_extract_lane(acc, 2));
-+                } else
++  horz_run_has_groups_.clear();
++  horz_wasm_groups_.clear();
 +#endif
-+                {
-+                  for (auto [pixel_weight, src] :
-+                       fxcrt::Zip(weights, window)) {
-+                    dest_b += pixel_weight * src.blue;
-+                    dest_g += pixel_weight * src.green;
-+                    dest_r += pixel_weight * src.red;
-+                  }
-                 }
-                 break;
+   // Only the two transform methods below have run kernels in
+   // ContinueStretchHorz(); the others keep their original per-column loops
+   // and need no plan.
+@@ -471,6 +475,7 @@
+     }
+     run.src_first = static_cast<uint32_t>(src_first);
+     run.src_count = static_cast<uint32_t>(src_last - src_first + run.taps);
++    const size_t first_column = horz_run_columns_.size();
+     for (uint32_t i = 0; i < run.length; ++i) {
+       const PixelWeight* pWeights =
+           weight_table_.GetPixelWeight(col + static_cast<int>(i));
+@@ -479,10 +484,182 @@
+           {static_cast<uint32_t>(pWeights->GetSrcStart() - src_first),
+            weights[0], run.taps == 2 ? weights[1] : 0u});
+     }
++#if defined(__wasm_simd128__)
++    BuildHorzWasmGroups(run,
++                        pdfium::span(horz_run_columns_).subspan(first_column));
++#endif
+     col += static_cast<int>(run.length);
++  }
++}
++
++#if defined(__wasm_simd128__)
++void CStretchEngine::BuildHorzWasmGroups(
++    const StretchHorzRun& run,
++    pdfium::span<const StretchHorzRunColumn> columns) {
++  // The kernels gather the blue/green/red bytes (or the single 8bpp byte);
++  // a 4-byte source's 4th byte is never read, matching the scalar loops.
++  const uint32_t bpp = trans_method_ == TransformMethod::k8BppTo8Bpp
++                           ? 1u
++                           : static_cast<uint32_t>(src_bpp_ / 8);
++  const uint32_t gathered = bpp == 1 ? 1u : 3u;
++  const uint32_t window_bytes = run.src_count * bpp;
++  const size_t group_count = columns.size() / 4;
++
++  // First pass: how would each group execute? Everything a group's four
++  // windows read must fit the registers a kernel gathers from: one 16-byte
++  // load (kind 1), two (kind 2), or neither (kind 0, the scalar loop). The
++  // load is kept inside the run's source window by sliding its base left,
++  // so the window itself must also cover the load. If the run would execute
++  // mostly scalar -- upscales fit kind 1, mild downscales kind 2, so runs
++  // are all-or-nothing in practice -- planning it is all cost: emit no
++  // groups and leave the run on the per-run scalar loops, which also skips
++  // the plan's index construction below.
++  auto group_kind = [&](size_t g) -> uint32_t {
++    uint32_t min_rel = columns[g * 4].rel_src;
++    uint32_t max_rel = min_rel;
++    for (size_t k = 1; k < 4; ++k) {
++      min_rel = std::min(min_rel, columns[g * 4 + k].rel_src);
++      max_rel = std::max(max_rel, columns[g * 4 + k].rel_src);
++    }
++    const uint32_t span_bytes = (max_rel + run.taps - min_rel) * bpp;
++    if (span_bytes <= 16 && window_bytes >= 16) {
++      return 1;
++    }
++    if (span_bytes <= 32 && window_bytes >= 32) {
++      return 2;
++    }
++    return 0;
++  };
++  size_t simd_groups = 0;
++  for (size_t g = 0; g < group_count; ++g) {
++    simd_groups += group_kind(g) != 0;
++  }
++  if (simd_groups * 4 < group_count * 3) {
++    horz_run_has_groups_.push_back(0);
++    return;
++  }
++  horz_run_has_groups_.push_back(1);
++
++  for (size_t g = 0; g < group_count; ++g) {
++    StretchHorzWasmGroup group;
++    std::fill_n(group.idx[0], 32, uint8_t{0xFF});
++    group.kind = group_kind(g);
++    group.src_byte_base = 0;
++    if (group.kind != 0) {
++      uint32_t min_rel = columns[g * 4].rel_src;
++      for (size_t k = 1; k < 4; ++k) {
++        min_rel = std::min(min_rel, columns[g * 4 + k].rel_src);
++      }
++      const uint32_t load_bytes = group.kind == 1 ? 16 : 32;
++      group.src_byte_base =
++          std::min(min_rel * bpp, window_bytes - load_bytes);
++    }
++    for (size_t k = 0; k < 4; ++k) {
++      const StretchHorzRunColumn& column = columns[g * 4 + k];
++      group.weights[0][k] = column.weight0;
++      group.weights[1][k] = column.weight1;
++      if (group.kind == 0) {
++        continue;
++      }
++      for (uint32_t t = 0; t < run.taps; ++t) {
++        const uint32_t src_byte =
++            (column.rel_src + t) * bpp - group.src_byte_base;
++        for (uint32_t c = 0; c < gathered; ++c) {
++          group.idx[t][k * 4 + c] = static_cast<uint8_t>(src_byte + c);
++        }
++      }
++    }
++    horz_wasm_groups_.push_back(group);
++  }
++}
++#endif
++
++#if defined(__wasm_simd128__)
++namespace {
++
++// Four destination pixels of a planned 1- or 2-tap run in one pass, from the
++// group's precomputed swizzle plan (see StretchHorzWasmGroup). Exactly the
++// scalar arithmetic on exactly the scalar operands: the swizzle produces the
++// zero-extended source bytes as 32-bit lanes, the multiply-accumulate is the
++// same uint32 wrap-around math in the same tap order, and the final shuffles
++// extract byte 2 of every lane, which IS PixelFromFixed (a >> 16 truncated
++// to uint8_t). kBpp = 1 (8bpp), 3 (BGR) or 4 (BGRx; dest byte 3 is loaded
++// and stored back so it stays untouched, as the scalar path leaves it).
++template <int kBpp, int kTaps, bool kWide>
++inline void StretchHorzGroupSimd(const StretchHorzWasmGroup& group,
++                                 const uint8_t* window_bytes,
++                                 uint8_t* dest_bytes) {
++  const v128_t src = wasm_v128_load(window_bytes + group.src_byte_base);
++  v128_t src_hi;
++  if constexpr (kWide) {
++    src_hi = wasm_v128_load(window_bytes + group.src_byte_base + 16);
+   }
++  // One gather per tap: a single i8x16.swizzle for a 16-byte window, or two
++  // combined with OR for a 32-byte one -- each register yields zero for the
++  // indices addressing the other (index - 16 wraps to >= 240 for indices
++  // below 16, and both give zero past 15).
++  auto gather = [&](const uint8_t* idx) {
++    const v128_t lanes = wasm_v128_load(idx);
++    if constexpr (kWide) {
++      return wasm_v128_or(
++          wasm_i8x16_swizzle(src, lanes),
++          wasm_i8x16_swizzle(src_hi,
++                             wasm_i8x16_sub(lanes, wasm_i8x16_splat(16))));
++    } else {
++      return wasm_i8x16_swizzle(src, lanes);
++    }
++  };
++  const v128_t m255 = wasm_i32x4_splat(0xFF);
++  const v128_t p0 = gather(group.idx[0]);
++  const v128_t w0 = wasm_v128_load(group.weights[0]);
++  v128_t b;
++  v128_t g;
++  v128_t r;
++  if constexpr (kBpp == 1) {
++    b = wasm_i32x4_mul(p0, w0);
++  } else {
++    b = wasm_i32x4_mul(wasm_v128_and(p0, m255), w0);
++    g = wasm_i32x4_mul(wasm_v128_and(wasm_u32x4_shr(p0, 8), m255), w0);
++    r = wasm_i32x4_mul(wasm_u32x4_shr(p0, 16), w0);
++  }
++  if constexpr (kTaps == 2) {
++    const v128_t p1 = gather(group.idx[1]);
++    const v128_t w1 = wasm_v128_load(group.weights[1]);
++    if constexpr (kBpp == 1) {
++      b = wasm_i32x4_add(b, wasm_i32x4_mul(p1, w1));
++    } else {
++      b = wasm_i32x4_add(b, wasm_i32x4_mul(wasm_v128_and(p1, m255), w1));
++      g = wasm_i32x4_add(
++          g, wasm_i32x4_mul(wasm_v128_and(wasm_u32x4_shr(p1, 8), m255), w1));
++      r = wasm_i32x4_add(r, wasm_i32x4_mul(wasm_u32x4_shr(p1, 16), w1));
++    }
++  }
++  if constexpr (kBpp == 1) {
++    const v128_t out =
++        wasm_i8x16_shuffle(b, b, 2, 6, 10, 14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
++                           0, 0);
++    wasm_v128_store32_lane(dest_bytes, out, 0);
++  } else {
++    const v128_t bg = wasm_i8x16_shuffle(b, g, 2, 18, 0, 0, 6, 22, 0, 0, 10,
++                                         26, 0, 0, 14, 30, 0, 0);
++    if constexpr (kBpp == 3) {
++      const v128_t out = wasm_i8x16_shuffle(bg, r, 0, 1, 18, 4, 5, 22, 8, 9,
++                                            26, 12, 13, 30, 0, 0, 0, 0);
++      wasm_v128_store64_lane(dest_bytes, out, 0);
++      wasm_v128_store32_lane(dest_bytes + 8, out, 2);
++    } else {
++      const v128_t out = wasm_i8x16_shuffle(bg, r, 0, 1, 18, 3, 4, 5, 22, 7,
++                                            8, 9, 26, 11, 12, 13, 30, 15);
++      const v128_t dest = wasm_v128_load(dest_bytes);
++      const v128_t bgr_mask = wasm_i32x4_splat(0x00FFFFFF);
++      wasm_v128_store(dest_bytes, wasm_v128_bitselect(out, dest, bgr_mask));
++    }
++  }
+ }
+ 
++}  // namespace
++#endif
++
+ bool CStretchEngine::ContinueStretchHorz(PauseIndicatorIface* pPause) {
+   if (!dest_width_) {
+     return false;
+@@ -528,6 +705,11 @@
+       }
+       case TransformMethod::k8BppTo8Bpp: {
+         pdfium::span<const StretchHorzRunColumn> run_columns(horz_run_columns_);
++#if defined(__wasm_simd128__)
++        pdfium::span<const uint8_t> run_has_groups(horz_run_has_groups_);
++        pdfium::span<const StretchHorzWasmGroup> run_wasm_groups(
++            horz_wasm_groups_);
++#endif
+         int col = dest_clip_.left;
+         for (const StretchHorzRun& run : horz_runs_) {
+           if (run.taps != 0) {
+@@ -542,6 +724,60 @@
+             run_columns = run_columns.subspan(run.length);
+             auto window = src_row_span.subspan(run.src_first, run.src_count);
+             auto dest_run = dest_span.subspan(dest_span_index, run.length);
++#if defined(__wasm_simd128__)
++            // Whole groups of four columns go through the swizzle kernel;
++            // groups the plan marked non-fitting, and the tail, take the
++            // scalar loops on their own subspans.
++            auto scalar_columns = [&](size_t first, size_t count) {
++              auto cols = columns.subspan(first, count);
++              auto dests = dest_run.subspan(first, count);
++              if (run.taps == 1) {
++                for (auto [column, dest] : fxcrt::Zip(cols, dests)) {
++                  dest =
++                      PixelFromFixed(column.weight0 * window[column.rel_src]);
++                }
++              } else {
++                for (auto [column, dest] : fxcrt::Zip(cols, dests)) {
++                  dest = PixelFromFixed(
++                      column.weight0 * window[column.rel_src] +
++                      column.weight1 * window[column.rel_src + 1]);
++                }
++              }
++            };
++            const bool use_groups = run_has_groups[size_t{0}] != 0;
++            run_has_groups = run_has_groups.subspan(size_t{1});
++            if (!use_groups) {
++              scalar_columns(0, run.length);
++            } else {
++              const size_t group_count = run.length / 4;
++              auto groups = run_wasm_groups.first(group_count);
++              run_wasm_groups = run_wasm_groups.subspan(group_count);
++              for (size_t g = 0; g < group_count; ++g) {
++                switch (groups[g].kind | (run.taps == 2 ? 4u : 0u)) {
++                  case 1:
++                    StretchHorzGroupSimd<1, 1, false>(groups[g], window.data(),
++                                                      &dest_run[g * 4]);
++                    break;
++                  case 2:
++                    StretchHorzGroupSimd<1, 1, true>(groups[g], window.data(),
++                                                     &dest_run[g * 4]);
++                    break;
++                  case 5:
++                    StretchHorzGroupSimd<1, 2, false>(groups[g], window.data(),
++                                                      &dest_run[g * 4]);
++                    break;
++                  case 6:
++                    StretchHorzGroupSimd<1, 2, true>(groups[g], window.data(),
++                                                     &dest_run[g * 4]);
++                    break;
++                  default:
++                    scalar_columns(g * 4, 4);
++                    break;
++                }
++              }
++              scalar_columns(group_count * 4, run.length % 4);
++            }
++#else
+             if (run.taps == 1) {
+               for (auto [column, dest] : fxcrt::Zip(columns, dest_run)) {
+                 dest = PixelFromFixed(column.weight0 * window[column.rel_src]);
+@@ -553,6 +789,7 @@
+                                    column.weight1 * window[column.rel_src + 1]);
+               }
              }
-@@ -562,6 +596,27 @@
++#endif
+             dest_span_index += run.length;
+             col += static_cast<int>(run.length);
+             continue;
+@@ -634,6 +871,11 @@
+               std::remove_const_t<typename decltype(src_pixels)::element_type>;
+           pdfium::span<const StretchHorzRunColumn> run_columns(
+               horz_run_columns_);
++#if defined(__wasm_simd128__)
++          pdfium::span<const uint8_t> run_has_groups(horz_run_has_groups_);
++          pdfium::span<const StretchHorzWasmGroup> run_wasm_groups(
++              horz_wasm_groups_);
++#endif
+           int col = dest_clip_.left;
+           for (const StretchHorzRun& run : horz_runs_) {
+             if (run.taps != 0) {
+@@ -649,6 +891,75 @@
+               auto dest_run =
+                   fxcrt::reinterpret_span<DestPixel>(dest_span.subspan(
+                       dest_span_index, run.length * sizeof(DestPixel)));
++#if defined(__wasm_simd128__)
++              // As in the k8BppTo8Bpp case above: whole groups of four
++              // columns through the swizzle kernel, non-fitting groups and
++              // the tail through the scalar loops on their own subspans.
++              auto scalar_columns = [&](size_t first, size_t count) {
++                auto cols = columns.subspan(first, count);
++                auto dests = dest_run.subspan(first, count);
++                if (run.taps == 1) {
++                  for (auto [column, dest] : fxcrt::Zip(cols, dests)) {
++                    const uint32_t weight0 = column.weight0;
++                    const auto& src0 = window[column.rel_src];
++                    dest.blue = PixelFromFixed(weight0 * src0.blue);
++                    dest.green = PixelFromFixed(weight0 * src0.green);
++                    dest.red = PixelFromFixed(weight0 * src0.red);
++                  }
++                } else {
++                  for (auto [column, dest] : fxcrt::Zip(cols, dests)) {
++                    const uint32_t weight0 = column.weight0;
++                    const uint32_t weight1 = column.weight1;
++                    const auto& src0 = window[column.rel_src];
++                    const auto& src1 = window[column.rel_src + 1];
++                    dest.blue = PixelFromFixed(weight0 * src0.blue +
++                                               weight1 * src1.blue);
++                    dest.green = PixelFromFixed(weight0 * src0.green +
++                                                weight1 * src1.green);
++                    dest.red = PixelFromFixed(weight0 * src0.red +
++                                              weight1 * src1.red);
++                  }
++                }
++              };
++              const bool use_groups = run_has_groups[size_t{0}] != 0;
++              run_has_groups = run_has_groups.subspan(size_t{1});
++              if (!use_groups) {
++                scalar_columns(0, run.length);
++              } else {
++                constexpr int kBpp = static_cast<int>(sizeof(DestPixel));
++                const size_t group_count = run.length / 4;
++                auto groups = run_wasm_groups.first(group_count);
++                run_wasm_groups = run_wasm_groups.subspan(group_count);
++                const uint8_t* window_bytes =
++                    reinterpret_cast<const uint8_t*>(window.data());
++                for (size_t g = 0; g < group_count; ++g) {
++                  uint8_t* dest_bytes =
++                      reinterpret_cast<uint8_t*>(&dest_run[g * 4]);
++                  switch (groups[g].kind | (run.taps == 2 ? 4u : 0u)) {
++                    case 1:
++                      StretchHorzGroupSimd<kBpp, 1, false>(
++                          groups[g], window_bytes, dest_bytes);
++                      break;
++                    case 2:
++                      StretchHorzGroupSimd<kBpp, 1, true>(
++                          groups[g], window_bytes, dest_bytes);
++                      break;
++                    case 5:
++                      StretchHorzGroupSimd<kBpp, 2, false>(
++                          groups[g], window_bytes, dest_bytes);
++                      break;
++                    case 6:
++                      StretchHorzGroupSimd<kBpp, 2, true>(
++                          groups[g], window_bytes, dest_bytes);
++                      break;
++                    default:
++                      scalar_columns(g * 4, 4);
++                      break;
++                  }
++                }
++                scalar_columns(group_count * 4, run.length % 4);
++              }
++#else
+               if (run.taps == 1) {
+                 for (auto [column, dest] : fxcrt::Zip(columns, dest_run)) {
+                   // Hoisted deliberately: the destination stores below are
+@@ -676,6 +987,7 @@
+                       PixelFromFixed(weight0 * src0.red + weight1 * src1.red);
+                 }
+               }
++#endif
+               dest_span_index += run.length * sizeof(DestPixel);
+               col += static_cast<int>(run.length);
+               continue;
+@@ -711,10 +1023,45 @@
+                   break;
+                 }
+                 default:
+-                  for (auto [pixel_weight, src] : fxcrt::Zip(weights, window)) {
+-                    dest_b += pixel_weight * src.blue;
+-                    dest_g += pixel_weight * src.green;
+-                    dest_r += pixel_weight * src.red;
++#if defined(__wasm_simd128__)
++                  // Vectorize the tap loop across channels rather than
++                  // across pixels: each tap loads the source pixel's 4
++                  // bytes, extends u8 -> u32 and multiply-accumulates
++                  // against the splatted weight, so lanes 0-2 end up holding
++                  // exactly the scalar path's dest_b/dest_g/dest_r (lane 3
++                  // is the ignored 4th byte). Same arithmetic in the same
++                  // order. Only available for 4-byte source pixels, since
++                  // the load reads 4 bytes. The 1- and 2-tap runs stay
++                  // scalar: at those trip counts the SIMD setup is all
++                  // overhead.
++                  if constexpr (sizeof(*window.data()) == 4) {
++                    v128_t acc = wasm_i64x2_const(0, 0);
++                    for (auto [pixel_weight, src] :
++                         fxcrt::Zip(weights, window)) {
++                      const v128_t px = wasm_u32x4_extend_low_u16x8(
++                          wasm_u16x8_extend_low_u8x16(
++                              wasm_v128_load32_zero(&src)));
++                      acc = wasm_i32x4_add(
++                          acc,
++                          wasm_i32x4_mul(
++                              px, wasm_i32x4_splat(
++                                      static_cast<int32_t>(pixel_weight))));
++                    }
++                    dest_b =
++                        static_cast<uint32_t>(wasm_i32x4_extract_lane(acc, 0));
++                    dest_g =
++                        static_cast<uint32_t>(wasm_i32x4_extract_lane(acc, 1));
++                    dest_r =
++                        static_cast<uint32_t>(wasm_i32x4_extract_lane(acc, 2));
++                  } else
++#endif
++                  {
++                    for (auto [pixel_weight, src] :
++                         fxcrt::Zip(weights, window)) {
++                      dest_b += pixel_weight * src.blue;
++                      dest_g += pixel_weight * src.green;
++                      dest_r += pixel_weight * src.red;
++                    }
+                   }
+                   break;
+               }
+@@ -755,6 +1102,27 @@
            uint32_t dest_r = 0;
            uint32_t dest_g = 0;
            uint32_t dest_b = 0;
@@ -77,7 +457,7 @@
            for (auto [weight, src] : fxcrt::Zip(weights, window)) {
              uint32_t pixel_weight = weight * src.alpha / 255;
              dest_b += pixel_weight * src.blue;
-@@ -569,6 +624,7 @@
+@@ -762,6 +1130,7 @@
              dest_r += pixel_weight * src.red;
              dest_a += pixel_weight;
            }
@@ -85,3 +465,59 @@
            dest_span[dest_span_index++] = PixelFromFixed(dest_b);
            dest_span[dest_span_index++] = PixelFromFixed(dest_g);
            dest_span[dest_span_index++] = PixelFromFixed(dest_r);
+--- a/core/fxge/dib/cstretchengine.h
++++ b/core/fxge/dib/cstretchengine.h
+@@ -53,6 +53,29 @@
+ };
+ FX_DATA_PARTITION_EXCEPTION(StretchHorzRunColumn);
+ 
++#if defined(__wasm_simd128__)
++// Precomputed gather plan for the SIMD run kernels in ContinueStretchHorz():
++// each group covers four consecutive destination columns of a 1- or 2-tap
++// run. `idx[t]` are i8x16.swizzle lane indices that pull the four columns'
++// tap-t source bytes out of the single 16-byte register loaded from the
++// run's source window at `src_byte_base`, arranged as four 32-bit lanes of
++// [blue, green, red, 0] (or [gray, 0, 0, 0] for 8bpp); an index of 0xFF
++// yields a zero byte. `weights[t]` are the four columns' tap-t weights in
++// matching lane order, copied verbatim from the run column plan. A group
++// whose four source windows fit one 16-byte load has `kind` == 1; one that
++// needs two (its indices then span 0..31, and the kernel combines
++// swizzle(lo, idx) with swizzle(hi, idx - 16), each register again yielding
++// zero for indices past it) has `kind` == 2; one that fits neither is
++// executed by the scalar loop (`kind` == 0).
++struct StretchHorzWasmGroup {
++  uint8_t idx[2][16];
++  uint32_t weights[2][4];
++  uint32_t src_byte_base;
++  uint32_t kind;
++};
++FX_DATA_PARTITION_EXCEPTION(StretchHorzWasmGroup);
++#endif
++
+ class CStretchEngine {
+  public:
+   static constexpr uint32_t kFixedPointBits = 16;
+@@ -184,6 +207,10 @@
+   };
+ 
+   void PlanHorzRuns();
++#if defined(__wasm_simd128__)
++  void BuildHorzWasmGroups(const StretchHorzRun& run,
++                           pdfium::span<const StretchHorzRunColumn> columns);
++#endif
+ 
+   const FXDIB_Format dest_format_;
+   const int dest_bpp_;
+@@ -209,6 +236,12 @@
+   WeightTable weight_table_;
+   DataVector<StretchHorzRun> horz_runs_;
+   DataVector<StretchHorzRunColumn> horz_run_columns_;
++#if defined(__wasm_simd128__)
++  // One byte per planned (taps != 0) run: 1 if the run's groups were emitted
++  // into `horz_wasm_groups_`, 0 if the run stays wholly on the scalar loops.
++  DataVector<uint8_t> horz_run_has_groups_;
++  DataVector<StretchHorzWasmGroup> horz_wasm_groups_;
++#endif
+ };
+ 
+ #endif  // CORE_FXGE_DIB_CSTRETCHENGINE_H_
