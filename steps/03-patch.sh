@@ -33,6 +33,7 @@ apply_patch "$PATCHES/png_predictor_perf.patch"
 # Includes the not-yet-uploaded run-planning follow-up (branch
 # stretch-bilinear-rows: 1/2-tap column runs + tiny-work bail-out).
 apply_patch "$PATCHES/stretch_engine_perf.patch"
+[ "$OS" != "emscripten" ] && apply_patch "$PATCHES/alpha_unroll_native.patch"
 apply_patch "$PATCHES/compositor_perf.patch"
 # Decode 3-component JPEGs straight to BGR (branch jpeg-decode-bgr, not yet
 # uploaded). Portable; helps native and wasm. The wasm jpeg_simd kernels

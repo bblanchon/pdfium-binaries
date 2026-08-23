@@ -1,0 +1,48 @@
+--- a/core/fxge/dib/cstretchengine.cpp
++++ b/core/fxge/dib/cstretchengine.cpp
+@@ -698,12 +698,39 @@
+           uint32_t dest_r = 0;
+           uint32_t dest_g = 0;
+           uint32_t dest_b = 0;
+-          for (auto [weight, src] : fxcrt::Zip(weights, window)) {
+-            uint32_t pixel_weight = weight * src.alpha / 255;
+-            dest_b += pixel_weight * src.blue;
+-            dest_g += pixel_weight * src.green;
+-            dest_r += pixel_weight * src.red;
+-            dest_a += pixel_weight;
++          // One and two taps dominate here exactly as in the opaque arm
++          // above; unrolled with the same tap-order summation, so the
++          // result is identical.
++          switch (weights.size()) {
++            case 1: {
++              const auto& src0 = window[0];
++              const uint32_t pw0 = weights[0] * src0.alpha / 255;
++              dest_b = pw0 * src0.blue;
++              dest_g = pw0 * src0.green;
++              dest_r = pw0 * src0.red;
++              dest_a = pw0;
++              break;
++            }
++            case 2: {
++              const auto& src0 = window[0];
++              const auto& src1 = window[1];
++              const uint32_t pw0 = weights[0] * src0.alpha / 255;
++              const uint32_t pw1 = weights[1] * src1.alpha / 255;
++              dest_b = pw0 * src0.blue + pw1 * src1.blue;
++              dest_g = pw0 * src0.green + pw1 * src1.green;
++              dest_r = pw0 * src0.red + pw1 * src1.red;
++              dest_a = pw0 + pw1;
++              break;
++            }
++            default:
++              for (auto [weight, src] : fxcrt::Zip(weights, window)) {
++                uint32_t pixel_weight = weight * src.alpha / 255;
++                dest_b += pixel_weight * src.blue;
++                dest_g += pixel_weight * src.green;
++                dest_r += pixel_weight * src.red;
++                dest_a += pixel_weight;
++              }
++              break;
+           }
+           dest_span[dest_span_index++] = PixelFromFixed(dest_b);
+           dest_span[dest_span_index++] = PixelFromFixed(dest_g);
