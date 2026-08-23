@@ -1,3 +1,5 @@
+name: macOS universal library
+
 on:
   workflow_call:
     inputs:
@@ -14,9 +16,14 @@ on:
         description: "The name of the artifact"
         value: ${{ jobs.build.outputs.artifact }}
 
+permissions: {}
+
 jobs:
   build:
+    name: Build
     runs-on: macos-latest
+    permissions:
+      actions: write # Download/upload workflow artifacts
     outputs:
       artifact: ${{ steps.init.outputs.artifact }}
     env:

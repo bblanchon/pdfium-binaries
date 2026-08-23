@@ -41,17 +41,23 @@ on:
         type: string
         required: false
         default: 3.1.72
+    secrets:
+      MUSL_URL:
+        description: Optional mirror of musl.cc
+        required: false
     outputs:
       artifact:
         description: "The name of the artifact"
         value: ${{ jobs.build.outputs.artifact }}
 
-permissions:
-  contents: read
-  actions: write
+permissions: {}
 
 jobs:
   build:
+    name: Build
+    permissions:
+      contents: read
+      actions: write # Upload workflow artifacts
     outputs:
       artifact: ${{ steps.init.outputs.artifact }}
     runs-on: ${{ (inputs.target_os == 'ios' || inputs.target_os == 'mac') && 'macos-15' || inputs.target_os == 'win' && 'windows-2022' || 'ubuntu-24.04' }}
@@ -75,10 +81,14 @@ jobs:
           [ "$PDFium_TARGET_OS" != "emscripten" ] && ARTIFACT="$ARTIFACT-$PDFium_TARGET_OS"
           [ "$PDFium_TARGET_ENVIRONMENT" != "" ] && ARTIFACT="$ARTIFACT-$PDFium_TARGET_ENVIRONMENT"
           ARTIFACT="$ARTIFACT-$PDFium_TARGET_CPU"
-          [ "${{inputs.is_debug}}" == "true" ] && ARTIFACT="$ARTIFACT-debug"
+          [ "$IS_DEBUG" == "true" ] && ARTIFACT="$ARTIFACT-debug"
           echo "artifact=$ARTIFACT" >> $GITHUB_OUTPUT
+        env:
+          IS_DEBUG: ${{ inputs.is_debug }}
       - name: Checkout this repo
         uses: actions/checkout@v6
+        with:
+          persist-credentials: false
       - name: Set environment variables
         run: steps/00-environment.sh
         shell: bash

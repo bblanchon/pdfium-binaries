@@ -59,11 +59,17 @@ on:
         required: false
         default: false
 
+permissions: {}
+
 jobs:
   build:
     name: Build
+    permissions:
+      contents: read
+      actions: write # Trigger reusable workflow and upload artifacts
     uses: ./.github/workflows/build.yml
-    secrets: inherit
+    secrets:
+      MUSL_URL: ${{ secrets.MUSL_URL }}
     with:
       branch: ${{ github.event.inputs.branch }}
       version: ${{ github.event.inputs.version }}

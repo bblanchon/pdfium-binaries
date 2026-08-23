@@ -65,7 +65,7 @@ case "$TARGET_OS" in
           ;;
       esac
 
-      [ -d "$MUSL_VERSION" ] || curl -L "$MUSL_URL/$MUSL_VERSION.tgz" | tar xz
+      [ -d "$MUSL_VERSION" ] || curl -sfL "$MUSL_URL/$MUSL_VERSION.tgz" | tar xz
       echo "$PWD/$MUSL_VERSION/bin" >> "$PATH_FILE"
 
       sudo apt-get install -y $PACKAGES
