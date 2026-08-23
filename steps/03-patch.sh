@@ -26,6 +26,39 @@ case "$BUILD_TYPE" in
 esac
 
 apply_patch "$PATCHES/public_headers.patch"
+# Under upstream review (CLs 155510, 155530, 155550). These use spans and
+# fxcrt::Zip() rather than raw pointers, so they carry no UNSAFE_BUFFERS;
+# drop each one once its CL lands.
+apply_patch "$PATCHES/png_predictor_perf.patch"
+# Includes the not-yet-uploaded run-planning follow-up (branch
+# stretch-bilinear-rows: 1/2-tap column runs + tiny-work bail-out).
+apply_patch "$PATCHES/stretch_engine_perf.patch"
+[ "$OS" != "emscripten" ] && apply_patch "$PATCHES/alpha_unroll_native.patch"
+apply_patch "$PATCHES/compositor_perf.patch"
+# Decode 3-component JPEGs straight to BGR (branch jpeg-decode-bgr, not yet
+# uploaded). Portable; helps native and wasm. The wasm jpeg_simd kernels
+# already dispatch on JCS_EXT_BGR, so no wasm-side change is needed.
+apply_patch "$PATCHES/jpeg_decode_bgr.patch"
+apply_patch "$PATCHES/swap_translate_perf.patch"
+apply_patch "$PATCHES/lcms_translate_memo.patch"
+apply_patch "$PATCHES/t4_psfunc_memo.patch"
+# Wasm-only. Both measure neutral on native (fillrect even regresses small
+# cache-resident fills there, where libc memset switches to non-temporal
+# stores), and only pay off under a runtime that neither vectorizes nor
+# elides the bounds checks itself. See PERFORMANCE.md.
+if [ "$OS" == "emscripten" ]; then
+  apply_patch "$PATCHES/glyph_blend_perf.patch"
+  apply_patch "$PATCHES/fillrect_memset_perf.patch"
+  # Only take effect when compiling with -msimd128 (wasm-standalone); the
+  # added code is guarded by __wasm_simd128__.
+  apply_patch "$PATCHES/stretch_engine_wasm_simd.patch"
+  # Swizzle kernels for the planned 1/2-tap runs (16B and 32B window
+  # variants, per-run gated) and for CopyRowToOpaqueBgra (all four
+  # BGR/BGRx -> BGRA/RGBA instantiations).
+  apply_patch "$PATCHES/stretch_horz_wasm_simd.patch"
+  apply_patch "$PATCHES/compositor_wasm_simd.patch"
+apply_patch "$PATCHES/c3_compositor_wasm_simd.patch"
+fi
 apply_patch "$PATCHES/clang_rt.patch" build
 
 [ "$ENABLE_V8" == "true" ] && apply_patch "$PATCHES/v8/pdfium.patch"
@@ -51,6 +84,14 @@ case "$OS" in
   emscripten)
     apply_patch "$PATCHES/wasm/pdfium.patch"
     apply_patch "$PATCHES/wasm/build.patch" build
+    apply_patch "$PATCHES/wasm/adler32_simd_wasm.patch"
+    apply_patch "$PATCHES/wasm/inflate_chunk_wasm.patch"
+    apply_patch "$PATCHES/wasm/jpeg_simd_wasm.patch"
+    mkdir -p third_party/libjpeg_turbo/simd/wasm
+    cp "$PATCHES/wasm/jpeg_simd/"*.c third_party/libjpeg_turbo/simd/wasm/
+    if [ "$TARGET_CPU" == "wasm-standalone" ]; then
+      apply_patch "$PATCHES/wasm/callbacks.patch"
+    fi
     if [ "$ENABLE_V8" == "true" ]; then
       apply_patch "$PATCHES/wasm/v8.patch" v8
     fi

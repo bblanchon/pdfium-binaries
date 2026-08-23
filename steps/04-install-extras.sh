@@ -6,6 +6,7 @@ SOURCE="${PDFium_SOURCE_DIR:-pdfium}"
 TARGET_OS=${PDFium_TARGET_OS:?}
 TARGET_ENVIRONMENT=${PDFium_TARGET_ENVIRONMENT:-}
 TARGET_CPU=${PDFium_TARGET_CPU:?}
+PATCHES="$PWD/patches"
 
 pushd "$SOURCE"
 
@@ -47,10 +48,18 @@ case "$TARGET_OS" in
       git clone https://github.com/emscripten-core/emsdk.git
     fi
     cd emsdk
-    ./emsdk install ${EMSDK_VERSION:-latest}
-    ./emsdk activate ${EMSDK_VERSION:-latest}
+    ./emsdk install ${EMSDK_VERSION:-6.0.0}
+    ./emsdk activate ${EMSDK_VERSION:-6.0.0}
     echo "$PWD/upstream/emscripten" >> "$PATH_FILE"
     echo "$PWD/upstream/bin" >> "$PATH_FILE"
+
+    if [ "$TARGET_CPU" == "wasm-standalone" ]; then
+      pushd "$PWD/upstream/emscripten"
+      patch -p1 --forward < "$PATCHES/wasm/emscripten.patch" || true
+      rm -Rf cache
+      popd
+    fi
+
     popd
     ;;
 esac

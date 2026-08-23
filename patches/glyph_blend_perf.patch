@@ -1,0 +1,162 @@
+--- a/core/fxge/cfx_renderdevice.cpp
++++ b/core/fxge/cfx_renderdevice.cpp
+@@ -147,30 +147,39 @@
+   return back_alpha + src_alpha - back_alpha * src_alpha / 255;
+ }
+ 
+-void ApplyAlpha(pdfium::span<uint8_t, 3> dest,
+-                const FX_BGRA_STRUCT<uint8_t>& bgra,
+-                int alpha) {
+-  dest[0] = AlphaMerge(dest[0], bgra.blue, alpha);
+-  dest[1] = AlphaMerge(dest[1], bgra.green, alpha);
+-  dest[2] = AlphaMerge(dest[2], bgra.red, alpha);
++// The per-pixel helpers below run on raw pointers: DrawNormalTextHelper
++// validates the destination row bounds once per row, and per-pixel
++// bounds-checked span constructions dominated glyph blending otherwise.
++void ApplyAlpha(uint8_t* dest, const FX_BGRA_STRUCT<uint8_t>& bgra, int alpha) {
++  UNSAFE_TODO({
++    dest[0] = AlphaMerge(dest[0], bgra.blue, alpha);
++    dest[1] = AlphaMerge(dest[1], bgra.green, alpha);
++    dest[2] = AlphaMerge(dest[2], bgra.red, alpha);
++  });
+ }
+ 
+ void ApplyDestAlpha(uint8_t back_alpha,
+                     int src_alpha,
+                     const FX_BGRA_STRUCT<uint8_t>& bgra,
+-                    pdfium::span<uint8_t, 4> dest) {
++                    uint8_t* dest) {
+   uint8_t dest_alpha = CalculateDestAlpha(back_alpha, src_alpha);
+-  ApplyAlpha(dest.first<3u>(), bgra, src_alpha * 255 / dest_alpha);
+-  dest[3] = dest_alpha;
++  ApplyAlpha(dest, bgra, src_alpha * 255 / dest_alpha);
++  UNSAFE_TODO(dest[3] = dest_alpha;);
+ }
+ 
+ void NormalizeArgb(int src_value,
+                    const FX_BGRA_STRUCT<uint8_t>& bgra,
+-                   pdfium::span<uint8_t, 4> dest,
++                   uint8_t* dest,
+                    int src_alpha) {
+-  uint8_t back_alpha = dest[3];
++  uint8_t back_alpha = UNSAFE_TODO(dest[3]);
+   if (back_alpha == 0) {
+-    FXARGB_SetDIB(dest, ArgbEncode(src_alpha, bgra.red, bgra.green, bgra.blue));
++    // Equivalent to FXARGB_SetDIB(dest, ArgbEncode(src_alpha, ...)).
++    UNSAFE_TODO({
++      dest[0] = bgra.blue;
++      dest[1] = bgra.green;
++      dest[2] = bgra.red;
++      dest[3] = static_cast<uint8_t>(src_alpha);
++    });
+   } else if (src_alpha != 0) {
+     ApplyDestAlpha(back_alpha, src_alpha, bgra, dest);
+   }
+@@ -179,9 +188,9 @@
+ void NormalizeDest(bool has_alpha,
+                    int src_value,
+                    const FX_BGRA_STRUCT<uint8_t>& bgra,
+-                   pdfium::span<uint8_t> dest) {
++                   uint8_t* dest) {
+   if (has_alpha) {
+-    NormalizeArgb(src_value, bgra, dest.first<4u>(),
++    NormalizeArgb(src_value, bgra, dest,
+                   CalcAlpha(TextGammaAdjust(src_value), bgra.alpha));
+     return;
+   }
+@@ -190,27 +199,26 @@
+     return;
+   }
+ 
+-  ApplyAlpha(dest.first<3u>(), bgra, src_alpha);
++  ApplyAlpha(dest, bgra, src_alpha);
+ }
+ 
+ void NormalizeSrc(bool has_alpha,
+                   int src_value,
+                   const FX_BGRA_STRUCT<uint8_t>& bgra,
+-                  pdfium::span<uint8_t> dest) {
++                  uint8_t* dest) {
+   if (!has_alpha) {
+-    ApplyAlpha(dest.first<3u>(), bgra,
+-               CalcAlpha(TextGammaAdjust(src_value), bgra.alpha));
++    ApplyAlpha(dest, bgra, CalcAlpha(TextGammaAdjust(src_value), bgra.alpha));
+     return;
+   }
+   int src_alpha = CalcAlpha(TextGammaAdjust(src_value), bgra.alpha);
+   if (src_alpha != 0) {
+-    NormalizeArgb(src_value, bgra, dest.first<4u>(), src_alpha);
++    NormalizeArgb(src_value, bgra, dest, src_alpha);
+   }
+ }
+ 
+-void SetAlpha(bool has_alpha, pdfium::span<uint8_t> alpha) {
++void SetAlpha(bool has_alpha, uint8_t* alpha) {
+   if (has_alpha) {
+-    alpha[3] = 255;
++    UNSAFE_TODO(alpha[3] = 255;);
+   }
+ }
+ 
+@@ -240,8 +248,11 @@
+         pGlyph->GetScanline(row)
+             .subspan(static_cast<size_t>((start_col - left) * 3))
+             .data();
+-    auto dest_span = bitmap->GetWritableScanline(dest_row).subspan(
++    auto dest_row_span = bitmap->GetWritableScanline(dest_row).subspan(
+         static_cast<size_t>(start_col * bytes_per_pixel));
++    CHECK_GE(dest_row_span.size(),
++             static_cast<size_t>(end_col - start_col) * bytes_per_pixel);
++    uint8_t* dest_span = dest_row_span.data();
+     if (x_subpixel == 0) {
+       for (int col = start_col; col < end_col; ++col) {
+         if (normalize) {
+@@ -251,8 +262,10 @@
+           MergeGammaAdjustRgb(&src_scan[0], bgra, &dest_span[0]);
+           SetAlpha(has_alpha, dest_span);
+         }
+-        UNSAFE_TODO(src_scan += 3;);
+-        dest_span = dest_span.subspan(bytes_per_pixel);
++        UNSAFE_TODO({
++          src_scan += 3;
++          dest_span += bytes_per_pixel;
++        });
+       }
+       continue;
+     }
+@@ -271,7 +284,7 @@
+           SetAlpha(has_alpha, dest_span);
+         }
+         src_scan += 3;
+-        dest_span = dest_span.subspan(bytes_per_pixel);
++        dest_span += bytes_per_pixel;
+         for (int col = start_col + 1; col < end_col; ++col) {
+           if (normalize) {
+             int src_value = AverageRgb(&src_scan[-1]);
+@@ -281,7 +294,7 @@
+             SetAlpha(has_alpha, dest_span);
+           }
+           src_scan += 3;
+-          dest_span = dest_span.subspan(bytes_per_pixel);
++          dest_span += bytes_per_pixel;
+         }
+         continue;
+       }
+@@ -298,7 +311,7 @@
+         SetAlpha(has_alpha, dest_span);
+       }
+       src_scan += 3;
+-      dest_span = dest_span.subspan(bytes_per_pixel);
++      dest_span += bytes_per_pixel;
+       for (int col = start_col + 1; col < end_col; ++col) {
+         if (normalize) {
+           int src_value = AverageRgb(&src_scan[-2]);
+@@ -308,7 +321,7 @@
+           SetAlpha(has_alpha, dest_span);
+         }
+         src_scan += 3;
+-        dest_span = dest_span.subspan(bytes_per_pixel);
++        dest_span += bytes_per_pixel;
+       }
+     });
+   }
