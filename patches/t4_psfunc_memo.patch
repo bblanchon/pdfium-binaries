@@ -1,0 +1,125 @@
+--- a/core/fpdfapi/page/cpdf_psfunc.cpp
++++ b/core/fpdfapi/page/cpdf_psfunc.cpp
+@@ -6,9 +6,19 @@
+ 
+ #include "core/fpdfapi/page/cpdf_psfunc.h"
+ 
++#include <string.h>
++
+ #include "core/fpdfapi/parser/cpdf_stream.h"
+ #include "core/fpdfapi/parser/cpdf_stream_acc.h"
+ 
++namespace {
++
++// 2^14 entries * 32 bytes = 512 KiB per function, lazily allocated.
++constexpr size_t kMemoSize = size_t{1} << 14;
++constexpr uint32_t kMemoProbes = 8;
++
++}  // namespace
++
+ CPDF_PSFunc::CPDF_PSFunc() : CPDF_Function(Type::kType4PostScript) {}
+ 
+ CPDF_PSFunc::~CPDF_PSFunc() = default;
+@@ -20,18 +30,60 @@
+   return ps_.Parse(pAcc->GetSpan());
+ }
+ 
++bool CPDF_PSFunc::MemoEnabled() const {
++  return inputs_ <= 4 && outputs_ <= 8;
++}
++
+ bool CPDF_PSFunc::v_Call(pdfium::span<const float> inputs,
+                          pdfium::span<float> results) const {
++  MemoEntry* insert_at = nullptr;
++  std::array<uint32_t, 4> in_bits = {};
++  if (MemoEnabled()) {
++    uint64_t h = 0xcbf29ce484222325ull;
++    for (uint32_t i = 0; i < inputs_; i++) {
++      memcpy(&in_bits[i], &inputs[i], sizeof(uint32_t));
++      h = (h ^ in_bits[i]) * 0x100000001b3ull;
++    }
++    if (memo_.empty()) {
++      memo_.resize(kMemoSize);
++    }
++    for (uint32_t probe = 0; probe < kMemoProbes; ++probe) {
++      MemoEntry& e = memo_[(h + probe) & (kMemoSize - 1)];
++      if (e.used == 0) {
++        insert_at = &e;
++        break;
++      }
++      if (e.used == 1 + outputs_ && e.in_bits == in_bits) {
++        if (!e.ok) {
++          return false;
++        }
++        for (uint32_t i = 0; i < outputs_; i++) {
++          results[i] = e.out[i];
++        }
++        return true;
++      }
++    }
++  }
+   ps_.Reset();
+   for (uint32_t i = 0; i < inputs_; i++) {
+     ps_.Push(inputs[i]);
+   }
+   ps_.Execute();
+-  if (ps_.GetStackSize() < outputs_) {
+-    return false;
++  const bool ok = ps_.GetStackSize() >= outputs_;
++  if (ok) {
++    for (uint32_t i = 0; i < outputs_; i++) {
++      results[outputs_ - i - 1] = ps_.Pop();
++    }
+   }
+-  for (uint32_t i = 0; i < outputs_; i++) {
+-    results[outputs_ - i - 1] = ps_.Pop();
++  if (insert_at) {
++    insert_at->in_bits = in_bits;
++    insert_at->ok = ok;
++    if (ok) {
++      for (uint32_t i = 0; i < outputs_; i++) {
++        insert_at->out[i] = results[i];
++      }
++    }
++    insert_at->used = 1 + outputs_;
+   }
+-  return true;
++  return ok;
+ }
+--- a/core/fpdfapi/page/cpdf_psfunc.h
++++ b/core/fpdfapi/page/cpdf_psfunc.h
+@@ -7,6 +7,11 @@
+ #ifndef CORE_FPDFAPI_PAGE_CPDF_PSFUNC_H_
+ #define CORE_FPDFAPI_PAGE_CPDF_PSFUNC_H_
+ 
++#include <stdint.h>
++
++#include <array>
++#include <vector>
++
+ #include "core/fpdfapi/page/cpdf_function.h"
+ #include "core/fpdfapi/page/cpdf_psengine.h"
+ 
+@@ -23,7 +28,22 @@
+               pdfium::span<float> results) const override;
+ 
+  private:
++  // Exact-match memo for v_Call(). A parsed program is a pure function of
++  // its pushed inputs, so the raw input bit patterns fully determine the
++  // outputs; a hit replays exactly what Execute() produced for the same
++  // inputs. Bounded: engages for at most 4 inputs and 8 outputs, insertion
++  // stops when the probe window fills, and the table is lazily allocated.
++  // The tail documents evaluate the same tuples millions of times.
++  struct MemoEntry {
++    std::array<uint32_t, 4> in_bits;
++    std::array<float, 8> out;
++    uint8_t used = 0;  // 0 = empty; else 1 + number of outputs
++    bool ok = false;
++  };
++  bool MemoEnabled() const;
++
+   mutable CPDF_PSEngine ps_;  // Pre-initialized scratch space for v_Call().
++  mutable std::vector<MemoEntry> memo_;
+ };
+ 
+ #endif  // CORE_FPDFAPI_PAGE_CPDF_PSFUNC_H_

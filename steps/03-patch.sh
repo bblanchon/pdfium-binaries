@@ -40,6 +40,7 @@ apply_patch "$PATCHES/compositor_perf.patch"
 apply_patch "$PATCHES/jpeg_decode_bgr.patch"
 apply_patch "$PATCHES/swap_translate_perf.patch"
 apply_patch "$PATCHES/lcms_translate_memo.patch"
+apply_patch "$PATCHES/t4_psfunc_memo.patch"
 # Wasm-only. Both measure neutral on native (fillrect even regresses small
 # cache-resident fills there, where libc memset switches to non-temporal
 # stores), and only pay off under a runtime that neither vectorizes nor
