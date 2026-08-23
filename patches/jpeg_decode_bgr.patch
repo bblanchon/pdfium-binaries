@@ -1,8 +1,16 @@
 diff --git a/core/fpdfapi/page/cpdf_dib.cpp b/core/fpdfapi/page/cpdf_dib.cpp
-index 925f22d09..6db61a59d 100644
+index 925f22d09..1ebe3c2e1 100644
 --- a/core/fpdfapi/page/cpdf_dib.cpp
 +++ b/core/fpdfapi/page/cpdf_dib.cpp
-@@ -500,6 +500,21 @@ CPDF_DIB::LoadState CPDF_DIB::CreateDecoder(uint8_t resolution_levels_to_skip) {
+@@ -16,6 +16,7 @@
+ 
+ #include "core/fpdfapi/page/cpdf_colorspace.h"
+ #include "core/fpdfapi/page/cpdf_docpagedata.h"
++#include "core/fpdfapi/page/cpdf_iccprofile.h"
+ #include "core/fpdfapi/page/cpdf_image.h"
+ #include "core/fpdfapi/page/cpdf_imageobject.h"
+ #include "core/fpdfapi/page/cpdf_indexedcs.h"
+@@ -500,6 +501,39 @@ CPDF_DIB::LoadState CPDF_DIB::CreateDecoder(uint8_t resolution_levels_to_skip) {
    return LoadState::kSuccess;
  }
  
@@ -12,19 +20,37 @@ index 925f22d09..6db61a59d 100644
 +// RGB-to-BGR swap, which a BGR decode makes a pass-through:
 +// - a default Decode array (no per-component decode arithmetic),
 +// - no color key mask (its comparisons read components in R,G,B order),
-+// - plain DeviceRGB or CalRGB (both translate as the bare swap; every
-+//   other family goes through CPDF_ColorSpace::TranslateImageLine()),
++// - a color space whose whole translation is the bare swap: DeviceRGB,
++//   CalRGB (both translate as the bare swap), or ICCBased with an sRGB
++//   profile (whose TranslateImageLine() is exactly fxcodec::ReverseRGB());
++//   every other family goes through a real conversion,
 +// - 3 components at 8 bpc (the swap case).
 +bool CPDF_DIB::ShouldDecodeJpegToBgr() const {
-+  return default_decode_ && !color_key_ && components_ == 3 && bpc_ == 8 &&
-+         (family_ == CPDF_ColorSpace::Family::kDeviceRGB ||
-+          family_ == CPDF_ColorSpace::Family::kCalRGB);
++  if (!default_decode_ || color_key_ || components_ != 3 || bpc_ != 8) {
++    return false;
++  }
++  if (family_ == CPDF_ColorSpace::Family::kDeviceRGB ||
++      family_ == CPDF_ColorSpace::Family::kCalRGB) {
++    return true;
++  }
++  // ICCBased-sRGB: TranslateScanline24bppDefaultDecode() reaches
++  // CPDF_ICCBasedCS::TranslateImageLine() only when the component counts
++  // match (otherwise it performs no translation at all), and for an sRGB
++  // profile that call is exactly the RGB-to-BGR swap. Unsupported profiles
++  // fall to the alternate color space's float conversion, which is not the
++  // bare swap - not captured.
++  if (family_ == CPDF_ColorSpace::Family::kICCBased && color_space_ &&
++      color_space_->ComponentCount() == 3) {
++    RetainPtr<CPDF_IccProfile> profile = color_space_->GetIccProfile();
++    return profile && profile->IsSRGB();
++  }
++  return false;
 +}
 +
  bool CPDF_DIB::CreateDCTDecoder(pdfium::span<const uint8_t> src_span,
                                  const CPDF_Dictionary* pParams,
                                  uint8_t resolution_levels_to_skip) {
-@@ -510,7 +525,8 @@ bool CPDF_DIB::CreateDCTDecoder(pdfium::span<const uint8_t> src_span,
+@@ -510,7 +544,8 @@ bool CPDF_DIB::CreateDCTDecoder(pdfium::span<const uint8_t> src_span,
                                 << std::min<int>(resolution_levels_to_skip, 3);
    decoder_ = JpegModule::CreateDecoder(
        src_span, GetWidth(), GetHeight(), components_,
@@ -34,7 +60,7 @@ index 925f22d09..6db61a59d 100644
    if (decoder_) {
      // Adopt the decoder's dimensions. libjpeg may have decoded at a reduced
      // size (scale_denom above), and its dimensions are authoritative in any
-@@ -541,7 +557,7 @@ bool CPDF_DIB::CreateDCTDecoder(pdfium::span<const uint8_t> src_span,
+@@ -541,7 +576,7 @@ bool CPDF_DIB::CreateDCTDecoder(pdfium::span<const uint8_t> src_span,
      bpc_ = info.bits_per_components;
      decoder_ = JpegModule::CreateDecoder(src_span, GetWidth(), GetHeight(),
                                           components_, info.color_transform,
@@ -43,7 +69,7 @@ index 925f22d09..6db61a59d 100644
      if (decoder_) {
        SetWidth(decoder_->GetWidth());
        SetHeight(decoder_->GetHeight());
-@@ -598,7 +614,8 @@ bool CPDF_DIB::CreateDCTDecoder(pdfium::span<const uint8_t> src_span,
+@@ -598,7 +633,8 @@ bool CPDF_DIB::CreateDCTDecoder(pdfium::span<const uint8_t> src_span,
    bpc_ = info.bits_per_components;
    decoder_ =
        JpegModule::CreateDecoder(src_span, GetWidth(), GetHeight(), components_,
@@ -53,7 +79,7 @@ index 925f22d09..6db61a59d 100644
    if (decoder_) {
      SetWidth(decoder_->GetWidth());
      SetHeight(decoder_->GetHeight());
-@@ -1231,9 +1248,18 @@ pdfium::span<const uint8_t> CPDF_DIB::GetScanline(int line) const {
+@@ -1231,9 +1267,18 @@ pdfium::span<const uint8_t> CPDF_DIB::GetScanline(int line) const {
      }
    }
    if (color_space_) {
