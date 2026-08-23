@@ -1,7 +1,7 @@
-diff --git a/BUILD.gn b/BUILD.gn
+diff --git a/third_party/libjpeg_turbo/BUILD.gn b/third_party/libjpeg_turbo/BUILD.gn
 index b423384..b968e59 100644
---- a/BUILD.gn
-+++ b/BUILD.gn
+--- a/third_party/libjpeg_turbo/BUILD.gn
++++ b/third_party/libjpeg_turbo/BUILD.gn
 @@ -168,6 +168,13 @@ if (current_cpu == "x86" || current_cpu == "x64") {
    }
  }

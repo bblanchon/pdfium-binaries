@@ -1,6 +1,8 @@
+diff --git a/core/fxge/dib/cstretchengine.cpp b/core/fxge/dib/cstretchengine.cpp
+index f91f1a1f3..61173206b 100644
 --- a/core/fxge/dib/cstretchengine.cpp
 +++ b/core/fxge/dib/cstretchengine.cpp
-@@ -698,12 +698,39 @@
+@@ -698,12 +698,39 @@ bool CStretchEngine::ContinueStretchHorz(PauseIndicatorIface* pPause) {
            uint32_t dest_r = 0;
            uint32_t dest_g = 0;
            uint32_t dest_b = 0;

@@ -1,10 +1,11 @@
+diff --git a/core/fxge/dib/cstretchengine.cpp b/core/fxge/dib/cstretchengine.cpp
+index 10622154f..f91f1a1f3 100644
 --- a/core/fxge/dib/cstretchengine.cpp
 +++ b/core/fxge/dib/cstretchengine.cpp
-@@ -13,9 +13,13 @@
- #include <utility>
+@@ -14,9 +14,12 @@
  
  #include "core/fxcrt/check.h"
-+#include "core/fxcrt/check_op.h"
+ #include "core/fxcrt/check_op.h"
 +#include "core/fxcrt/fx_2d_size.h"
  #include "core/fxcrt/fx_safe_types.h"
  #include "core/fxcrt/fx_system.h"
@@ -14,7 +15,7 @@
  #include "core/fxge/calculate_pitch.h"
  #include "core/fxge/dib/cfx_dibbase.h"
  #include "core/fxge/dib/cfx_dibitmap.h"
-@@ -113,12 +117,12 @@
+@@ -114,12 +117,12 @@ bool CStretchEngine::WeightTable::CalculateWeights(
            // Always room for one weight per size calculation.
            pixel_weights.weights_[0] = kFixedPointOne;
          } else {
@@ -33,7 +34,7 @@
          }
        } else {
          int pixel_pos = static_cast<int>(floor(src_pos));
-@@ -140,7 +144,10 @@
+@@ -141,7 +144,10 @@ bool CStretchEngine::WeightTable::CalculateWeights(
      start_i = std::max(start_i, src_min);
      end_i = std::min(end_i, src_max - 1);
      if (start_i > end_i) {
@@ -45,16 +46,7 @@
        pixel_weights.SetStartEnd(start_i, start_i, weight_count);
        continue;
      }
-@@ -175,7 +182,7 @@
- 
- const CStretchEngine::PixelWeight* CStretchEngine::WeightTable::GetPixelWeight(
-     int pixel) const {
--  DCHECK(pixel >= dest_min_);
-+  DCHECK_GE(pixel, dest_min_);
-   return reinterpret_cast<const PixelWeight*>(
-       &weight_tables_[(pixel - dest_min_) * item_size_bytes_]);
- }
-@@ -311,9 +318,112 @@
+@@ -312,11 +318,114 @@ bool CStretchEngine::StartStretchHorz() {
            src_clip_.left, src_clip_.right, resample_options_)) {
      return false;
    }
@@ -62,8 +54,8 @@
    cur_row_ = src_clip_.top;
    state_ = State::kHorizontal;
    return true;
-+}
-+
+ }
+ 
 +void CStretchEngine::PlanHorzRuns() {
 +  horz_runs_.clear();
 +  horz_run_columns_.clear();
@@ -164,10 +156,12 @@
 +    }
 +    col += static_cast<int>(run.length);
 +  }
- }
- 
++}
++
  bool CStretchEngine::ContinueStretchHorz(PauseIndicatorIface* pPause) {
-@@ -324,7 +434,7 @@
+   if (!dest_width_) {
+     return false;
+@@ -325,7 +434,7 @@ bool CStretchEngine::ContinueStretchHorz(PauseIndicatorIface* pPause) {
      return true;
    }
  
@@ -176,7 +170,7 @@
    static const int kStrechPauseRows = 10;
    int rows_to_go = kStrechPauseRows;
    for (; cur_row_ < src_clip_.bottom; ++cur_row_) {
-@@ -336,7 +446,7 @@
+@@ -337,7 +446,7 @@ bool CStretchEngine::ContinueStretchHorz(PauseIndicatorIface* pPause) {
        rows_to_go = kStrechPauseRows;
      }
  
@@ -185,7 +179,7 @@
      pdfium::span<uint8_t> dest_span = inter_buf_.subspan(
          (cur_row_ - src_clip_.top) * inter_pitch_, inter_pitch_);
      size_t dest_span_index = 0;
-@@ -346,51 +456,103 @@
+@@ -347,51 +456,103 @@ bool CStretchEngine::ContinueStretchHorz(PauseIndicatorIface* pPause) {
        case TransformMethod::k1BppToManyBpp: {
          for (int col = dest_clip_.left; col < dest_clip_.right; ++col) {
            const PixelWeight* pWeights = weight_table_.GetPixelWeight(col);
@@ -245,8 +239,7 @@
 +            dest_span_index += run.length;
 +            col += static_cast<int>(run.length);
 +            continue;
-           }
--          dest_span[dest_span_index++] = PixelFromFixed(dest_a);
++          }
 +          const int run_end = col + static_cast<int>(run.length);
 +          for (; col < run_end; ++col) {
 +            const PixelWeight* pWeights = weight_table_.GetPixelWeight(col);
@@ -275,7 +268,8 @@
 +                break;
 +            }
 +            dest_span[dest_span_index++] = PixelFromFixed(dest_a);
-+          }
+           }
+-          dest_span[dest_span_index++] = PixelFromFixed(dest_a);
          }
          break;
        }
@@ -317,7 +311,7 @@
            }
            dest_span[dest_span_index++] = PixelFromFixed(dest_b);
            dest_span[dest_span_index++] = PixelFromFixed(dest_g);
-@@ -399,45 +561,149 @@
+@@ -400,45 +561,149 @@ bool CStretchEngine::ContinueStretchHorz(PauseIndicatorIface* pPause) {
          break;
        }
        case TransformMethod::kManyBpptoManyBpp: {
@@ -495,7 +489,7 @@
            }
            dest_span[dest_span_index++] = PixelFromFixed(dest_b);
            dest_span[dest_span_index++] = PixelFromFixed(dest_g);
-@@ -465,89 +731,129 @@
+@@ -466,89 +731,129 @@ void CStretchEngine::StretchVert() {
      return;
    }
  
@@ -580,17 +574,17 @@
 +        if (DestBpp == 1) {
 +          for (auto [dest, acc] : fxcrt::Zip(dest_row, accum_span)) {
 +            dest = PixelFromFixed(acc);
-           }
--          UNSAFE_TODO({
--            *dest_scan = PixelFromFixed(dest_a);
--            dest_scan += DestBpp;
--          });
++          }
 +        } else {
 +          size_t offset = 0;
 +          for (int col = 0; col < dest_cols; ++col) {
 +            dest_row[offset] = PixelFromFixed(accum_span[offset]);
 +            offset += DestBpp;
-+          }
+           }
+-          UNSAFE_TODO({
+-            *dest_scan = PixelFromFixed(dest_a);
+-            dest_scan += DestBpp;
+-          });
          }
          break;
        }
@@ -615,13 +609,7 @@
 +        if (DestBpp == 3) {
 +          for (auto [dest, acc] : fxcrt::Zip(dest_row, accum_span)) {
 +            dest = PixelFromFixed(acc);
-           }
--          UNSAFE_TODO({
--            dest_scan[0] = PixelFromFixed(dest_b);
--            dest_scan[1] = PixelFromFixed(dest_g);
--            dest_scan[2] = PixelFromFixed(dest_r);
--            dest_scan += DestBpp;
--          });
++          }
 +        } else {
 +          CHECK_EQ(DestBpp, 4);
 +          auto dest_pixels =
@@ -633,7 +621,13 @@
 +            dest.blue = PixelFromFixed(acc.blue);
 +            dest.green = PixelFromFixed(acc.green);
 +            dest.red = PixelFromFixed(acc.red);
-+          }
+           }
+-          UNSAFE_TODO({
+-            dest_scan[0] = PixelFromFixed(dest_b);
+-            dest_scan[1] = PixelFromFixed(dest_g);
+-            dest_scan[2] = PixelFromFixed(dest_r);
+-            dest_scan += DestBpp;
+-          });
          }
          break;
        }
@@ -656,6 +650,16 @@
 -            dest_g += pixel_weight * src_pixel[1];
 -            dest_r += pixel_weight * src_pixel[2];
 -            dest_a += pixel_weight * src_pixel[3];
+-          }
+-          if (dest_a) {
+-            int r = static_cast<uint32_t>(dest_r) * 255 / dest_a;
+-            int g = static_cast<uint32_t>(dest_g) * 255 / dest_a;
+-            int b = static_cast<uint32_t>(dest_b) * 255 / dest_a;
+-            UNSAFE_TODO({
+-              dest_scan[0] = std::clamp(b, 0, 255);
+-              dest_scan[1] = std::clamp(g, 0, 255);
+-              dest_scan[2] = std::clamp(r, 0, 255);
+-            });
 +        CHECK(has_alpha_);
 +        CHECK_EQ(DestBpp, 4);
 +        auto dest_pixels =
@@ -671,16 +675,6 @@
 +            dest.green = std::clamp(g, 0, 255);
 +            dest.red = std::clamp(r, 0, 255);
            }
--          if (dest_a) {
--            int r = static_cast<uint32_t>(dest_r) * 255 / dest_a;
--            int g = static_cast<uint32_t>(dest_g) * 255 / dest_a;
--            int b = static_cast<uint32_t>(dest_b) * 255 / dest_a;
--            UNSAFE_TODO({
--              dest_scan[0] = std::clamp(b, 0, 255);
--              dest_scan[1] = std::clamp(g, 0, 255);
--              dest_scan[2] = std::clamp(r, 0, 255);
--            });
--          }
 -          UNSAFE_TODO({
 -            dest_scan[3] = PixelFromFixed(dest_a);
 -            dest_scan += DestBpp;
@@ -689,6 +683,8 @@
          }
          break;
        }
+diff --git a/core/fxge/dib/cstretchengine.h b/core/fxge/dib/cstretchengine.h
+index e56411bd9..3db31e1a2 100644
 --- a/core/fxge/dib/cstretchengine.h
 +++ b/core/fxge/dib/cstretchengine.h
 @@ -13,6 +13,7 @@
@@ -699,7 +695,7 @@
  #include "core/fxcrt/fx_system.h"
  #include "core/fxcrt/raw_span.h"
  #include "core/fxcrt/retain_ptr.h"
-@@ -23,6 +24,35 @@
+@@ -23,6 +24,35 @@ class CFX_DIBBase;
  class PauseIndicatorIface;
  class ScanlineComposerIface;
  
@@ -735,7 +731,7 @@
  class CStretchEngine {
   public:
    static constexpr uint32_t kFixedPointBits = 16;
-@@ -54,18 +84,12 @@
+@@ -54,18 +84,12 @@ class CStretchEngine {
  
    struct PixelWeight {
      void SetStartEnd(int src_start, int src_end, size_t weight_count) {
@@ -755,7 +751,7 @@
      void SetWeightForPosition(int position, uint32_t weight) {
        CHECK_GE(position, src_start_);
        CHECK_LE(position, src_end_);
-@@ -73,6 +97,23 @@
+@@ -73,6 +97,23 @@ class CStretchEngine {
        UNSAFE_BUFFERS(weights_[position - src_start_] = weight);
      }
  
@@ -779,7 +775,7 @@
      // NOTE: relies on defined behaviour for unsigned overflow to
      // decrement the previous position, as needed.
      void RemoveLastWeightAndAdjust(uint32_t weight_change) {
-@@ -142,6 +183,8 @@
+@@ -142,6 +183,8 @@ class CStretchEngine {
      kManyBpptoManyBppWithAlpha
    };
  
@@ -788,7 +784,7 @@
    const FXDIB_Format dest_format_;
    const int dest_bpp_;
    const int src_bpp_;
-@@ -164,6 +207,8 @@
+@@ -164,6 +207,8 @@ class CStretchEngine {
    State state_ = State::kInitial;
    int cur_row_ = 0;
    WeightTable weight_table_;
@@ -797,3 +793,167 @@
  };
  
  #endif  // CORE_FXGE_DIB_CSTRETCHENGINE_H_
+diff --git a/core/fxge/dib/cstretchengine_unittest.cpp b/core/fxge/dib/cstretchengine_unittest.cpp
+index d15965bba..9312c5f3d 100644
+--- a/core/fxge/dib/cstretchengine_unittest.cpp
++++ b/core/fxge/dib/cstretchengine_unittest.cpp
+@@ -4,13 +4,18 @@
+ 
+ #include "core/fxge/dib/cstretchengine.h"
+ 
++#include <algorithm>
++#include <map>
+ #include <utility>
++#include <vector>
+ 
+ #include "core/fpdfapi/page/cpdf_dib.h"
+ #include "core/fpdfapi/parser/cpdf_dictionary.h"
+ #include "core/fpdfapi/parser/cpdf_number.h"
+ #include "core/fpdfapi/parser/cpdf_stream.h"
++#include "core/fxge/dib/cfx_dibitmap.h"
+ #include "core/fxge/dib/fx_dib.h"
++#include "core/fxge/dib/scanlinecomposer_iface.h"
+ #include "testing/gtest/include/gtest/gtest.h"
+ 
+ namespace {
+@@ -19,10 +24,41 @@ namespace {
+ constexpr uint32_t kTooBigSrcLen = 20;
+ constexpr uint32_t kTooBigDestLen = 32 * 1024 * 1024 + 1;
+ 
++// Captures the scanlines StretchVert() composes, so a test can tell a row that
++// was zeroed apart from a copy of the row above it. StretchVert() composes into
++// its caller through this interface only, so nothing test-only is needed to
++// reach the output.
++class ScanlineRecorder final : public ScanlineComposerIface {
++ public:
++  void ComposeScanline(int line,
++                       pdfium::span<const uint8_t> scanline) override {
++    rows_[line] = std::vector<uint8_t>(scanline.begin(), scanline.end());
++  }
++
++  bool SetInfo(int width,
++               int height,
++               FXDIB_Format src_format,
++               DataVector<uint32_t> src_palette) override {
++    return true;
++  }
++
++  bool HasRow(int line) const { return rows_.find(line) != rows_.end(); }
++
++  bool RowIsAllZero(int line) const {
++    auto it = rows_.find(line);
++    CHECK(it != rows_.end());
++    return std::ranges::all_of(it->second,
++                               [](uint8_t byte) { return byte == 0; });
++  }
++
++ private:
++  std::map<int, std::vector<uint8_t>> rows_;
++};
++
+ uint32_t PixelWeightSum(const CStretchEngine::PixelWeight* weights) {
+   uint32_t sum = 0;
+-  for (int i = weights->src_start_; i <= weights->src_end_; ++i) {
+-    sum += weights->GetWeightForPosition(i);
++  for (uint32_t weight : weights->GetWeights()) {
++    sum += weight;
+   }
+   return sum;
+ }
+@@ -137,6 +173,96 @@ TEST(CStretchEngine, ZeroLengthSrcNoSmoothingBilinear) {
+   ASSERT_TRUE(table.CalculateWeights(100, 0, 100, 0, 0, 0, options));
+ }
+ 
++// A source clip box that is empty in x leaves `src_max` at 0, so the
++// area-average branch clamps a destination pixel's tap position from above
++// against `src_max - 1`, i.e. -1. Regression test for storing that negative
++// position; the degenerate entry must contribute no weight.
++TEST(CStretchEngine, EmptySourceRangeDownscale) {
++  FXDIB_ResampleOptions options;
++  CStretchEngine::WeightTable table;
++  ASSERT_TRUE(table.CalculateWeights(1, 0, 1, 100, 0, 0, options));
++  EXPECT_EQ(0u, PixelWeightSum(table.GetPixelWeight(0)));
++}
++
++// Same degenerate source range, reached through the constructor rather than
++// by calling CalculateWeights() directly: a horizontally mirrored
++// destination whose clip box maps the source's right edge onto x == 0 leaves
++// a source clip of zero width but non-zero height.
++TEST(CStretchEngine, MirroredDestinationEmptySourceClip) {
++  auto source = pdfium::MakeRetain<CFX_DIBitmap>();
++  ASSERT_TRUE(source->Create(100, 50, FXDIB_Format::kBgra));
++  CStretchEngine engine(nullptr, FXDIB_Format::kBgra, /*dest_width=*/-100,
++                        /*dest_height=*/50, FX_RECT(100, 0, 200, 50), source,
++                        FXDIB_ResampleOptions());
++  EXPECT_TRUE(engine.StartStretchHorz());
++}
++
++// The mirror image of the case above: here the source clip degenerates at the
++// right edge, so `src_min` and `src_max` are both the source width. Clamping
++// the tap position up to `src_min` would put it one past the last source
++// pixel, which the horizontal pass then reads.
++//
++// This drives the horizontal pass directly instead of via Continue(), which
++// would go on to run StretchVert() and dereference the null
++// ScanlineComposerIface*. The tap position is consumed by the horizontal
++// pass, so stopping there still covers the case.
++TEST(CStretchEngine, EmptySourceClipAtRightEdge) {
++  auto source = pdfium::MakeRetain<CFX_DIBitmap>();
++  ASSERT_TRUE(source->Create(100, 50, FXDIB_Format::kBgra));
++  CStretchEngine engine(nullptr, FXDIB_Format::kBgra, /*dest_width=*/100,
++                        /*dest_height=*/50, FX_RECT(100, 0, 200, 50), source,
++                        FXDIB_ResampleOptions());
++  ASSERT_TRUE(engine.StartStretchHorz());
++  EXPECT_FALSE(engine.ContinueStretchHorz(nullptr));
++}
++
++// The vertical pass can be handed an empty tap range even when the source clip
++// is not degenerate, which is the case the three tests above cannot reach --
++// StartStretchHorz() rejects a zero-height source clip, so `src_min ==
++// src_max` never survives to StretchVert().
++//
++// The geometry that does reach it: a vertically mirrored destination
++// (`dest_height < 0`) whose clip box straddles the bottom edge of the
++// destination. The constructor maps the clip box back to source space and then
++// clamps it with `src_clip_.Intersect()`, raising `src_clip_.top` from -25 to
++// 0; the per-row tap position that CalculateWeights() computes afterwards is
++// not clamped the same way, so the lower destination rows land above the
++// clamped clip and get `src_start = src_min`, `src_end = pixel_pos < src_min`
++// -- an empty range.
++//
++// This matters because StretchVert()'s row-wide accumulator is allocated once
++// outside the row loop and reused. A row with no taps writes nothing into it,
++// so failing to zero it for that row would repeat the last row that did have
++// taps. The source here is opaque white, which makes a repeated row and a
++// zeroed row tell apart.
++TEST(CStretchEngine, EmptySourceRangeInVerticalPass) {
++  auto source = pdfium::MakeRetain<CFX_DIBitmap>();
++  ASSERT_TRUE(source->Create(100, 50, FXDIB_Format::kBgr));
++  source->Clear(0xffffffff);
++
++  FXDIB_ResampleOptions options;
++  options.bNoSmoothing = true;
++
++  ScanlineRecorder recorder;
++  CStretchEngine engine(&recorder, FXDIB_Format::kBgr, /*dest_width=*/100,
++                        /*dest_height=*/-50, FX_RECT(0, 25, 100, 75), source,
++                        options);
++  ASSERT_TRUE(engine.StartStretchHorz());
++  ASSERT_FALSE(engine.ContinueStretchHorz(nullptr));
++  engine.StretchVert();
++
++  // Destination rows 25..49 tap source rows 24..0 and must be opaque; the
++  // clip box runs to 75, and rows 50..74 tap nothing.
++  for (int line = 0; line < 25; ++line) {
++    ASSERT_TRUE(recorder.HasRow(line)) << "line " << line;
++    EXPECT_FALSE(recorder.RowIsAllZero(line)) << "line " << line;
++  }
++  for (int line = 25; line < 50; ++line) {
++    ASSERT_TRUE(recorder.HasRow(line)) << "line " << line;
++    EXPECT_TRUE(recorder.RowIsAllZero(line)) << "line " << line;
++  }
++}
++
+ TEST(CStretchEngine, ZeroLengthDest) {
+   FXDIB_ResampleOptions options;
+   CStretchEngine::WeightTable table;
