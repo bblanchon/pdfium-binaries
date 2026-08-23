@@ -56,6 +56,7 @@ if [ "$OS" == "emscripten" ]; then
   # BGR/BGRx -> BGRA/RGBA instantiations).
   apply_patch "$PATCHES/stretch_horz_wasm_simd.patch"
   apply_patch "$PATCHES/compositor_wasm_simd.patch"
+apply_patch "$PATCHES/c3_compositor_wasm_simd.patch"
 fi
 apply_patch "$PATCHES/clang_rt.patch" build
 
