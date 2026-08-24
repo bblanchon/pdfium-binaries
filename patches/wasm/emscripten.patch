@@ -128,7 +128,7 @@ index 206b5c3ee..42b891150 100644
 +
 +weak_alias(freopen, freopen64);
 diff --git a/system/lib/standalone/standalone.c b/system/lib/standalone/standalone.c
-index 755049544..28187455c 100644
+index 0aab88e7a..ee1cb39a0 100644
 --- a/system/lib/standalone/standalone.c
 +++ b/system/lib/standalone/standalone.c
 @@ -6,6 +6,7 @@
@@ -439,23 +439,23 @@ index 755049544..28187455c 100644
 +  return -ENOSYS;
 +}
 +
- weak int __syscall_poll(intptr_t fds, int nfds, int timeout) {
+ weak int __syscall_poll(struct pollfd *fds, nfds_t nfds, int timeout) {
    return -ENOSYS;
  }
-@@ -75,48 +358,742 @@ weak int __syscall_poll(intptr_t fds, int nfds, int timeout) {
+@@ -98,48 +381,742 @@ weak int __syscall_epoll_pwait_nonblocking(int epfd, struct epoll_event *ev,
  // TODO: full file support for WASI, or an option for it
  // open()
- weak int __syscall_openat(int dirfd, intptr_t path, int flags, ...) {
--  if (!strcmp((const char*)path, "/dev/stdin")) {
-+  const char* resolved_path = (const char*)path;
+ weak int __syscall_openat(int dirfd, const char *path, int flags, ...) {
+-  if (!strcmp(path, "/dev/stdin")) {
++  const char* resolved_path = path;
 +  if (!strcmp(resolved_path, "/dev/stdin")) {
      return STDIN_FILENO;
    }
--  if (!strcmp((const char*)path, "/dev/stdout")) {
+-  if (!strcmp(path, "/dev/stdout")) {
 +  if (!strcmp(resolved_path, "/dev/stdout")) {
      return STDOUT_FILENO;
    }
--  if (!strcmp((const char*)path, "/dev/stderr")) {
+-  if (!strcmp(path, "/dev/stderr")) {
 +  if (!strcmp(resolved_path, "/dev/stderr")) {
      return STDERR_FILENO;
    }
@@ -701,7 +701,7 @@ index 755049544..28187455c 100644
 +  }
  }
  
--weak int __syscall_fstat64(int fd, intptr_t buf) {
+-weak int __syscall_fstat64(int fd, struct stat *buf) {
 -  return -ENOSYS;
 +weak int __syscall_ftruncate64(int fd, off_t length) {
 +  if (length < 0) {
@@ -718,9 +718,9 @@ index 755049544..28187455c 100644
 +  return 0;
  }
  
--weak int __syscall_stat64(intptr_t path, intptr_t buf) {
-+int rmdirat(int dirfd, intptr_t path) {
-+  const char* resolved_path = (const char*)path;
+-weak int __syscall_stat64(const char *path, struct stat *buf) {
++int rmdirat(int dirfd, const char *path) {
++  const char* resolved_path = path;
 +
 +  // Resolve path if fd is AT_FDCWD.
 +  if (dirfd == AT_FDCWD) {
@@ -745,17 +745,17 @@ index 755049544..28187455c 100644
 +  return 0;
 +}
 +
-+weak int __syscall_rmdir(intptr_t path) {
++weak int __syscall_rmdir(const char *path) {
 +  return rmdirat(AT_FDCWD, path);
 +}
 +
-+weak int __syscall_unlinkat(int dirfd, intptr_t path, int flags) {
++weak int __syscall_unlinkat(int dirfd, const char *path, int flags) {
 +  // unlinkat with AT_REMOVEDIR flag is acutally rmdir.
 +  if ((flags & AT_REMOVEDIR) != 0) {
 +    return rmdirat(dirfd, path);
 +  }
 +
-+  const char* resolved_path = (const char*)path;
++  const char* resolved_path = path;
 +
 +  // Resolve path if fd is AT_FDCWD.
 +  if (dirfd == AT_FDCWD) {
@@ -785,8 +785,8 @@ index 755049544..28187455c 100644
    return -ENOSYS;
  }
  
-+weak int __syscall_renameat(int olddirfd, intptr_t oldpath, int newdirfd, intptr_t newpath) {
-+  const char* oldpathresolved_path = (const char*)oldpath;
++weak int __syscall_renameat(int olddirfd, const char *oldpath, int newdirfd, const char *newpath) {
++  const char* oldpathresolved_path = oldpath;
 +
 +  // Resolve path if fd is AT_FDCWD.
 +  if (olddirfd == AT_FDCWD) {
@@ -802,7 +802,7 @@ index 755049544..28187455c 100644
 +    oldpathresolved_path = oldpathrelative_path;
 +  }
 +
-+  const char* newpathresolved_path = (const char*)newpath;
++  const char* newpathresolved_path = newpath;
 +
 +  // Resolve path if fd is AT_FDCWD.
 +  if (newdirfd == AT_FDCWD) {
@@ -830,16 +830,16 @@ index 755049544..28187455c 100644
    return -ENOSYS;
  }
  
--weak int __syscall_mkdirat(int dirfd, intptr_t path, int mode) {
+-weak int __syscall_mkdirat(int dirfd, const char *path, mode_t mode) {
 -  return -ENOSYS;
 +weak int __syscall_dup3(int fd, int suggestfd, int flags) {
 +    return -ENOSYS;
  }
  
--weak int __syscall_newfstatat(int dirfd, intptr_t path, intptr_t buf, int flags) {
+-weak int __syscall_newfstatat(int dirfd, const char *path, struct stat *buf, int flags) {
 -  return -ENOSYS;
-+weak int __syscall_faccessat(int dirfd, intptr_t path, int amode, int flags) {
-+  const char* resolved_path = (const char*)path;
++weak int __syscall_faccessat(int dirfd, const char *path, int amode, int flags) {
++  const char* resolved_path = path;
 +
 +  // Resolve path if fd is AT_FDCWD.
 +  if (dirfd == AT_FDCWD) {
@@ -934,18 +934,18 @@ index 755049544..28187455c 100644
 +  }
 +}
 +
-+weak int __syscall_fstat64(int fd, intptr_t buf) {
++weak int __syscall_fstat64(int fd, struct stat *buf) {
 +  __wasi_filestat_t internal_stat;
 +  __wasi_errno_t error = __wasi_fd_filestat_get(fd, &internal_stat);
 +  if (error != __WASI_ERRNO_SUCCESS) {
 +    return __wasi_syscall_ret(error);
 +  }
-+  __wasi_filestat_to_stat(&internal_stat, (struct stat *) buf);
++  __wasi_filestat_to_stat(&internal_stat, buf);
 +  return 0;
 +}
 +
-+weak int __syscall_getdents64(int fd, intptr_t dirp, size_t count) {
-+  intptr_t dirpointer = dirp;
++weak int __syscall_getdents64(int fd, void *dirp, size_t count) {
++  intptr_t dirpointer = (intptr_t)dirp;
 +  struct dirent *de;
 +  de = (void *)(dirpointer);
 +
@@ -1100,14 +1100,14 @@ index 755049544..28187455c 100644
 +  return dirent_processed;
 +}
 +
-+int __syscall_newfstatat(int dirfd, intptr_t path, intptr_t buf, int flags) {
++int __syscall_newfstatat(int dirfd, const char *path, struct stat *buf, int flags) {
 +  // Convert flags to WASI.
 +  __wasi_lookupflags_t lookup_flags = 0;
 +  if ((flags & AT_SYMLINK_NOFOLLOW) == 0) {
 +    lookup_flags |= __WASI_LOOKUPFLAGS_SYMLINK_FOLLOW;
 +  }
 +
-+  const char* resolved_path = (const char*)path;
++  const char* resolved_path = path;
 +
 +  // Resolve path if fd is AT_FDCWD.
 +  if (dirfd == AT_FDCWD) {
@@ -1129,16 +1129,16 @@ index 755049544..28187455c 100644
 +    return __wasi_syscall_ret(error);
 +  }
 +
-+  __wasi_filestat_to_stat(&fsb_cur, (struct stat *) buf);
++  __wasi_filestat_to_stat(&fsb_cur, buf);
 +
 +  return 0;
 +}
 +
-+weak int __syscall_stat64(intptr_t path, intptr_t buf) {
++weak int __syscall_stat64(const char *path, struct stat *buf) {
 +  return __syscall_newfstatat(AT_FDCWD, path, buf, 0);
  }
  
- weak int __syscall_lstat64(intptr_t path, intptr_t buf) {
+ weak int __syscall_lstat64(const char *path, struct stat *buf) {
 -  return -ENOSYS;
 +  return __syscall_newfstatat(AT_FDCWD, path, buf, AT_SYMLINK_NOFOLLOW);
 +}
@@ -1147,7 +1147,7 @@ index 755049544..28187455c 100644
 +  return __wasi_syscall_ret(__wasi_random_get(buffer, length));
 +}
 +
-+weak int __syscall_getcwd(intptr_t buf, size_t size) {
++weak int __syscall_getcwd(char *buf, size_t size) {
 +  // Check if buf points to a bad address.
 +  if (!buf && size > 0) {
 +    return -EFAULT;
@@ -1169,13 +1169,13 @@ index 755049544..28187455c 100644
 +  }
 +
 +  // Return value is a null-terminated c string.
-+  strcpy((char*)buf, res);
++  strcpy(buf, res);
 +
 +  return len;
 +}
 +
-+weak int __syscall_mkdirat(int dirfd, intptr_t path, int mode) {
-+  const char* resolved_path = (const char*)path;
++weak int __syscall_mkdirat(int dirfd, const char *path, mode_t mode) {
++  const char* resolved_path = path;
 +
 +  // Resolve path if fd is AT_FDCWD.
 +  if (dirfd == AT_FDCWD) {
@@ -1200,7 +1200,7 @@ index 755049544..28187455c 100644
  }
  
  // Emscripten additions
-@@ -162,12 +1139,21 @@ weak double emscripten_date_now(void) {
+@@ -185,12 +1162,21 @@ weak double emscripten_date_now(void) {
    return clock_gettime_ms(CLOCK_REALTIME);
  }
  
@@ -1222,7 +1222,7 @@ index 755049544..28187455c 100644
    abort();
  }
  #endif
-@@ -270,6 +1256,21 @@ int _setitimer_js(int which, double timeout) {
+@@ -293,6 +1279,21 @@ int _setitimer_js(int which, double timeout) {
    return -1;
  }
  
@@ -1244,7 +1244,7 @@ index 755049544..28187455c 100644
  weak uintptr_t emscripten_stack_snapshot(void) {
    return 0;
  }
-@@ -314,6 +1315,252 @@ weak void _emscripten_get_progname(char* buf, int length) {
+@@ -337,6 +1338,252 @@ weak void _emscripten_get_progname(char* buf, int length) {
  
  weak void _emscripten_runtime_keepalive_clear() {}
  
