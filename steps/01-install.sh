@@ -10,7 +10,9 @@ ENABLE_V8=${PDFium_ENABLE_V8:-false}
 
 DepotTools_URL='https://chromium.googlesource.com/chromium/tools/depot_tools.git'
 DepotTools_DIR="$PWD/depot_tools"
-WindowsSDK_DIR="/c/Program Files (x86)/Windows Kits/10/bin/10.0.19041.0"
+WindowsSDK_VERSION='10.0.28000.0'
+WindowsSDK_URL='https://go.microsoft.com/fwlink/?linkid=2370315'
+WindowsSDK_DIR="/c/Program Files (x86)/Windows Kits/10/bin/$WindowsSDK_VERSION"
 
 # Download depot_tools if not exists in this location
 if [ ! -d "$DepotTools_DIR" ]; then
@@ -118,6 +120,19 @@ case "$TARGET_OS" in
     ;;
 
   win)
+    if [ ! -d "$WindowsSDK_DIR/$TARGET_CPU" ]; then
+      WindowsSDK_INSTALLER="$TEMP/winsdksetup.exe"
+
+      curl -sL -o "$WindowsSDK_INSTALLER" "$WindowsSDK_URL"
+
+      MSYS2_ARG_CONV_EXCL="*" "$WindowsSDK_INSTALLER" \
+        /features \
+        "OptionId.DesktopCPP$TARGET_CPU" \
+        /ceip off \
+        /quiet \
+        /norestart
+    fi
+
     echo "$WindowsSDK_DIR/$CURRENT_CPU" >> "$PATH_FILE"
     ;;
 
