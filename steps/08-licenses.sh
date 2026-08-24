@@ -92,5 +92,5 @@ if [ "$ENABLE_V8" == "true" ]; then
 fi
 
 if [ "$TARGET_ENVIRONMENT" == "musl" ]; then
-  curl -s -o "$OUTPUT_DIR/musl.txt" https://git.musl-libc.org/cgit/musl/plain/COPYRIGHT
+  curl -s -m 60 --retry 10 -o "$OUTPUT_DIR/musl.txt" https://git.musl-libc.org/cgit/musl/plain/COPYRIGHT
 fi
