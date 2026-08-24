@@ -28,15 +28,15 @@ jobs:
         echo "version=$VERSION" >> $GITHUB_OUTPUT
         echo "branch=chromium/$BUILD" >> $GITHUB_OUTPUT
     - name: Trigger build
-      uses: benc-uk/workflow-dispatch@v1
-      with:
-        workflow: Build all
-        inputs: |
-          {
-            "branch": "${{ steps.chromium.outputs.branch }}",
-            "version": "${{ steps.chromium.outputs.version }}",
-            "is_debug": "false",
-            "enable_v8": "true",
-            "release": "true",
-            "nuget": "true"
-          }
+      run: |
+        gh workflow run "Build all" \
+          --field branch="$BRANCH" \
+          --field version="$VERSION" \
+          --field is_debug=false \
+          --field enable_v8=true \
+          --field release=true \
+          --field nuget=true
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        BRANCH: ${{ steps.chromium.outputs.branch }}
+        VERSION: ${{ steps.chromium.outputs.version }}
