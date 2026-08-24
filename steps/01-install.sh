@@ -10,7 +10,8 @@ ENABLE_V8=${PDFium_ENABLE_V8:-false}
 
 DepotTools_URL='https://chromium.googlesource.com/chromium/tools/depot_tools.git'
 DepotTools_DIR="$PWD/depot_tools"
-WindowsSDK_DIR="/c/Program Files (x86)/Windows Kits/10/bin/10.0.19041.0"
+WindowsSDK_VERSION='10.0.28000.0'
+WindowsSDK_DIR="/c/Program Files (x86)/Windows Kits/10/bin/$WindowsSDK_VERSION"
 
 # Download depot_tools if not exists in this location
 if [ ! -d "$DepotTools_DIR" ]; then
@@ -118,6 +119,15 @@ case "$TARGET_OS" in
     ;;
 
   win)
+    if [ ! -d "$WindowsSDK_DIR" ]; then
+      winget install --id Microsoft.WindowsSDK --exact --version "$WindowsSDK_VERSION" --accept-package-agreements --accept-source-agreements --disable-interactivity
+
+      if [ ! -d "$WindowsSDK_DIR" ]; then
+        echo "Windows SDK $WindowsSDK_VERSION installation did not produce expected directory: $WindowsSDK_DIR" >&2
+        exit 1
+      fi
+    fi
+
     echo "$WindowsSDK_DIR/$CURRENT_CPU" >> "$PATH_FILE"
     ;;
 
