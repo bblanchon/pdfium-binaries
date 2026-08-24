@@ -1,8 +1,21 @@
+diff --git a/toolchain/win/setup_toolchain.py b/toolchain/win/setup_toolchain.py
+index 68ad6c4a0..210900ad8 100644
+--- a/toolchain/win/setup_toolchain.py
++++ b/toolchain/win/setup_toolchain.py
+@@ -21,7 +21,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), os.pardir, os.pardir))
+ import gn_helpers
+ 
+ SCRIPT_DIR = os.path.dirname(__file__)
+-SDK_VERSION = '10.0.28000.0'
++SDK_VERSION = os.environ.get('WINDOWS_SDK_VERSION', '10.0.28000.0')
+ MSVC_DIR = re.compile('^.*/VC/Tools/MSVC/[^/]+/include$')
+ WINDOWS_KITS_DIR = re.compile(r'^(.*/Windows Kits/\d+/Include/[^/]+)/.*')
+ 
 diff --git a/toolchain/win/toolchain.gni b/toolchain/win/toolchain.gni
-index 7dbd8a17e..361f74f85 100644
+index 9a7e27ca7..0d29156a1 100644
 --- a/toolchain/win/toolchain.gni
 +++ b/toolchain/win/toolchain.gni
-@@ -252,7 +252,7 @@ template("msvc_toolchain") {
+@@ -270,7 +270,7 @@ template("msvc_toolchain") {
        } else {
          werror = ""
        }
