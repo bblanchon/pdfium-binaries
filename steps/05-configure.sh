@@ -30,18 +30,16 @@ mkdir -p "$BUILD"
   if [ "$BUILD_TYPE" == "static" ]; then
     echo "pdf_is_complete_lib = true"
 
+    # Chromium's bundled libc++ is only a dependency of executables, shared
+    # libraries and loadable modules (see //build/config/BUILDCONFIG.gn), never
+    # of a static_library, so its compiled objects don't make it into
+    # libpdfium.a. Its symbols also carry the __Cr ABI namespace, which no
+    # platform C++ library provides, so the consumer's link fails on undefined
+    # std::__Cr::ios_base as soon as pdfium's FDF code is pulled in.
+    echo "use_custom_libcxx = false"
+
     if [ "$OS-$TARGET_CPU" == "linux-arm64" ]; then
       echo "use_lld = false"
-      echo "use_custom_libcxx = false"
-    fi
-
-    # A static archive is linked into the consumer's binary, which uses the
-    # platform libc++. Chromium's bundled libc++ mangles as std::__Cr and its
-    # compiled iostream objects are not part of the archive, so linking fails on
-    # undefined std::__Cr::ios_base symbols as soon as pdfium's FDF code is
-    # pulled in. Build against the system libc++ (std::__1) instead.
-    if [ "$OS" == "ios" ] || [ "$OS" == "mac" ]; then
-      echo "use_custom_libcxx = false"
     fi
   fi
 
