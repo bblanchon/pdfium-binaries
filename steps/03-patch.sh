@@ -26,15 +26,17 @@ case "$BUILD_TYPE" in
 esac
 
 apply_patch "$PATCHES/public_headers.patch"
-# Under upstream review (CLs 155510, 155530, 155550). These use spans and
-# fxcrt::Zip() rather than raw pointers, so they carry no UNSAFE_BUFFERS;
-# drop each one once its CL lands.
+# Under upstream review (CL 155510). Uses spans and fxcrt::Zip() rather than
+# raw pointers, so it carries no UNSAFE_BUFFERS; drop it once the CL lands.
+# CL 155530 (compositor) landed upstream, so its patch is gone.
 apply_patch "$PATCHES/png_predictor_perf.patch"
-# Includes the not-yet-uploaded run-planning follow-up (branch
+# CL 155550's content landed upstream, but this patch stays because it also
+# carries the not-yet-uploaded run-planning follow-up (branch
 # stretch-bilinear-rows: 1/2-tap column runs + tiny-work bail-out).
+# NEEDS REWORK: the follow-up conflicts with CL 155970's typed destination
+# spans, which landed after it, so this no longer applies to origin/main.
 apply_patch "$PATCHES/stretch_engine_perf.patch"
 [ "$OS" != "emscripten" ] && apply_patch "$PATCHES/alpha_unroll_native.patch"
-apply_patch "$PATCHES/compositor_perf.patch"
 # Decode 3-component JPEGs straight to BGR (branch jpeg-decode-bgr, not yet
 # uploaded). Portable; helps native and wasm. The wasm jpeg_simd kernels
 # already dispatch on JCS_EXT_BGR, so no wasm-side change is needed.
