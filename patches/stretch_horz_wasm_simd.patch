@@ -283,7 +283,7 @@
              dest_span_index += run.length;
              col += static_cast<int>(run.length);
              continue;
-@@ -634,6 +871,11 @@
+@@ -639,6 +876,11 @@
                std::remove_const_t<typename decltype(src_pixels)::element_type>;
            pdfium::span<const StretchHorzRunColumn> run_columns(
                horz_run_columns_);
@@ -295,7 +295,7 @@
            int col = dest_clip_.left;
            for (const StretchHorzRun& run : horz_runs_) {
              if (run.taps != 0) {
-@@ -649,6 +891,75 @@
+@@ -654,6 +896,75 @@
                auto dest_run =
                    fxcrt::reinterpret_span<DestPixel>(dest_span.subspan(
                        dest_span_index, run.length * sizeof(DestPixel)));
@@ -371,7 +371,7 @@
                if (run.taps == 1) {
                  for (auto [column, dest] : fxcrt::Zip(columns, dest_run)) {
                    // Hoisted deliberately: the destination stores below are
-@@ -676,6 +987,7 @@
+@@ -681,6 +992,7 @@
                        PixelFromFixed(weight0 * src0.red + weight1 * src1.red);
                  }
                }
@@ -379,7 +379,7 @@
                dest_span_index += run.length * sizeof(DestPixel);
                col += static_cast<int>(run.length);
                continue;
-@@ -711,10 +1023,45 @@
+@@ -720,10 +1032,45 @@
                    break;
                  }
                  default:
@@ -429,7 +429,7 @@
                    }
                    break;
                }
-@@ -755,6 +1102,27 @@
+@@ -768,6 +1115,27 @@
            uint32_t dest_r = 0;
            uint32_t dest_g = 0;
            uint32_t dest_b = 0;
@@ -457,14 +457,14 @@
            for (auto [weight, src] : fxcrt::Zip(weights, window)) {
              uint32_t pixel_weight = weight * src.alpha / 255;
              dest_b += pixel_weight * src.blue;
-@@ -762,6 +1130,7 @@
+@@ -775,6 +1143,7 @@
              dest_r += pixel_weight * src.red;
              dest_a += pixel_weight;
            }
 +#endif
-           dest_span[dest_span_index++] = PixelFromFixed(dest_b);
-           dest_span[dest_span_index++] = PixelFromFixed(dest_g);
-           dest_span[dest_span_index++] = PixelFromFixed(dest_r);
+           FX_BGRA_STRUCT<uint8_t>& dest = dest_pixels[dest_index++];
+           dest.blue = PixelFromFixed(dest_b);
+           dest.green = PixelFromFixed(dest_g);
 --- a/core/fxge/dib/cstretchengine.h
 +++ b/core/fxge/dib/cstretchengine.h
 @@ -53,6 +53,29 @@

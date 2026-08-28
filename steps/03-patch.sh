@@ -30,11 +30,10 @@ apply_patch "$PATCHES/public_headers.patch"
 # raw pointers, so it carries no UNSAFE_BUFFERS; drop it once the CL lands.
 # CL 155530 (compositor) landed upstream, so its patch is gone.
 apply_patch "$PATCHES/png_predictor_perf.patch"
-# CL 155550's content landed upstream, but this patch stays because it also
-# carries the not-yet-uploaded run-planning follow-up (branch
-# stretch-bilinear-rows: 1/2-tap column runs + tiny-work bail-out).
-# NEEDS REWORK: the follow-up conflicts with CL 155970's typed destination
-# spans, which landed after it, so this no longer applies to origin/main.
+# CL 155550's content landed upstream, so this patch now carries only the
+# not-yet-uploaded run-planning follow-up (branch stretch-bilinear-rows:
+# 1/2-tap column runs + tiny-work bail-out), re-derived on top of the typed
+# destination spans that CL 155970 landed afterwards.
 apply_patch "$PATCHES/stretch_engine_perf.patch"
 [ "$OS" != "emscripten" ] && apply_patch "$PATCHES/alpha_unroll_native.patch"
 # Decode 3-component JPEGs straight to BGR (branch jpeg-decode-bgr, not yet
