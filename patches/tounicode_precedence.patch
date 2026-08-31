@@ -1,0 +1,40 @@
+diff --git a/core/fpdfapi/font/cpdf_tounicodemap.cpp b/core/fpdfapi/font/cpdf_tounicodemap.cpp
+index 5a4d342d0..08d59805a 100644
+--- a/core/fpdfapi/font/cpdf_tounicodemap.cpp
++++ b/core/fpdfapi/font/cpdf_tounicodemap.cpp
+@@ -373,11 +373,15 @@ void CPDF_ToUnicodeMap::SetCode(uint32_t srccode, WideString destcode) {
+ }
+ 
+ void CPDF_ToUnicodeMap::InsertIntoMaps(uint32_t code, uint32_t destcode) {
+-  auto [it, inserted] = map_.insert({code, destcode});
+-  if (!inserted) {
+-    it->second = std::min(it->second, destcode);
+-  }
+-
++  // Adobe TN #5014, "Adobe CMap and CIDFont Files Specification": "Code
++  // mappings (unlike codespace ranges) may overlap, but succeeding maps
++  // superceded preceding maps." A later bfchar or bfrange entry therefore
++  // replaces an earlier mapping for the same code, which subset fonts rely on
++  // when a catch-all bfrange is followed by overrides for individual codes.
++  map_[code] = destcode;
++
++  // Which code a reverse lookup prefers is a separate question, and the lowest
++  // one remains the more predictable answer.
+   auto [reverse_it, reverse_inserted] = reverse_map_.insert({destcode, code});
+   if (!reverse_inserted) {
+     reverse_it->second = std::min(reverse_it->second, code);
+diff --git a/core/fpdfapi/font/cpdf_tounicodemap.h b/core/fpdfapi/font/cpdf_tounicodemap.h
+index 5e9dddc20..3b8a64a97 100644
+--- a/core/fpdfapi/font/cpdf_tounicodemap.h
++++ b/core/fpdfapi/font/cpdf_tounicodemap.h
+@@ -53,8 +53,8 @@ class CPDF_ToUnicodeMap {
+ 
+   // Key: charcode
+   // Value: unicode
+-  // If there are multiple entries with the same key, this stores the lowest
+-  // value.
++  // If a charcode is mapped more than once, this stores the last mapping, as
++  // succeeding maps supersede preceding ones.
+   std::map<uint32_t, uint32_t> map_;
+   // Key: unicode
+   // Value: charcode
