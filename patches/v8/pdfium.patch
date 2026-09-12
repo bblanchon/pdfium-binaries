@@ -1,8 +1,8 @@
 diff --git a/fpdfsdk/fpdf_view.cpp b/fpdfsdk/fpdf_view.cpp
-index c808459f4..0c6746b94 100644
+index f45010fea..9f99f0616 100644
 --- a/fpdfsdk/fpdf_view.cpp
 +++ b/fpdfsdk/fpdf_view.cpp
-@@ -61,6 +61,9 @@
+@@ -66,6 +66,9 @@
  
  #ifdef PDF_ENABLE_V8
  #include "fxjs/cfx_v8_array_buffer_allocator.h"
@@ -12,7 +12,7 @@ index c808459f4..0c6746b94 100644
  #endif
  
  #ifdef PDF_ENABLE_XFA
-@@ -110,6 +113,11 @@ namespace {
+@@ -114,6 +117,11 @@ namespace {
  
  bool g_bLibraryInitialized = false;
  
@@ -24,7 +24,7 @@ index c808459f4..0c6746b94 100644
  RetainPtr<const CPDF_Object> GetXFAEntryFromDocument(const CPDF_Document* doc) {
    const CPDF_Dictionary* root = doc->GetRoot();
    if (!root) {
-@@ -197,6 +205,23 @@ FPDF_InitLibraryWithConfig(const FPDF_LIBRARY_CONFIG* config) {
+@@ -202,6 +210,23 @@ FPDF_InitLibraryWithConfig(const FPDF_LIBRARY_CONFIG* config) {
    if (g_bLibraryInitialized) {
      return;
    }
@@ -48,23 +48,32 @@ index c808459f4..0c6746b94 100644
    CFX_Timer::InitializeGlobals();
  
    CFX_GEModule::RendererType renderer_type =
-@@ -237,11 +262,10 @@ FPDF_InitLibraryWithConfig(const FPDF_LIBRARY_CONFIG* config) {
+@@ -259,16 +284,15 @@ FPDF_InitLibraryWithConfig(const FPDF_LIBRARY_CONFIG* config) {
    CPDFXFA_ModuleInit();
  #endif  // PDF_ENABLE_XFA
  
 -  if (config && config->version >= 2) {
 -    void* platform = config->version >= 3 ? config->m_pPlatform : nullptr;
+-    const bool isolate_per_document =
+-        config->version >= 7 && config->m_IsolatePerDocument;
+-    if (isolate_per_document) {
+-      CHECK(!config->m_pIsolate);
+-    }
 -    IJS_Runtime::Initialize(config->m_v8EmbedderSlot, config->m_pIsolate,
--                            platform);
--  }
+-                            platform, isolate_per_document);
 +#if PDF_ENABLE_V8
-+  IJS_Runtime::Initialize(0, g_isolate, g_platform);
++  const bool isolate_per_document =
++      config && config->version >= 7 && config->m_IsolatePerDocument;
++  if (isolate_per_document) {
++    CHECK(!config->m_pIsolate);
+   }
++  IJS_Runtime::Initialize(0, g_isolate, g_platform, isolate_per_document);
 +#endif  // PDF_ENABLE_V8
 +
    g_bLibraryInitialized = true;
  }
  
-@@ -261,6 +285,19 @@ FPDF_EXPORT void FPDF_CALLCONV FPDF_DestroyLibrary() {
+@@ -288,6 +312,19 @@ FPDF_EXPORT void FPDF_CALLCONV FPDF_DestroyLibrary() {
    CFX_GEModule::Destroy();
    CFX_Timer::DestroyGlobals();
  
