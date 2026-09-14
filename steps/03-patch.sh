@@ -14,6 +14,21 @@ apply_patch() {
   patch --verbose -p1 -d "$DIR" -i "$FILE"
 }
 
+# For a patch whose content has landed on PDFium main but is missing from
+# the chromium/* branch being built: applied unless MARKER_FILE already
+# contains MARKER, a string only the landed code has, in which case the
+# checked-out source has the change and the patch would not apply.
+apply_patch_unless_landed() {
+  local FILE="$1"
+  local MARKER="$2"
+  local MARKER_FILE="$3"
+  if grep -q -- "$MARKER" "$MARKER_FILE"; then
+    echo "$(basename "$FILE"): already upstream, skipping"
+  else
+    apply_patch "$FILE"
+  fi
+}
+
 pushd "${SOURCE}"
 
 case "$BUILD_TYPE" in
@@ -34,19 +49,22 @@ apply_patch "$PATCHES/public_headers.patch"
 # destination spans that CL 155970 landed afterwards.
 apply_patch "$PATCHES/stretch_engine_perf.patch"
 [ "$OS" != "emscripten" ] && apply_patch "$PATCHES/alpha_unroll_native.patch"
-# CL 156070 (BGR decode) and CL 156090 (the ICCBased/sRGB extension) landed
-# upstream, so their patch is gone. Note it is not in chromium/8050: builds
-# from that branch lose the optimization until a branch is cut from a main
-# that has it.
+# Decode 3-component JPEGs straight to BGR: CL 156070 and its ICCBased/sRGB
+# extension CL 156090, as landed on main (32d5e1d51 and dbe0a5f4c,
+# 2026-09-09). Not in chromium/8044 or chromium/8057, which were cut before
+# they landed, so the landed diff is carried until the built branch has it.
+apply_patch_unless_landed "$PATCHES/jpeg_decode_bgr.patch" \
+  "ScanlinesAreBgr" core/fxcodec/scanlinedecoder.h
 apply_patch "$PATCHES/swap_translate_perf.patch"
 apply_patch "$PATCHES/lcms_translate_memo.patch"
 apply_patch "$PATCHES/t4_psfunc_memo.patch"
-# Correctness fix, under upstream review (CL 156290, with its tests in
-# CL 156270). Adobe TN #5014 requires later ToUnicode mappings to supersede
-# earlier ones; PDFium kept the numerically lowest unicode, so subset fonts
-# using a catch-all bfrange plus overrides extracted wrong characters. Drop
-# this once the CL lands.
-apply_patch "$PATCHES/tounicode_precedence.patch"
+# Correctness fix: Adobe TN #5014 requires later ToUnicode mappings to
+# supersede earlier ones; PDFium kept the numerically lowest unicode, so
+# subset fonts using a catch-all bfrange plus overrides extracted wrong
+# characters. CL 156290 as landed on main (6c8196a14, 2026-09-12); not in
+# chromium/8044 or chromium/8057, which were cut before it landed.
+apply_patch_unless_landed "$PATCHES/tounicode_precedence.patch" \
+  "later map entries supersede" core/fpdfapi/font/cpdf_tounicodemap.h
 # Wasm-only. Both measure neutral on native (fillrect even regresses small
 # cache-resident fills there, where libc memset switches to non-temporal
 # stores), and only pay off under a runtime that neither vectorizes nor
