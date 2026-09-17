@@ -1,0 +1,237 @@
+diff --git a/third_party/zlib/BUILD.gn b/third_party/zlib/BUILD.gn
+index eff72b2..9a8e88e 100644
+--- a/third_party/zlib/BUILD.gn
++++ b/third_party/zlib/BUILD.gn
+@@ -75,6 +75,14 @@ use_arm_neon_optimizations =
+ use_x86_x64_optimizations =
+     (current_cpu == "x86" || current_cpu == "x64") && !is_ios
+ 
++declare_args() {
++  # Enabled for wasm builds that compile with -msimd128 (the pdfium-binaries
++  # wasm-standalone target, see build/config/wasm and steps/05-configure.sh).
++  zlib_wasm_simd = false
++}
++
++use_wasm_simd_optimizations = zlib_wasm_simd
++
+ config("zlib_adler32_simd_config") {
+   if (use_x86_x64_optimizations) {
+     defines = [ "ADLER32_SIMD_SSSE3" ]
+@@ -88,6 +96,10 @@ config("zlib_adler32_simd_config") {
+   if (use_arm_neon_optimizations) {
+     defines = [ "ADLER32_SIMD_NEON" ]
+   }
++
++  if (use_wasm_simd_optimizations) {
++    defines = [ "ADLER32_SIMD_WASM" ]
++  }
+ }
+ 
+ source_set("zlib_adler32_simd") {
+@@ -104,7 +116,7 @@ source_set("zlib_adler32_simd") {
+     }
+   }
+ 
+-  if (use_arm_neon_optimizations) {
++  if (use_arm_neon_optimizations || use_wasm_simd_optimizations) {
+     sources = [
+       "adler32_simd.c",
+       "adler32_simd.h",
+@@ -328,12 +340,17 @@ component("zlib") {
+   defines = []
+   deps = []
+ 
+-  if (!use_x86_x64_optimizations && !use_arm_neon_optimizations) {
++  if (!use_x86_x64_optimizations && !use_arm_neon_optimizations &&
++      !use_wasm_simd_optimizations) {
+     # Apparently android_cronet bot builds with NEON disabled and
+     # we also should disable optimizations for iOS@x86 (a.k.a. simulator).
+     defines += [ "CPU_NO_SIMD" ]
+   }
+ 
++  if (use_wasm_simd_optimizations) {
++    deps += [ ":zlib_adler32_simd" ]
++  }
++
+   if (use_x86_x64_optimizations || use_arm_neon_optimizations) {
+     deps += [
+       ":zlib_adler32_simd",
+diff --git a/third_party/zlib/adler32.c b/third_party/zlib/adler32.c
+index de78b4e..381e764 100644
+--- a/third_party/zlib/adler32.c
++++ b/third_party/zlib/adler32.c
+@@ -58,7 +58,7 @@
+ #endif
+ 
+ #include "cpu_features.h"
+-#if defined(ADLER32_SIMD_SSSE3) || defined(ADLER32_SIMD_NEON) || defined(ADLER32_SIMD_RVV)
++#if defined(ADLER32_SIMD_SSSE3) || defined(ADLER32_SIMD_NEON) || defined(ADLER32_SIMD_RVV) || defined(ADLER32_SIMD_WASM)
+ #include "adler32_simd.h"
+ #endif
+ 
+@@ -68,10 +68,10 @@ uLong ZEXPORT adler32_z(uLong adler, const Bytef *buf, z_size_t len) {
+     unsigned n;
+     /* TODO(cavalcantii): verify if this lengths are optimal for current CPUs. */
+ #if defined(ADLER32_SIMD_SSSE3) || defined(ADLER32_SIMD_NEON) \
+-    || defined(ADLER32_SIMD_RVV)
++    || defined(ADLER32_SIMD_RVV) || defined(ADLER32_SIMD_WASM)
+ #if defined(ADLER32_SIMD_SSSE3)
+     if (buf != Z_NULL && len >= 64 && x86_cpu_enable_ssse3)
+-#elif defined(ADLER32_SIMD_NEON)
++#elif defined(ADLER32_SIMD_NEON) || defined(ADLER32_SIMD_WASM)
+     if (buf != Z_NULL && len >= 64)
+ #elif defined(ADLER32_SIMD_RVV)
+     if (buf != Z_NULL && len >= 32 && riscv_cpu_enable_rvv)
+diff --git a/third_party/zlib/adler32_simd.c b/third_party/zlib/adler32_simd.c
+index 08c21d3..443e41e 100644
+--- a/third_party/zlib/adler32_simd.c
++++ b/third_party/zlib/adler32_simd.c
+@@ -366,6 +366,148 @@ uint32_t ZLIB_INTERNAL adler32_simd_(  /* NEON */
+     return s1 | (s2 << 16);
+ }
+ 
++#elif defined(ADLER32_SIMD_WASM)
++
++#include <wasm_simd128.h>
++
++uint32_t ZLIB_INTERNAL adler32_simd_(  /* WASM SIMD128 */
++    uint32_t adler,
++    const unsigned char *buf,
++    z_size_t len)
++{
++    /*
++     * Split Adler-32 into component sums. Same block structure as the NEON
++     * implementation above; wasm loads have no alignment requirement, so the
++     * serial alignment prologue is unnecessary.
++     */
++    uint32_t s1 = adler & 0xffff;
++    uint32_t s2 = adler >> 16;
++
++    /*
++     * Process the data in blocks.
++     */
++    const unsigned BLOCK_SIZE = 1 << 5;
++
++    z_size_t blocks = len / BLOCK_SIZE;
++    len -= blocks * BLOCK_SIZE;
++
++    while (blocks)
++    {
++        unsigned n = NMAX / BLOCK_SIZE;  /* The NMAX constraint. */
++        if (n > blocks)
++            n = (unsigned) blocks;
++        blocks -= n;
++
++        v128_t v_s2 = wasm_u32x4_make(0, 0, 0, s1 * n);
++        v128_t v_s1 = wasm_i32x4_splat(0);
++
++        v128_t v_column_sum_1 = wasm_i16x8_splat(0);
++        v128_t v_column_sum_2 = wasm_i16x8_splat(0);
++        v128_t v_column_sum_3 = wasm_i16x8_splat(0);
++        v128_t v_column_sum_4 = wasm_i16x8_splat(0);
++
++        do {
++            /*
++             * Load 32 input bytes.
++             */
++            const v128_t bytes1 = wasm_v128_load(buf);
++            const v128_t bytes2 = wasm_v128_load(buf + 16);
++
++            /*
++             * Add previous block byte sum to v_s2.
++             */
++            v_s2 = wasm_i32x4_add(v_s2, v_s1);
++
++            /*
++             * Horizontally add the bytes for s1.
++             */
++            v_s1 = wasm_i32x4_add(
++                v_s1, wasm_u32x4_extadd_pairwise_u16x8(wasm_i16x8_add(
++                          wasm_u16x8_extadd_pairwise_u8x16(bytes1),
++                          wasm_u16x8_extadd_pairwise_u8x16(bytes2))));
++
++            /*
++             * Vertically add the bytes for s2.
++             */
++            v_column_sum_1 = wasm_i16x8_add(
++                v_column_sum_1, wasm_u16x8_extend_low_u8x16(bytes1));
++            v_column_sum_2 = wasm_i16x8_add(
++                v_column_sum_2, wasm_u16x8_extend_high_u8x16(bytes1));
++            v_column_sum_3 = wasm_i16x8_add(
++                v_column_sum_3, wasm_u16x8_extend_low_u8x16(bytes2));
++            v_column_sum_4 = wasm_i16x8_add(
++                v_column_sum_4, wasm_u16x8_extend_high_u8x16(bytes2));
++
++            buf += BLOCK_SIZE;
++
++        } while (--n);
++
++        v_s2 = wasm_i32x4_shl(v_s2, 5);
++
++        /*
++         * Multiply-add bytes by [ 32, 31, 30, ... ] for s2.
++         */
++        const v128_t weights_1 =
++            wasm_u16x8_make(32, 31, 30, 29, 28, 27, 26, 25);
++        const v128_t weights_2 =
++            wasm_u16x8_make(24, 23, 22, 21, 20, 19, 18, 17);
++        const v128_t weights_3 = wasm_u16x8_make(16, 15, 14, 13, 12, 11, 10, 9);
++        const v128_t weights_4 = wasm_u16x8_make(8, 7, 6, 5, 4, 3, 2, 1);
++        v_s2 = wasm_i32x4_add(
++            v_s2, wasm_u32x4_extmul_low_u16x8(v_column_sum_1, weights_1));
++        v_s2 = wasm_i32x4_add(
++            v_s2, wasm_u32x4_extmul_high_u16x8(v_column_sum_1, weights_1));
++        v_s2 = wasm_i32x4_add(
++            v_s2, wasm_u32x4_extmul_low_u16x8(v_column_sum_2, weights_2));
++        v_s2 = wasm_i32x4_add(
++            v_s2, wasm_u32x4_extmul_high_u16x8(v_column_sum_2, weights_2));
++        v_s2 = wasm_i32x4_add(
++            v_s2, wasm_u32x4_extmul_low_u16x8(v_column_sum_3, weights_3));
++        v_s2 = wasm_i32x4_add(
++            v_s2, wasm_u32x4_extmul_high_u16x8(v_column_sum_3, weights_3));
++        v_s2 = wasm_i32x4_add(
++            v_s2, wasm_u32x4_extmul_low_u16x8(v_column_sum_4, weights_4));
++        v_s2 = wasm_i32x4_add(
++            v_s2, wasm_u32x4_extmul_high_u16x8(v_column_sum_4, weights_4));
++
++        /*
++         * Sum epi32 ints v_s1(s2) and accumulate in s1(s2).
++         */
++        s1 += wasm_u32x4_extract_lane(v_s1, 0) +
++              wasm_u32x4_extract_lane(v_s1, 1) +
++              wasm_u32x4_extract_lane(v_s1, 2) +
++              wasm_u32x4_extract_lane(v_s1, 3);
++        s2 += wasm_u32x4_extract_lane(v_s2, 0) +
++              wasm_u32x4_extract_lane(v_s2, 1) +
++              wasm_u32x4_extract_lane(v_s2, 2) +
++              wasm_u32x4_extract_lane(v_s2, 3);
++
++        /*
++         * Reduce.
++         */
++        s1 %= BASE;
++        s2 %= BASE;
++    }
++
++    /*
++     * Handle leftover data.
++     */
++    if (len) {
++        while (len--) {
++            s2 += (s1 += *buf++);
++        }
++
++        if (s1 >= BASE)
++            s1 -= BASE;
++        s2 %= BASE;
++    }
++
++    /*
++     * Return the recombined sums.
++     */
++    return s1 | (s2 << 16);
++}
++
+ #elif defined(ADLER32_SIMD_RVV)
+ #include <riscv_vector.h>
+ 

@@ -7,13 +7,13 @@ IS_DEBUG=${PDFium_IS_DEBUG:-false}
 
 ninja -C "$BUILD_DIR" pdfium
 
-if [ "$TARGET_CPU" == "wasm" ]; then
+if [[ "$TARGET_CPU" == "wasm" || "$TARGET_CPU" == "wasm-standalone" ]]; then
   LIBPDFIUMA="$BUILD_DIR/obj/libpdfium.a"
-  EXPORTED_FUNCTIONS=$(llvm-nm $LIBPDFIUMA --format=just-symbols | grep "^FPDF\|^FSDK\|^FORM\|^IFSDK" | sed 's/^/_/' | paste -sd "," -)
+  EXPORTED_FUNCTIONS=$("$SOURCE/third_party/emsdk/upstream/bin/llvm-nm" $LIBPDFIUMA --format=just-symbols | grep "^FPDF\|^FSDK\|^FORM\|^IFSDK" | sed 's/^/_/' | paste -sd "," -)
   EMCC_ARGS=(
     -s ALLOW_MEMORY_GROWTH=1
     -s ALLOW_TABLE_GROWTH=1
-    -s EXPORTED_FUNCTIONS="$EXPORTED_FUNCTIONS,_free,_malloc,_calloc,_realloc"
+    -s EXPORTED_FUNCTIONS="$EXPORTED_FUNCTIONS,_free,_malloc,_calloc,_realloc,_memset,_pdfium_jpeg_encode,_pdfium_jpeg_free"
     -s EXPORTED_RUNTIME_METHODS="ccall,cwrap,addFunction,removeFunction"
     -s LLD_REPORT_UNDEFINED
     -s WASM=1
@@ -21,16 +21,99 @@ if [ "$TARGET_CPU" == "wasm" ]; then
     "$LIBPDFIUMA"
     --no-entry
   )
+  if [[ "$TARGET_CPU" == "wasm-standalone" ]]; then
+    # Link a strong memset that uses the memory.fill instruction (libc's
+    # memset is a weak alias, so this overrides it). Emscripten only ships
+    # this in -Oz libc variants; see patches/wasm/memset_shim.c.
+    EMCC="$SOURCE/third_party/emsdk/upstream/emscripten/emcc"
+    BULKMEM_S="$SOURCE/third_party/emsdk/upstream/emscripten/system/lib/libc/emscripten_memset_bulkmem.S"
+    "$EMCC" -O2 -mbulk-memory -fno-builtin-memset -c patches/wasm/memset_shim.c -o "$BUILD_DIR/memset_shim.o"
+    # JPEG encode shim: exposes libjpeg-turbo's compressor (otherwise
+    # dead-stripped, since PDFium only decodes). Needs the longjmp lowering
+    # at compile time for its setjmp error handler.
+    "$EMCC" -O2 -mbulk-memory -msimd128 -sSUPPORT_LONGJMP=wasm -DMANGLE_JPEG_NAMES \
+      -I "$SOURCE/third_party/libjpeg_turbo" -I "$SOURCE/third_party/libjpeg_turbo/src" \
+      -c patches/wasm/jpeg_encode_shim.c -o "$BUILD_DIR/jpeg_encode_shim.o"
+    "$EMCC" -mbulk-memory -c "$BULKMEM_S" -o "$BUILD_DIR/memset_bulkmem.o"
+    EMCC_ARGS+=(
+      -mbulk-memory
+      -msimd128
+      -sSUPPORT_LONGJMP=wasm
+      -s ERROR_ON_UNDEFINED_SYMBOLS=0
+      -s STANDALONE_WASM=1
+      "$BUILD_DIR/memset_shim.o"
+      "$BUILD_DIR/jpeg_encode_shim.o"
+      "$BUILD_DIR/memset_bulkmem.o"
+    )
+  fi
+
   if [[ "$IS_DEBUG" == "true" ]]; then
     EMCC_ARGS+=(
       --profile
       -g
     )
   else
-    # O3 does not work! Strips out too much!
+    # This is binaryen's post-link level; the objects in libpdfium.a are
+    # already compiled at GN's -O2. -O3 keeps every export (the export
+    # sections are identical to -O2's), renders bit-identically, and is worth
+    # a small but reliable ~0.5-1% of total render wall-clock across an
+    # 8-document corpus while making the module ~8 KB smaller. The old
+    # "O3 strips out too much" warning here predated -s EXPORTED_FUNCTIONS,
+    # without which nothing marked the FPDF_* symbols as
+    # dead-code-elimination roots.
+    #
+    # Raising the per-translation-unit level (config("optimize") in
+    # build/config/compiler/BUILD.gn) is a separate lever, deliberately not
+    # taken: measured over the same corpus it is a wash (-0.09% total, i.e.
+    # indistinguishable from leaving it alone) for +188 KB of module size.
+    # Its one large win, -9% on a trivial text page, does not generalize to
+    # text-heavy documents, and it costs ~2 ms on transparency compositing.
+    #
+    # -flto here applies only to the link, so PDFium's own objects (compiled
+    # by ninja without it) are unaffected and it LTOs emscripten's bitcode
+    # sysroot instead. Worth about 1% of corpus wall-clock, regresses no
+    # document, and the module comes out marginally smaller. It also lets
+    # more memset calls fold into memory.fill.
+    #
+    # Compiling PDFium itself with -flto was measured and rejected, so this
+    # is not an untried avenue: thin LTO is a net +2.6% *regression* and full
+    # LTO gives half of link-only's gain while peaking at 3.5 GB of link
+    # memory. Both re-decide inlining inside the hand-tuned stretch and
+    # composite loops and lose vectorization doing it - wasm SIMD op counts
+    # rank in the same order as the benchmarks (thin < baseline < full).
+    # Chromium's use_thin_lto arg cannot express any of this: it asserts on
+    # use_lld, which is false for emscripten even though it links with
+    # wasm-ld.
     EMCC_ARGS+=(
-      -O2
+      -O3
+      -flto
+    )
+  fi
+  # Keep the wasm name section (real function names) for profilers, e.g.
+  # wazero's perfmap support (build tag "perfmap"). Adds size, so opt-in.
+  if [[ "${PDFium_PROFILING_NAMES:-false}" == "true" ]]; then
+    EMCC_ARGS+=(
+      --profiling-funcs
     )
   fi
   em++ "${EMCC_ARGS[@]}"
+
+  if [[ "$TARGET_CPU" == "wasm-standalone" ]]; then
+    # Translate the LLVM legacy exception handling encoding to the
+    # standardized exnref encoding (required by e.g. wazero). The --enable
+    # flags only gate binaryen's validator (emscripten strips the
+    # target_features section, so they must be passed explicitly); they do
+    # not change the output. This is the minimal set the current module
+    # needs; if a future emscripten emits more features, wasm-opt fails
+    # loudly and the missing --enable flag can be added.
+    WASM_OPT_ARGS=(--translate-to-exnref)
+    if [[ "${PDFium_PROFILING_NAMES:-false}" == "true" ]]; then
+      # Preserve the name section through the translation.
+      WASM_OPT_ARGS+=(-g)
+    fi
+    "$SOURCE/third_party/emsdk/upstream/bin/wasm-opt" "${WASM_OPT_ARGS[@]}" \
+      --enable-exception-handling --enable-reference-types \
+      --enable-bulk-memory --enable-nontrapping-float-to-int --enable-simd \
+      "$BUILD_DIR/pdfium.wasm" -o "$BUILD_DIR/pdfium.wasm"
+  fi
 fi

@@ -1,0 +1,101 @@
+--- a/core/fpdfapi/page/cpdf_dib.cpp
++++ b/core/fpdfapi/page/cpdf_dib.cpp
+@@ -31,6 +31,7 @@
+ #include "core/fpdfapi/parser/fpdf_parser_decode.h"
+ #include "core/fpdfapi/parser/fpdf_parser_utility.h"
+ #include "core/fxcodec/basic/basicmodule.h"
++#include "core/fxcodec/fx_codec.h"
+ #include "core/fxcodec/icc/icc_transform.h"
+ #include "core/fxcodec/jbig2/jbig2_decoder.h"
+ #include "core/fxcodec/jpeg/jpegmodule.h"
+@@ -1095,14 +1096,10 @@
+   const uint8_t* src_pos = src_scan.data();
+   switch (bpc_) {
+     case 8:
+-      UNSAFE_TODO({
+-        for (int column = 0; column < GetWidth(); column++) {
+-          *dest_pos++ = src_pos[2];
+-          *dest_pos++ = src_pos[1];
+-          *dest_pos++ = *src_pos;
+-          src_pos += 3;
+-        }
+-      });
++      // The whole translation is the per-pixel RGB-to-BGR byte swap;
++      // ReverseRGB() is that swap, in a form the compiler vectorizes
++      // (the destination scanline buffer never overlaps the source).
++      fxcodec::ReverseRGB(dest_scan, src_scan, GetWidth());
+       break;
+     case 16:
+       UNSAFE_TODO({
+--- a/core/fxcodec/fx_codec.cpp
++++ b/core/fxcodec/fx_codec.cpp
+@@ -6,6 +6,10 @@
+ 
+ #include "core/fxcodec/fx_codec.h"
+ 
++#if defined(__wasm_simd128__)
++#include <wasm_simd128.h>
++#endif
++
+ #include <utility>
+ 
+ #include "core/fxcrt/numerics/safe_conversions.h"
+@@ -50,6 +54,58 @@
+       fxcrt::reinterpret_span<const FX_RGB_STRUCT<uint8_t>>(pSrcBuf).first(
+           count);
+ 
++#if defined(__wasm_simd128__)
++  // 16 pixels (48 bytes) per iteration: 3 loads, 4 constant shuffles,
++  // 3 stores. All three loads complete before the first store, and the
++  // 48-byte windows never overlap each other, so the kernel is equally
++  // correct for the in-place (dst == src) and the disjoint-copy case;
++  // partial overlap is as unsupported as it is for the scalar loops.
++  // Output byte j comes from source byte 3*(j/3) + (2 - j%3), so a
++  // 16-byte output chunk straddles at most two input chunks, except for
++  // the middle chunk, whose two stragglers (source bytes 15 and 32) are
++  // gathered into `m` first.
++  {
++    size_t vec = count - count % 16;
++    uint8_t* dst_bytes = pDestBuf.data();
++    const uint8_t* src_bytes = pSrcBuf.data();
++    for (size_t i = 0; i < vec; i += 16) {
++      const uint8_t* s = src_bytes + 3 * i;
++      uint8_t* d = dst_bytes + 3 * i;
++      const v128_t a = wasm_v128_load(s);
++      const v128_t b = wasm_v128_load(s + 16);
++      const v128_t c = wasm_v128_load(s + 32);
++      const v128_t o0 = wasm_i8x16_shuffle(a, b, 2, 1, 0, 5, 4, 3, 8, 7, 6,
++                                           11, 10, 9, 14, 13, 12, 17);
++      const v128_t m = wasm_i8x16_shuffle(a, c, 15, 16, 0, 0, 0, 0, 0, 0, 0,
++                                          0, 0, 0, 0, 0, 0, 0);
++      const v128_t o1 = wasm_i8x16_shuffle(b, m, 0, 16, 4, 3, 2, 7, 6, 5, 10,
++                                           9, 8, 13, 12, 11, 17, 15);
++      const v128_t o2 = wasm_i8x16_shuffle(c, b, 30, 3, 2, 1, 6, 5, 4, 9, 8,
++                                           7, 12, 11, 10, 15, 14, 13);
++      wasm_v128_store(d, o0);
++      wasm_v128_store(d + 16, o1);
++      wasm_v128_store(d + 32, o2);
++    }
++    dst_span = dst_span.subspan(vec);
++    const auto src_rest = src_span.subspan(vec);
++    if (dst_span.data() == src_rest.data()) {
++      for (auto& pix : dst_span) {
++        std::swap(pix.red, pix.blue);
++      }
++      return;
++    }
++    for (auto [src_pix, dst_pix] : fxcrt::Zip(src_rest, dst_span)) {
++      const uint8_t blue = src_pix.blue;
++      const uint8_t green = src_pix.green;
++      const uint8_t red = src_pix.red;
++      dst_pix.red = blue;
++      dst_pix.green = green;
++      dst_pix.blue = red;
++    }
++    return;
++  }
++#endif  // defined(__wasm_simd128__)
++
+   if (dst_span.data() == src_span.data()) {
+     for (auto& pix : dst_span) {
+       std::swap(pix.red, pix.blue);

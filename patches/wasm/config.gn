@@ -1,7 +1,35 @@
+declare_args() {
+  # Set to true by steps/05-configure.sh for the wasm-standalone target.
+  # The browser (non-standalone) wasm target keeps the default feature set.
+  wasm_standalone = false
+}
+
 config("compiler") {
   defines = [
     # Enable fseeko() and ftello() (required by libopenjpeg20)
     # https://github.com/emscripten-core/emscripten/issues/4932
     "_POSIX_C_SOURCE=200112",
   ]
+
+  if (wasm_standalone) {
+    cflags = [
+      # Bulk memory operations (memory.copy / memory.fill). Enabled by
+      # default in current emscripten; made explicit here because the
+      # memset shim (patches/wasm/memset_shim.c) and the runtimes'
+      # required feature set depend on it.
+      "-mbulk-memory",
+
+      # Enable WebAssembly SIMD for the hand-written wasm_simd128.h kernels
+      # (e.g. the adler32 port in third_party/zlib). Runtimes must support
+      # the SIMD proposal.
+      "-msimd128",
+
+      # Lower setjmp/longjmp to WebAssembly exception handling instructions
+      # instead of emscripten invoke_* JS trampolines. Removes all invoke_*
+      # imports; runtimes must support the exception handling proposal (the
+      # binary is post-processed to the standardized exnref encoding in
+      # steps/06-build.sh).
+      "-sSUPPORT_LONGJMP=wasm",
+    ]
+  }
 }

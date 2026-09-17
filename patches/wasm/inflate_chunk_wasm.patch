@@ -1,0 +1,106 @@
+--- a/third_party/zlib/BUILD.gn
++++ b/third_party/zlib/BUILD.gn
+@@ -202,12 +202,22 @@
+       ]
+     }
+   }
++
++  if (use_wasm_simd_optimizations) {
++    # WebAssembly is little-endian and supports unaligned loads/stores.
++    defines = [
++      "INFLATE_CHUNK_SIMD_WASM",
++      "INFLATE_CHUNK_READ_64LE",
++      "DEFLATE_CHUNK_WRITE_64LE",
++    ]
++  }
+ }
+ 
+ source_set("zlib_data_chunk_simd") {
+   visibility = [ ":*" ]
+ 
+-  if (use_x86_x64_optimizations || use_arm_neon_optimizations) {
++  if (use_x86_x64_optimizations || use_arm_neon_optimizations ||
++      use_wasm_simd_optimizations) {
+     include_dirs = [ "." ]
+ 
+     sources = [
+@@ -348,7 +358,10 @@
+   }
+ 
+   if (use_wasm_simd_optimizations) {
+-    deps += [ ":zlib_adler32_simd" ]
++    deps += [
++      ":zlib_adler32_simd",
++      ":zlib_data_chunk_simd",
++    ]
+   }
+ 
+   if (use_x86_x64_optimizations || use_arm_neon_optimizations) {
+@@ -363,7 +376,7 @@
+     } else if (use_arm_neon_optimizations) {
+       deps += [ ":zlib_arm_crc32" ]
+     }
+-  } else {
++  } else if (!use_wasm_simd_optimizations) {
+     sources += [ "inflate.c" ]
+   }
+ 
+--- a/third_party/zlib/contrib/optimizations/chunkcopy.h
++++ b/third_party/zlib/contrib/optimizations/chunkcopy.h
+@@ -33,6 +33,9 @@
+ #elif defined(INFLATE_CHUNK_SIMD_SSE2)
+ #include <emmintrin.h>
+ typedef __m128i z_vec128i_t;
++#elif defined(INFLATE_CHUNK_SIMD_WASM)
++#include <wasm_simd128.h>
++typedef v128_t z_vec128i_t;
+ #elif defined(INFLATE_CHUNK_GENERIC)
+ typedef struct { uint8_t x[16]; } z_vec128i_t;
+ #else
+@@ -269,6 +272,46 @@
+ static inline void v_store_128(void* out, const z_vec128i_t vec) {
+   _mm_storeu_si128((__m128i*)out, vec);
+ }
++#elif defined(INFLATE_CHUNK_SIMD_WASM)
++/*
++ * v_load64_dup(): load *src as an unaligned 64-bit int and duplicate it in
++ * every 64-bit component of the 128-bit result (64-bit int splat).
++ */
++static inline z_vec128i_t v_load64_dup(const void* src) {
++  return wasm_v128_load64_splat(src);
++}
++
++/*
++ * v_load32_dup(): load *src as an unaligned 32-bit int and duplicate it in
++ * every 32-bit component of the 128-bit result (32-bit int splat).
++ */
++static inline z_vec128i_t v_load32_dup(const void* src) {
++  return wasm_v128_load32_splat(src);
++}
++
++/*
++ * v_load16_dup(): load *src as an unaligned 16-bit int and duplicate it in
++ * every 16-bit component of the 128-bit result (16-bit int splat).
++ */
++static inline z_vec128i_t v_load16_dup(const void* src) {
++  return wasm_v128_load16_splat(src);
++}
++
++/*
++ * v_load8_dup(): load the 8-bit int *src and duplicate it in every 8-bit
++ * component of the 128-bit result (8-bit int splat).
++ */
++static inline z_vec128i_t v_load8_dup(const void* src) {
++  return wasm_v128_load8_splat(src);
++}
++
++/*
++ * v_store_128(): store the 128-bit vec in a memory destination (that might
++ * not be 16-byte aligned) void* out.
++ */
++static inline void v_store_128(void* out, const z_vec128i_t vec) {
++  wasm_v128_store(out, vec);
++}
+ #elif defined(INFLATE_CHUNK_GENERIC)
+ /*
+  * Default implementations for chunk-copy functions rely on memcpy() being

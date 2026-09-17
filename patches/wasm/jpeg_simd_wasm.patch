@@ -1,0 +1,52 @@
+diff --git a/third_party/libjpeg_turbo/BUILD.gn b/third_party/libjpeg_turbo/BUILD.gn
+index b423384..b968e59 100644
+--- a/third_party/libjpeg_turbo/BUILD.gn
++++ b/third_party/libjpeg_turbo/BUILD.gn
+@@ -168,6 +168,13 @@ if (current_cpu == "x86" || current_cpu == "x64") {
+   }
+ }
+ 
++declare_args() {
++  # Enabled for wasm builds that compile with -msimd128 (the pdfium-binaries
++  # wasm-standalone target). The wasm SIMD kernels are bit-identical to the
++  # scalar C paths.
++  jpeg_wasm_simd = false
++}
++
+ config("libjpeg_simd_config") {
+   if (is_msan && (current_cpu == "x86" || current_cpu == "x64")) {
+     # MemorySanitizer doesn't support assembly code, so keep it disabled in x86
+@@ -180,6 +187,8 @@ config("libjpeg_simd_config") {
+       "NEON_INTRINSICS",
+       "WITH_SIMD",
+     ]
++  } else if (jpeg_wasm_simd) {
++    defines = [ "WITH_SIMD" ]
+   }
+ }
+ 
+@@ -229,6 +238,24 @@ static_library("simd") {
+       ]
+     }
+ 
++    configs -= [ "//build/config/compiler:default_optimization" ]
++    configs += [ "//build/config/compiler:optimize_speed" ]
++  } else if (jpeg_wasm_simd) {
++    include_dirs += [ "simd/wasm/" ]
++
++    sources = [
++      "simd/wasm/jccolor-wasm.c",
++      "simd/wasm/jchuff-wasm.c",
++      "simd/wasm/jcphuff-wasm.c",
++      "simd/wasm/jcsample-wasm.c",
++      "simd/wasm/jdcolor-wasm.c",
++      "simd/wasm/jdsample-wasm.c",
++      "simd/wasm/jfdctint-wasm.c",
++      "simd/wasm/jidctint-wasm.c",
++      "simd/wasm/jquanti-wasm.c",
++      "simd/wasm/jsimd.c",
++    ]
++
+     configs -= [ "//build/config/compiler:default_optimization" ]
+     configs += [ "//build/config/compiler:optimize_speed" ]
+   }
