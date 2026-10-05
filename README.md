@@ -243,6 +243,20 @@ The following NuGet packages are available:
 **HELP WANTED!**  
 I can provide packages for your favorite package manager, but I need help from someone who knows the format. Contact me via [GitHub issues](https://github.com/bblanchon/pdfium-binaries/issues) if you want to help.
 
+### iOS apps on the App Store
+
+The App Store rejects iOS apps that contain standalone `.dylib` files. That's why the iOS device and simulator archives also contain PDFium as `lib/pdfium.framework`.
+
+To embed `pdfium.framework` instead of `libpdfium.dylib` with the NuGet packages `bblanchon.PDFium.iOS` and `bblanchon.PDFiumV8.iOS`, set the following property in your iOS app:
+
+```xml
+<PropertyGroup>
+  <PDFiumUseFramework>true</PDFiumUseFramework>
+</PropertyGroup>
+```
+
+Your P/Invoke declarations must then load `@rpath/pdfium.framework/pdfium` instead of `pdfium` on iOS.
+
 ### Static builds
 
 Our pre-compiled versions of PDFium include only shared/dynamic libraries (`.so`, `.dll`, `.dylib`...), and **we don't plan to add static builds** in the future.
