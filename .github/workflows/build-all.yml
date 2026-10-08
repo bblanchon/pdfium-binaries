@@ -481,6 +481,23 @@ jobs:
       target_cpu: x86
       enable_v8: true
 
+  linux_musl_arm:
+    name: Linux musl ARM
+    permissions:
+      contents: read
+      actions: write # Upload workflow artifacts
+    uses: ./.github/workflows/build.yml
+    secrets:
+      MUSL_URL: ${{ secrets.MUSL_URL }}
+    with:
+      branch: ${{ github.event.inputs.branch }}
+      version: ${{ github.event.inputs.version }}
+      is_debug: ${{ github.event.inputs.is_debug == 'true' }}
+      target_os: linux
+      target_cpu: arm
+      target_environment: musl
+      enable_v8: false
+
   linux_musl_arm64:
     name: Linux musl ARM64
     permissions:
@@ -756,6 +773,7 @@ jobs:
       - linux_x64_v8
       - linux_x86
       - linux_x86_v8
+      - linux_musl_arm
       - linux_musl_arm64
       - linux_musl_x64
       - linux_musl_x86
@@ -847,6 +865,7 @@ jobs:
       - linux_arm_v8
       - linux_arm64
       - linux_arm64_v8
+      - linux_musl_arm
       - linux_musl_arm64
       - linux_musl_x64
       - linux_musl_x86
