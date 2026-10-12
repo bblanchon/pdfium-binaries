@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- the App Store rejects iOS apps containing standalone dylibs (ITMS-90171) -->
+<!-- set PDFiumUseFramework to true to embed pdfium.framework instead of libpdfium.dylib -->
+<!-- P/Invokes must then load "@rpath/pdfium.framework/pdfium" instead of "pdfium" -->
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Target Name="PDFiumUseFramework" AfterTargets="ComputeResolvedFilesToPublishList" Condition="'$(PDFiumUseFramework)' == 'true'">
+    <PropertyGroup>
+      <_PDFiumFramework>$([MSBuild]::NormalizeDirectory('$(MSBuildThisFileDirectory)', '..', '..', 'frameworks', '$(RuntimeIdentifier)', 'pdfium.framework'))</_PDFiumFramework>
+    </PropertyGroup>
+    <ItemGroup Condition="Exists('$(_PDFiumFramework)pdfium')">
+      <_PDFiumDylib Include="@(ResolvedFileToPublish)" Condition="'%(ResolvedFileToPublish.NuGetPackageId)' == '$(MSBuildThisFileName)' and '%(Filename)%(Extension)' == 'libpdfium.dylib'" />
+      <ResolvedFileToPublish Remove="@(_PDFiumDylib)" />
+      <ResolvedFileToPublish Include="$(_PDFiumFramework)**" Condition="'@(_PDFiumDylib)' != ''" CopyToPublishDirectory="PreserveNewest" />
+    </ItemGroup>
+  </Target>
+</Project>

@@ -40,6 +40,10 @@
     <file src="bblanchon.PDFium.native.targets" target="build/native/bblanchon.PDFium.iOS.targets" />
     <file src="include/**/*.h" target="build/native" />
 
+    <!-- special targets file embeds pdfium.framework in iOS apps when PDFiumUseFramework is true -->
+    <file src="bblanchon.PDFium.iOS.targets" target="build/net6.0-ios13.6/bblanchon.PDFium.iOS.targets" />
+    <file src="bblanchon.PDFium.iOS.targets" target="buildTransitive/net6.0-ios13.6/bblanchon.PDFium.iOS.targets" />
+
     <!-- the native PDFium binaries -->
     <!-- see list of available runtime identifiers -->
     <!-- https://docs.microsoft.com/en-us/dotnet/core/rid-catalog -->
@@ -48,5 +52,10 @@
     <file src="pdfium-ios-simulator-x64/lib/libpdfium.dylib" target="runtimes/iossimulator-x64/native/libpdfium.dylib" />
     <file src="pdfium-ios-catalyst-arm64/lib/libpdfium.dylib" target="runtimes/maccatalyst-arm64/native/libpdfium.dylib" />
     <file src="pdfium-ios-catalyst-x64/lib/libpdfium.dylib" target="runtimes/maccatalyst-x64/native/libpdfium.dylib" />
+
+    <!-- the App Store only accepts dynamic libraries embedded as frameworks -->
+    <file src="pdfium-ios-device-arm64/lib/pdfium.framework/**" target="frameworks/ios-arm64/pdfium.framework" />
+    <file src="pdfium-ios-simulator-arm64/lib/pdfium.framework/**" target="frameworks/iossimulator-arm64/pdfium.framework" />
+    <file src="pdfium-ios-simulator-x64/lib/pdfium.framework/**" target="frameworks/iossimulator-x64/pdfium.framework" />
   </files>
 </package>
