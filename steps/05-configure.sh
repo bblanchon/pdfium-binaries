@@ -97,6 +97,7 @@ mkdir -p "$BUILD"
 
       if [ "$TARGET_CPU" == "arm64" ]; then
         echo 'libyuv_use_neon = false'
+        echo 'libyuv_use_sme = false'
       fi
 
       [ "$ENABLE_V8" == "true" ] && case "$TARGET_CPU" in
