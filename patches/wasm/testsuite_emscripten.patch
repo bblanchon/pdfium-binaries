@@ -1,0 +1,60 @@
+diff --git a/testing/gtest/include/gtest/gtest.h b/testing/gtest/include/gtest/gtest.h
+index 47062803f..95e32f979 100644
+--- a/testing/gtest/include/gtest/gtest.h
++++ b/testing/gtest/include/gtest/gtest.h
+@@ -8,3 +8,14 @@
+ // third_party/googletest.
+ 
+ #include "third_party/googletest/src/googletest/include/gtest/gtest.h"
++
++// Emscripten has no fork(), so googletest disables death tests and does not
++// define EXPECT_DEATH. PDFium's tests use EXPECT_DEATH unguarded; map it to
++// the IF_SUPPORTED variant, which still compiles the statement but skips it
++// (with a warning) on platforms without death test support.
++#if defined(__EMSCRIPTEN__) && !defined(EXPECT_DEATH)
++#define EXPECT_DEATH(statement, matcher) \
++  EXPECT_DEATH_IF_SUPPORTED(statement, matcher)
++#define ASSERT_DEATH(statement, matcher) \
++  ASSERT_DEATH_IF_SUPPORTED(statement, matcher)
++#endif
+diff --git a/testing/utils/path_service.cpp b/testing/utils/path_service.cpp
+index c291774d9..fe05f2b75 100644
+--- a/testing/utils/path_service.cpp
++++ b/testing/utils/path_service.cpp
+@@ -11,6 +11,10 @@
+ #elif defined(__APPLE__)
+ #include <mach-o/dyld.h>
+ #include <sys/stat.h>
++#elif defined(__EMSCRIPTEN__)
++#include <limits.h>
++#include <sys/stat.h>
++#include <unistd.h>
+ #else  // Linux
+ #include <linux/limits.h>
+ #include <sys/stat.h>
+@@ -24,7 +28,8 @@
+ 
+ namespace {
+ 
+-#if defined(__APPLE__) || (defined(ANDROID) && __ANDROID_API__ < 21)
++#if defined(__APPLE__) || defined(__EMSCRIPTEN__) || \
++    (defined(ANDROID) && __ANDROID_API__ < 21)
+ using stat_wrapper_t = struct stat;
+ 
+ int CallStat(const char* path, stat_wrapper_t* sb) {
+@@ -95,6 +100,15 @@ std::string PathService::GetExecutableDir() {
+   if (_NSGetExecutablePath(&path[0], &path_length)) {
+     return std::string();
+   }
++#elif defined(__EMSCRIPTEN__)
++  // A wasm module has no real executable path. Use the working directory,
++  // which the test runner sets two levels below the source root (mirroring
++  // a native out/<config> layout), so GetSourceDir() resolves correctly.
++  char cwd_buf[PATH_MAX];
++  if (!::getcwd(cwd_buf, PATH_MAX)) {
++    return std::string();
++  }
++  return std::string(cwd_buf);
+ #else   // Linux
+   static const char kProcSelfExe[] = "/proc/self/exe";
+   char buf[PATH_MAX];

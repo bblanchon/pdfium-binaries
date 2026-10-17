@@ -1,0 +1,30 @@
+diff --git a/fpdfsdk/BUILD.gn b/fpdfsdk/BUILD.gn
+index fa21e2046..7d2fc7037 100644
+--- a/fpdfsdk/BUILD.gn
++++ b/fpdfsdk/BUILD.gn
+@@ -60,6 +60,9 @@ source_set("fpdfsdk") {
+     "fpdf_transformpage.cpp",
+     "fpdf_view.cpp",
+   ]
++  if (current_os == "emscripten") {
++    sources += [ "fpdf_emscripten.c" ]
++  }
+ 
+   configs += [
+     "../:pdfium_strict_config",
+diff --git a/public/fpdfview.h b/public/fpdfview.h
+index 9dab9e860..457464e3c 100644
+--- a/public/fpdfview.h
++++ b/public/fpdfview.h
+@@ -220,7 +220,11 @@ typedef int FPDF_OBJECT_TYPE;
+ #endif  // defined(FPDF_IMPLEMENTATION)
+ #endif  // defined(WIN32)
+ #else
++#if defined(WIN32)
+ #define FPDF_EXPORT
++#else
++#define FPDF_EXPORT __attribute__((visibility("default")))
++#endif  // defined(WIN32)
+ #endif  // defined(COMPONENT_BUILD)
+ 
+ #if defined(WIN32) && defined(FPDFSDK_EXPORTS)

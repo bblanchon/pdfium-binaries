@@ -1,0 +1,45 @@
+diff --git a/fpdfsdk/fpdf_view.cpp b/fpdfsdk/fpdf_view.cpp
+index af43639b0..bd7181d97 100644
+--- a/fpdfsdk/fpdf_view.cpp
++++ b/fpdfsdk/fpdf_view.cpp
+@@ -1072,11 +1072,39 @@ FPDF_EXPORT FPDF_BOOL FPDF_CALLCONV FPDFBitmap_FillRect(FPDF_BITMAP bitmap,
+ 
+   const int row_end = fill_rect.top + fill_rect.Height();
+   if (bpp == 32) {
++    // When all 4 bytes of the color are equal (e.g. white 0xFFFFFFFF), the
++    // fill is a plain memset, which is much faster than a per-pixel 32-bit
++    // fill loop, especially on targets without SIMD (e.g. WebAssembly,
++    // where memset can lower to the memory.fill instruction).
++    const uint32_t fill_color = static_cast<uint32_t>(color);
++    const uint8_t fill_byte = fill_color & 0xFF;
++    const bool byte_uniform = fill_color == fill_byte * 0x01010101u;
++    const uint32_t pitch = pBitmap->GetPitch();
++    if (byte_uniform && fill_rect.left == 0 &&
++        fill_rect.Width() == pBitmap->GetWidth() &&
++        pitch == static_cast<uint32_t>(pBitmap->GetWidth()) * 4) {
++      // Full-width fill on a bitmap without row padding: all rows form one
++      // contiguous block, so a single memset covers the whole region.
++      auto region = pBitmap->GetWritableBuffer().subspan(
++          static_cast<size_t>(fill_rect.top) * pitch,
++          static_cast<size_t>(fill_rect.Height()) * pitch);
++      // SAFETY: `region` accurately describes the fill region, so `size()`
++      // matches `data()`.
++      UNSAFE_BUFFERS(FXSYS_memset(region.data(), fill_byte, region.size()));
++      return true;
++    }
+     for (int row = fill_rect.top; row < row_end; ++row) {
+       auto span32 = pBitmap->GetWritableScanlineAs<uint32_t>(row).subspan(
+           static_cast<size_t>(fill_rect.left),
+           static_cast<size_t>(fill_rect.Width()));
+-      std::ranges::fill(span32, static_cast<uint32_t>(color));
++      if (byte_uniform) {
++        // SAFETY: `span32` accurately describes the scanline region, so
++        // `size_bytes()` matches `data()`.
++        UNSAFE_BUFFERS(
++            FXSYS_memset(span32.data(), fill_byte, span32.size_bytes()));
++      } else {
++        std::ranges::fill(span32, fill_color);
++      }
+     }
+     return true;
+   }
