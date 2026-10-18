@@ -243,19 +243,13 @@ The following NuGet packages are available:
 **HELP WANTED!**  
 I can provide packages for your favorite package manager, but I need help from someone who knows the format. Contact me via [GitHub issues](https://github.com/bblanchon/pdfium-binaries/issues) if you want to help.
 
-### iOS apps on the App Store
+### iOS and Mac Catalyst apps on the App Store
 
-The App Store rejects iOS apps that contain standalone `.dylib` files. That's why the iOS device and simulator archives also contain PDFium as `lib/pdfium.framework`.
+The App Store rejects iOS and Mac Catalyst apps that contain standalone `.dylib` files. The iOS device and simulator archives also contain PDFium as `lib/pdfium.framework`. Mac Catalyst archives contain `lib/pdfium.framework.zip`; extract it to get a versioned framework with its symbolic links intact.
 
-To embed `pdfium.framework` instead of `libpdfium.dylib` with the NuGet packages `bblanchon.PDFium.iOS` and `bblanchon.PDFiumV8.iOS`, set the following property in your iOS app:
+The NuGet packages `bblanchon.PDFium.iOS` and `bblanchon.PDFiumV8.iOS` include the framework (zipped for Mac Catalyst) in `runtimes/<rid>/native`, so the .NET SDK automatically embeds, links, and signs it with the app's identity. Both packages require .NET 8 or later and iOS or Mac Catalyst 17.4 or later.
 
-```xml
-<PropertyGroup>
-  <PDFiumUseFramework>true</PDFiumUseFramework>
-</PropertyGroup>
-```
-
-Your P/Invoke declarations must then load `@rpath/pdfium.framework/pdfium` instead of `pdfium` on iOS.
+**Breaking change:** these NuGet packages now contain `pdfium.framework` instead of `libpdfium.dylib`. P/Invoke declarations must load `@rpath/pdfium.framework/pdfium` instead of `pdfium` on iOS and Mac Catalyst. No opt-in property or custom MSBuild targets are needed. The standalone `.dylib` remains available in the `.tgz` archives for other consumers.
 
 ### Static builds
 
