@@ -1,0 +1,13 @@
+diff --git a/hwy/detect_compiler_arch.h b/hwy/detect_compiler_arch.h
+index 792ec5c..f98dcec 100644
+--- a/hwy/detect_compiler_arch.h
++++ b/hwy/detect_compiler_arch.h
+@@ -442,7 +442,7 @@
+ #elif HWY_ARCH_PPC || HWY_ARCH_S390X || HWY_ARCH_ARM_V7 || HWY_ARCH_ARM_OLD
+ #define HWY_ARCH_MAX_BYTES 16
+ #else
+-#error "Missing case for HWY_ARCH_*"
++#define HWY_ARCH_MAX_BYTES 16
+ #endif
+ 
+ //------------------------------------------------------------------------------

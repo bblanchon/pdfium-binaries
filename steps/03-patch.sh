@@ -81,6 +81,7 @@ esac
 case "$TARGET_CPU" in
   mipsel|mips64el)
     apply_patch "$PATCHES/mips64el/build.patch" build
+    apply_patch "$PATCHES/mips64el/highway.patch" third_party/highway/src
     ;;
   ppc64)
     apply_patch "$PATCHES/ppc64/pdfium.patch"
