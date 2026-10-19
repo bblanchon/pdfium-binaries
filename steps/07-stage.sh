@@ -56,7 +56,7 @@ case "$OS-$BUILD_TYPE" in
     mv "$BUILD/pdfium.html" "$STAGING_LIB"
     mv "$BUILD/pdfium.js" "$STAGING_LIB"
     mv "$BUILD/pdfium.wasm" "$STAGING_LIB"
-    rm -rf "$STAGING/include/cpp"
+    mv "$BUILD/obj/libpdfium.a" "$STAGING_LIB"
     rm "$STAGING/PDFiumConfig.cmake"
     ;;
 
