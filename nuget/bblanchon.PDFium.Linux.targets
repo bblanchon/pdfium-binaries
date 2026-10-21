@@ -35,6 +35,11 @@
       <Link>musl-x64\libpdfium.so</Link>
       <Visible>false</Visible>
     </None>
+    <None Include="$(MSBuildThisFileDirectory)..\..\runtimes\linux-musl-arm\native\libpdfium.so">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>musl-arm\libpdfium.so</Link>
+      <Visible>false</Visible>
+    </None>
     <None Include="$(MSBuildThisFileDirectory)..\..\runtimes\linux-musl-arm64\native\libpdfium.so">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Link>musl-arm64\libpdfium.so</Link>

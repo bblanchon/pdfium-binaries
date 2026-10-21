@@ -30,6 +30,10 @@ while read -r LIBRARY; do
     cpu_features)
       cp "$SOURCE_DIR/third_party/cpu_features/src/LICENSE" "$OUTPUT_DIR/cpu_features.txt"
       ;;
+    dragonbox)
+      cp "$SOURCE_DIR/third_party/dragonbox/src/LICENSE-Apache2-LLVM" "$OUTPUT_DIR/dragonbox-Apache2-LLVM.txt"
+      cp "$SOURCE_DIR/third_party/dragonbox/src/LICENSE-Boost" "$OUTPUT_DIR/dragonbox-Boost.txt"
+      ;;
     fast_float)
       cp "$SOURCE_DIR/third_party/fast_float/src/LICENSE-MIT" "$OUTPUT_DIR/fast_float.txt"
       ;;
@@ -38,6 +42,9 @@ while read -r LIBRARY; do
       ;;
     freetype|fx_freetype)
       cp "$SOURCE_DIR/third_party/freetype/FTL.TXT" "$OUTPUT_DIR/freetype.txt"
+      ;;
+    harfbuzz)
+      cp "$SOURCE_DIR/third_party/harfbuzz/src/COPYING" "$OUTPUT_DIR/harfbuzz.txt"
       ;;
     highway)
       cp "$SOURCE_DIR/third_party/highway/LICENSE" "$OUTPUT_DIR/highway.txt"
@@ -80,7 +87,7 @@ while read -r LIBRARY; do
       # IGNORE: we don't need to include these licenses
       ;;
     *)
-      echo "WARNING: unknow library $LIBRARY" >&2
+      echo "::warning file=steps/08-licenses.sh::Unknown library $LIBRARY"
       ;;
   esac
 done <<< "$THIRD_PARTY_LIBRARIES"

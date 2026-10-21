@@ -99,6 +99,14 @@ mkdir -p "$BUILD"
       echo 'use_custom_libcxx = false'
       echo 'use_custom_libcxx_for_host = false'
       echo 'use_glib = false'
+      # Use the musl toolchain's headers instead of the glibc sysroot.
+      echo 'use_sysroot = false'
+
+      if [ "$TARGET_CPU" == "arm64" ]; then
+        echo 'libyuv_use_neon = false'
+        echo 'libyuv_use_sme = false'
+      fi
+
       [ "$ENABLE_V8" == "true" ] && case "$TARGET_CPU" in
         arm)
             echo "v8_snapshot_toolchain = \"//build/toolchain/linux:clang_x86_v8_arm\""
