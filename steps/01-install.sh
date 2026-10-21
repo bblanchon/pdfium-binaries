@@ -137,7 +137,15 @@ case "$TARGET_OS" in
     ;;
 
   mac|ios)
-    sudo xcode-select -s "/Applications/Xcode_26.0.app"
+    # Pins the Xcode version bundled on the macos-15 GitHub Actions runner.
+    # A local machine won't have that exact versioned copy, so fall back to
+    # whatever Xcode is already selected rather than failing outright.
+    XCODE_PATH="/Applications/Xcode_26.0.app"
+    if [ -d "$XCODE_PATH" ]; then
+      sudo xcode-select -s "$XCODE_PATH"
+    else
+      echo "Warning: $XCODE_PATH not found; using the currently selected Xcode ($(xcode-select -p))." >&2
+    fi
     ;;
 
   emscripten)

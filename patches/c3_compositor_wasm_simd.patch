@@ -1,0 +1,234 @@
+--- a/core/fxge/dib/cfx_scanlinecompositor.cpp
++++ b/core/fxge/dib/cfx_scanlinecompositor.cpp
+@@ -1023,6 +1023,127 @@
+   for (; i < total; ++i) {
+     const uint8_t src_alpha = CompositePixelBgra2BgraCommon(
+         src_span[i], /*clip=*/255, dest_span[i]);
++    if (src_alpha == 255) {
++      CopyPixelToOpaqueBgra(src_span[i], dest_span[i]);
++    } else if (src_alpha != 0) {
++      CompositePixelBgra2BgraNoBlend(src_span[i], src_alpha, dest_span[i]);
++    }
++  }
++}
++
++// Clip-masked variant of CompositeRowBgra2BgraNormalNoClipSimd: the
++// effective source alpha is floor(src.alpha * clip / 255) per pixel
++// (exactly CompositePixelBgra2BgraCommon()), and a dest.alpha == 0 lane
++// takes the source channels with that clipped alpha rather than the
++// source pixel verbatim. Everything else is the same verified lane
++// arithmetic as the no-clip kernel.
++template <typename DestPixelStruct>
++void CompositeRowBgra2BgraNormalClipSimd(
++    pdfium::span<const FX_BGRA_STRUCT<uint8_t>> src_span,
++    pdfium::span<const uint8_t> clip_span,
++    pdfium::span<DestPixelStruct> dest_span) {
++  constexpr bool kDestRgba =
++      std::is_same_v<DestPixelStruct, FX_RGBA_STRUCT<uint8_t>>;
++  static_assert(kDestRgba ||
++                std::is_same_v<DestPixelStruct, FX_BGRA_STRUCT<uint8_t>>);
++  const size_t total = src_span.size();
++  CHECK_LE(total, dest_span.size());
++  CHECK_LE(total, clip_span.size());
++  const uint8_t* src = reinterpret_cast<const uint8_t*>(src_span.data());
++  const uint8_t* clip = clip_span.data();
++  uint8_t* dst = reinterpret_cast<uint8_t*>(dest_span.data());
++
++  const v128_t zero = wasm_i32x4_splat(0);
++  const v128_t one = wasm_i32x4_splat(1);
++  const v128_t c255 = wasm_i32x4_splat(255);
++  const v128_t alpha_bytes =
++      wasm_i32x4_splat(static_cast<int32_t>(0xFF000000u));
++
++  size_t i = 0;
++  UNSAFE_TODO({
++    for (; i + 4 <= total; i += 4, src += 16, clip += 4, dst += 16) {
++      v128_t s = wasm_v128_load(src);
++      if constexpr (kDestRgba) {
++        s = wasm_i8x16_swizzle(
++            s, wasm_i8x16_const(2, 1, 0, 3, 6, 5, 4, 7, 10, 9, 8, 11, 14, 13,
++                                12, 15));
++      }
++      const v128_t cb = wasm_v128_load32_zero(clip);
++      const v128_t c32 =
++          wasm_u32x4_extend_low_u16x8(wasm_u16x8_extend_low_u8x16(cb));
++      // src_alpha = floor(src.alpha * clip / 255)
++      const v128_t sa = Div255U32(wasm_i32x4_mul(wasm_u32x4_shr(s, 24), c32));
++      // The pixel a dest.alpha == 0 lane receives: source channels with the
++      // clipped alpha.
++      const v128_t s_clipped =
++          wasm_v128_bitselect(wasm_i32x4_shl(sa, 24), s, alpha_bytes);
++
++      // All four lanes fully opaque after clipping: source verbatim (the
++      // clipped alpha is 255 only when the source alpha already was).
++      if (wasm_i32x4_all_true(wasm_i32x4_eq(sa, c255))) {
++        wasm_v128_store(dst, s);
++        continue;
++      }
++
++      const v128_t d = wasm_v128_load(dst);
++      const v128_t da = wasm_u32x4_shr(d, 24);
++      const v128_t m_dst0 = wasm_i32x4_eq(da, zero);
++
++      // All four lanes transparent after clipping: dest unchanged except
++      // dest.alpha == 0 lanes, which take the source channels with the
++      // clipped (zero) alpha.
++      if (!wasm_v128_any_true(sa)) {
++        if (wasm_v128_any_true(m_dst0)) {
++          wasm_v128_store(dst, wasm_v128_bitselect(s_clipped, d, m_dst0));
++        }
++        continue;
++      }
++
++      const v128_t m_skip = wasm_i32x4_eq(sa, zero);
++
++      const v128_t du = wasm_i32x4_sub(wasm_i32x4_add(da, sa),
++                                       Div255U32(wasm_i32x4_mul(da, sa)));
++      const v128_t du_safe =
++          wasm_v128_bitselect(one, du, wasm_i32x4_eq(du, zero));
++
++      const v128_t num = wasm_i32x4_mul(sa, c255);
++      v128_t q = wasm_i32x4_trunc_sat_f32x4(wasm_f32x4_div(
++          wasm_f32x4_convert_i32x4(num), wasm_f32x4_convert_i32x4(du_safe)));
++      q = wasm_i32x4_sub(
++          q, wasm_u32x4_le(wasm_i32x4_mul(wasm_i32x4_add(q, one), du_safe),
++                           num));
++      q = wasm_i32x4_add(q,
++                         wasm_u32x4_gt(wasm_i32x4_mul(q, du_safe), num));
++
++      const v128_t r_lo = wasm_i8x16_shuffle(q, zero, 0, 16, 0, 16, 0, 16, 0,
++                                             16, 4, 16, 4, 16, 4, 16, 4, 16);
++      const v128_t r_hi = wasm_i8x16_shuffle(q, zero, 8, 16, 8, 16, 8, 16, 8,
++                                             16, 12, 16, 12, 16, 12, 16, 12,
++                                             16);
++      const v128_t rinv_lo = wasm_i16x8_sub(wasm_i16x8_splat(255), r_lo);
++      const v128_t rinv_hi = wasm_i16x8_sub(wasm_i16x8_splat(255), r_hi);
++
++      const v128_t s_lo = wasm_u16x8_extend_low_u8x16(s);
++      const v128_t s_hi = wasm_u16x8_extend_high_u8x16(s);
++      const v128_t d_lo = wasm_u16x8_extend_low_u8x16(d);
++      const v128_t d_hi = wasm_u16x8_extend_high_u8x16(d);
++      const v128_t m_lo = Div255U16(wasm_i16x8_add(
++          wasm_i16x8_mul(d_lo, rinv_lo), wasm_i16x8_mul(s_lo, r_lo)));
++      const v128_t m_hi = Div255U16(wasm_i16x8_add(
++          wasm_i16x8_mul(d_hi, rinv_hi), wasm_i16x8_mul(s_hi, r_hi)));
++      v128_t merged = wasm_u8x16_narrow_i16x8(m_lo, m_hi);
++      merged = wasm_v128_bitselect(wasm_i32x4_shl(du, 24), merged,
++                                   alpha_bytes);
++
++      v128_t out = wasm_v128_bitselect(d, merged, m_skip);
++      out = wasm_v128_bitselect(s_clipped, out, m_dst0);
++      wasm_v128_store(dst, out);
++    }
++  });
++
++  for (; i < total; ++i) {
++    const uint8_t src_alpha = CompositePixelBgra2BgraCommon(
++        src_span[i], clip_span[i], dest_span[i]);
+     if (src_alpha == 255) {
+       CopyPixelToOpaqueBgra(src_span[i], dest_span[i]);
+     } else if (src_alpha != 0) {
+@@ -1030,6 +1151,7 @@
+     }
+   }
+ }
++
+ #endif  // defined(__wasm_simd128__)
+ 
+ template <typename DestPixelStruct>
+@@ -1102,6 +1224,13 @@
+     }
+     return;
+   }
++#if defined(__wasm_simd128__)
++  if constexpr (std::is_same_v<DestPixelStruct, FX_BGRA_STRUCT<uint8_t>> ||
++                std::is_same_v<DestPixelStruct, FX_RGBA_STRUCT<uint8_t>>) {
++    CompositeRowBgra2BgraNormalClipSimd(src_span, clip_span, dest_span);
++    return;
++  }
++#endif
+   for (auto [input, clip, output] :
+        fxcrt::Zip(src_span, clip_span, dest_span)) {
+     const uint8_t src_alpha =
+@@ -1236,8 +1365,81 @@
+   UNSAFE_TODO({
+     if (dest_Bpp == src_Bpp) {
+       FXSYS_memcpy(dest_scan, src_scan, width * dest_Bpp);
++      return;
++    }
++#if defined(__wasm_simd128__)
++    // Bpp conversion rows are pure byte gathers: 16 pixels per iteration
++    // with constant shuffles (index maps verified against the scalar copy
++    // by simulation). The 3->4 direction preserves the destination's
++    // fourth byte exactly as the 3-byte memcpy does.
++    const int vec = width - width % 16;
++    if (src_Bpp == 4 && dest_Bpp == 3) {
++      for (int col = 0; col < vec; col += 16) {
++        const uint8_t* sp = src_scan + 4 * col;
++        uint8_t* dp = dest_scan + 3 * col;
++        const v128_t s0 = wasm_v128_load(sp);
++        const v128_t s1 = wasm_v128_load(sp + 16);
++        const v128_t s2 = wasm_v128_load(sp + 32);
++        const v128_t s3 = wasm_v128_load(sp + 48);
++        wasm_v128_store(
++            dp, wasm_i8x16_shuffle(s0, s1, 0, 1, 2, 4, 5, 6, 8, 9, 10, 12,
++                                   13, 14, 16, 17, 18, 20));
++        wasm_v128_store(
++            dp + 16, wasm_i8x16_shuffle(s1, s2, 5, 6, 8, 9, 10, 12, 13, 14,
++                                        16, 17, 18, 20, 21, 22, 24, 25));
++        wasm_v128_store(
++            dp + 32, wasm_i8x16_shuffle(s2, s3, 10, 12, 13, 14, 16, 17, 18,
++                                        20, 21, 22, 24, 25, 26, 28, 29, 30));
++      }
++      dest_scan += 3 * vec;
++      src_scan += 4 * vec;
++      for (int col = vec; col < width; col++) {
++        FXSYS_memcpy(dest_scan, src_scan, 3);
++        dest_scan += 3;
++        src_scan += 4;
++      }
+       return;
+     }
++    if (src_Bpp == 3 && dest_Bpp == 4) {
++      for (int col = 0; col < vec; col += 16) {
++        const uint8_t* sp = src_scan + 3 * col;
++        uint8_t* dp = dest_scan + 4 * col;
++        const v128_t a = wasm_v128_load(sp);
++        const v128_t b = wasm_v128_load(sp + 16);
++        const v128_t c = wasm_v128_load(sp + 32);
++        const v128_t d0 = wasm_v128_load(dp);
++        const v128_t d1 = wasm_v128_load(dp + 16);
++        const v128_t d2 = wasm_v128_load(dp + 32);
++        const v128_t d3 = wasm_v128_load(dp + 48);
++        wasm_v128_store(
++            dp, wasm_i8x16_shuffle(a, d0, 0, 1, 2, 19, 3, 4, 5, 23, 6, 7, 8,
++                                   27, 9, 10, 11, 31));
++        const v128_t t1 =
++            wasm_i8x16_shuffle(a, b, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
++                               22, 23, 0, 0, 0, 0);
++        wasm_v128_store(
++            dp + 16, wasm_i8x16_shuffle(t1, d1, 0, 1, 2, 19, 3, 4, 5, 23, 6,
++                                        7, 8, 27, 9, 10, 11, 31));
++        const v128_t t2 =
++            wasm_i8x16_shuffle(b, c, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17,
++                               18, 19, 0, 0, 0, 0);
++        wasm_v128_store(
++            dp + 32, wasm_i8x16_shuffle(t2, d2, 0, 1, 2, 19, 3, 4, 5, 23, 6,
++                                        7, 8, 27, 9, 10, 11, 31));
++        wasm_v128_store(
++            dp + 48, wasm_i8x16_shuffle(c, d3, 4, 5, 6, 19, 7, 8, 9, 23, 10,
++                                        11, 12, 27, 13, 14, 15, 31));
++      }
++      dest_scan += 4 * vec;
++      src_scan += 3 * vec;
++      for (int col = vec; col < width; col++) {
++        FXSYS_memcpy(dest_scan, src_scan, 3);
++        dest_scan += 4;
++        src_scan += 3;
++      }
++      return;
++    }
++#endif  // defined(__wasm_simd128__)
+     for (int col = 0; col < width; col++) {
+       FXSYS_memcpy(dest_scan, src_scan, 3);
+       dest_scan += dest_Bpp;

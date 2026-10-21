@@ -1,0 +1,106 @@
+--- a/core/fxcodec/icc/icc_transform.cpp
++++ b/core/fxcodec/icc/icc_transform.cpp
+@@ -116,6 +116,15 @@
+       new IccTransform(hTransform, nSrcComponents, bLab, bNormal));
+ }
+ 
++namespace {
++
++// 2^17 entries * 16 bytes = 2 MiB per transform, lazily allocated. Covers
++// the distinct-color counts seen in practice with a low load factor.
++constexpr size_t kMemoSize = size_t{1} << 17;
++constexpr uint32_t kMemoProbes = 8;
++
++}  // namespace
++
+ void IccTransform::Translate(pdfium::span<const float> src_values,
+                              pdfium::span<float, 3> dest_values) {
+   uint8_t output[4];
+@@ -129,14 +138,48 @@
+       inputs[i] = src_values[i];
+     }
+     cmsDoTransform(transform_, inputs.data(), output, 1);
+-  } else {
+-    DataVector<uint8_t> inputs(std::max<size_t>(src_values.size(), 16));
+-    for (size_t i = 0; i < src_values.size(); ++i) {
+-      inputs[i] =
+-          static_cast<int>(std::clamp(src_values[i] * 255.0f, 0.0f, 255.0f));
++    dest_values[0] = output[2] / 255.0f;
++    dest_values[1] = output[1] / 255.0f;
++    dest_values[2] = output[0] / 255.0f;
++    return;
++  }
++  // The transform consumes the quantized 8-bit tuple, so the tuple is a
++  // complete key for the result (at most 4 components; more is rejected
++  // by CreateTransformSRGB()).
++  uint8_t inputs[16] = {};
++  const size_t n = std::min<size_t>(src_values.size(), 4);
++  uint64_t key = 0;
++  for (size_t i = 0; i < n; ++i) {
++    inputs[i] =
++        static_cast<int>(std::clamp(src_values[i] * 255.0f, 0.0f, 255.0f));
++    key = (key << 8) | inputs[i];
++  }
++  const uint64_t tag = key + 1;
++  if (memo_.empty()) {
++    memo_.resize(kMemoSize);
++  }
++  const uint64_t h = key * 0x9E3779B97F4A7C15ull;
++  MemoEntry* insert_at = nullptr;
++  for (uint32_t probe = 0; probe < kMemoProbes; ++probe) {
++    MemoEntry& e = memo_[(h + probe) & (kMemoSize - 1)];
++    if (e.tag == tag) {
++      dest_values[0] = e.out[0] / 255.0f;
++      dest_values[1] = e.out[1] / 255.0f;
++      dest_values[2] = e.out[2] / 255.0f;
++      return;
+     }
+-    cmsDoTransform(transform_, inputs.data(), output, 1);
++    if (e.tag == 0) {
++      insert_at = &e;
++      break;
++    }
+   }
++  cmsDoTransform(transform_, inputs, output, 1);
++  if (insert_at) {
++    insert_at->out[0] = output[2];
++    insert_at->out[1] = output[1];
++    insert_at->out[2] = output[0];
++    insert_at->tag = tag;
++  }
+   dest_values[0] = output[2] / 255.0f;
+   dest_values[1] = output[1] / 255.0f;
+   dest_values[2] = output[0] / 255.0f;
+--- a/core/fxcodec/icc/icc_transform.h
++++ b/core/fxcodec/icc/icc_transform.h
+@@ -20,6 +20,8 @@
+ #include "third_party/lcms/include/lcms2.h"
+ #endif
+ 
++#include <vector>
++
+ namespace fxcodec {
+ 
+ class IccTransform {
+@@ -50,6 +52,21 @@
+   const int src_components_;
+   const bool lab_;
+   const bool normal_;
++
++  // Exact-match memo for Translate(): open-addressed table keyed on the
++  // 8-bit-quantized input tuple (at most 4 components), storing the three
++  // output samples. Bit-identical by construction - a hit returns exactly
++  // what cmsDoTransform() returned for the same quantized inputs. Real
++  // documents evaluate few distinct colors relative to calls (per-pixel
++  // GetRGB() on inverted-Decode CMYK scans: millions of calls, tens of
++  // thousands of tuples), and the memo removes the per-call pipeline
++  // evaluation. Lazily allocated; insertion stops when the probe window
++  // is full, evaluation then falls through to the transform.
++  struct MemoEntry {
++    uint64_t tag = 0;  // key + 1; 0 = empty
++    uint8_t out[3] = {};
++  };
++  std::vector<MemoEntry> memo_;
+ };
+ 
+ }  // namespace fxcodec
