@@ -24,6 +24,14 @@ mkdir -p "$BUILD"
     echo "target_cpu = \"$TARGET_CPU\""
   fi
   echo "target_os = \"$OS\""
+  # build/gn_logs.gni imports //build/config/mac/mac_sdk.gni whenever
+  # host_os == "mac", regardless of target_os; build_overrides/build.gni
+  # only derives use_system_xcode for target_os "mac"/"ios", leaving it at
+  # its "" default otherwise, which mac_sdk.gni's `!use_system_xcode` then
+  # fails on. Only matters when building a non-mac/ios target on a Mac host.
+  if [ "$OS" != "mac" ] && [ "$OS" != "ios" ]; then
+    echo "use_system_xcode = true"
+  fi
   echo "pdf_enable_v8 = $ENABLE_V8"
   echo "pdf_enable_xfa = $ENABLE_V8"
   echo "treat_warnings_as_errors = false"
