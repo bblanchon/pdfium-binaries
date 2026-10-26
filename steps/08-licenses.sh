@@ -69,7 +69,7 @@ while read -r LIBRARY; do
       sed -n '1,/\*\//p' "$SOURCE_DIR/third_party/libopenjpeg/src/openjpeg.c" > "$OUTPUT_DIR/libopenjpeg.txt"
       ;;
     libtiff|fx_tiff|tiff)
-      sed '1d;s/^.\{0,3\}//;23,$d' "$SOURCE_DIR/third_party/libtiff/t4.h" > "$OUTPUT_DIR/libtiff.txt"
+      sed '1d;s/^.\{0,3\}//;23,$d' "$SOURCE_DIR/third_party/libtiff/src/t4.h" > "$OUTPUT_DIR/libtiff.txt"
       ;;
     libunwind)
       cp "$SOURCE_DIR/third_party/libunwind/src/LICENSE.TXT" "$OUTPUT_DIR/libunwind.txt"
