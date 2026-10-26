@@ -56,7 +56,7 @@ while read -r LIBRARY; do
       cp "$SOURCE_DIR/v8/third_party/inspector_protocol/LICENSE" "$OUTPUT_DIR/inspector_protocol.txt"
       ;;
     lcms|lcms2|fx_lcms|fx_lcms2)
-      sed '/^$/,$d' "$SOURCE_DIR/third_party/lcms/include/lcms2.h" > "$OUTPUT_DIR/lcms.txt"
+      sed '/^$/,$d' "$SOURCE_DIR/third_party/lcms/src/include/lcms2.h" > "$OUTPUT_DIR/lcms.txt"
       ;;
     libpng|png)
       cp "$SOURCE_DIR/third_party/libpng/LICENSE" "$OUTPUT_DIR/libpng.txt"
