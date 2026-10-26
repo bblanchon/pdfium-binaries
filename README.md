@@ -351,6 +351,11 @@ The following projects use (or recommend using) our PDFium builds:
       <td>Static builds</td>
     </tr>
     <tr>
+      <td><img src="https://github.com/kdpkke.png" width="48" height="48" alt="kdpkke"></td>
+      <td><a href="https://github.com/kateinoigakukun"><code>@kdpkke</code></a></td>
+      <td>framework files for iOS build</td>
+    </tr>
+    <tr>
       <td><img src="https://github.com/mara004.png" width="48" height="48" alt="mara004"></td>
       <td><a href="https://github.com/mara004"><code>@mara004</code></a></td>
       <td>ppc and mips builds. Constant aid.</td>
