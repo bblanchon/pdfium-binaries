@@ -76,6 +76,7 @@ mkdir -p "$BUILD"
       echo 'pdf_is_complete_lib = true'
       echo 'is_clang = false'
       echo 'use_custom_libcxx = false'
+      echo 'pdf_use_libyuv = false'
       if [ "$ENABLE_V8" == "true" ]; then
         # Set a toolchain with the same bitness as the target CPU
         echo "v8_snapshot_toolchain = \"//build/toolchain/linux:x86\""
