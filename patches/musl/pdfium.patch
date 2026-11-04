@@ -1,5 +1,55 @@
+diff --git a/core/fxge/BUILD.gn b/core/fxge/BUILD.gn
+index f8c85ead1..83726db5d 100644
+--- a/core/fxge/BUILD.gn
++++ b/core/fxge/BUILD.gn
+@@ -77,7 +77,6 @@ source_set("fxge") {
+     "dib/cfx_imagetransformer.h",
+     "dib/cfx_scanlinecompositor.cpp",
+     "dib/cfx_scanlinecompositor.h",
+-    "dib/cfx_scanlinecompositor_hwy.cpp",
+     "dib/cfx_scanlinecompositor_hwy.h",
+     "dib/cstretchengine.cpp",
+     "dib/cstretchengine.h",
+diff --git a/core/fxge/dib/cfx_scanlinecompositor.cpp b/core/fxge/dib/cfx_scanlinecompositor.cpp
+index b3f255951..880b59eb7 100644
+--- a/core/fxge/dib/cfx_scanlinecompositor.cpp
++++ b/core/fxge/dib/cfx_scanlinecompositor.cpp
+@@ -467,13 +467,7 @@ void CompositeRow_Bgr2Bgra_NoBlend_NoClip(
+   auto bgra_src =
+       fxcrt::reinterpret_span<const FX_BGRA_STRUCT<uint8_t>>(src_span).first(
+           width);
+-  if constexpr (std::is_same_v<DestPixelStruct, FX_BGRA_STRUCT<uint8_t>>) {
+-    // SIMD: packed-BGRA src/dest, opaque copy (alpha forced 0xFF)
+-    CompositeRowBgra2BgrxForceOpaqueSimd(bgra_src, dest_span);
+-  } else {
+-    static_assert(std::is_same_v<DestPixelStruct, FX_RGBA_STRUCT<uint8_t>>);
+     CopyRowToOpaqueBgra(dest_span, bgra_src);
+-  }
+ }
+ 
+ template <typename DestPixelStruct>
+@@ -660,11 +654,6 @@ void CompositeRowBgra2Bgra(pdfium::span<const FX_BGRA_STRUCT<uint8_t>> src_span,
+       }
+       return;
+     }
+-    if constexpr (std::is_same_v<DestPixelStruct, FX_BGRA_STRUCT<uint8_t>>) {
+-      // SIMD: packed-BGRA, normal, no clip
+-      CompositeRowBgra2BgraSimd(src_span, dest_span);
+-    } else {
+-      static_assert(std::is_same_v<DestPixelStruct, FX_RGBA_STRUCT<uint8_t>>);
+       for (auto [input, output] : fxcrt::Zip(src_span, dest_span)) {
+         const uint8_t src_alpha =
+             CompositePixelBgra2BgraCommon(input, /*clip=*/255, output);
+@@ -678,7 +667,6 @@ void CompositeRowBgra2Bgra(pdfium::span<const FX_BGRA_STRUCT<uint8_t>> src_span,
+         // src_alpha == 0: invisible source, or dest already set by
+         // CompositePixelBgra2BgraCommon(). Nothing to do.
+       }
+-    }
+     return;
+   }
+ 
 diff --git a/third_party/highway/BUILD.gn b/third_party/highway/BUILD.gn
-index a975b0b..e5c424a 100644
+index a975b0b41..e5c424a83 100644
 --- a/third_party/highway/BUILD.gn
 +++ b/third_party/highway/BUILD.gn
 @@ -11,7 +11,7 @@ config("libhwy_external_config") {
