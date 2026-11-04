@@ -125,7 +125,11 @@ export PATH
 
 [ $START_STEP -le 2 ] && . steps/02-checkout.sh
 [ $START_STEP -le 3 ] && . steps/03-patch.sh
+
 [ $START_STEP -le 4 ] && . steps/04-install-extras.sh
+PATH="$(tr '\n' ':' < "$PATH_FILE")$PATH"
+export PATH
+
 [ $START_STEP -le 5 ] && . steps/05-configure.sh
 [ $START_STEP -le 6 ] && . steps/06-build.sh
 [ $START_STEP -le 7 ] && . steps/07-stage.sh
