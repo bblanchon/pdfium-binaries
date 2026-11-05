@@ -51,6 +51,7 @@ case "$OS-$BUILD_TYPE" in
 
   mac-shared|ios-shared)
     mv "$BUILD/libpdfium.dylib" "$STAGING_LIB"
+    install_name_tool -id @rpath/libpdfium.dylib "$STAGING_LIB/libpdfium.dylib"
     ;;
 
   emscripten-*)
