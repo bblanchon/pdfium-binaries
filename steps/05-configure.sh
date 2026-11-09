@@ -55,6 +55,7 @@ mkdir -p "$BUILD"
         echo 'ios_deployment_target = "17.4"'
         if [ "$TARGET_CPU" == "arm64" ]; then
             echo 'arm_control_flow_integrity = "none"'
+            echo 'v8_enable_pointer_compression = false'
         fi
       else
         echo 'ios_deployment_target = "17.0"'
