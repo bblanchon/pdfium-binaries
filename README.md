@@ -248,6 +248,15 @@ The following NuGet packages are available:
 **HELP WANTED!**  
 I can provide packages for your favorite package manager, but I need help from someone who knows the format. Contact me via [GitHub issues](https://github.com/bblanchon/pdfium-binaries/issues) if you want to help.
 
+### iOS and Mac Catalyst apps on the App Store
+
+The App Store rejects iOS and Mac Catalyst apps that contain standalone `.dylib` files. The iOS device and simulator archives also contain PDFium as `lib/pdfium.framework`. Mac Catalyst archives contain `lib/pdfium.framework.zip`; extract it to get a versioned framework with its symbolic links intact.
+
+The NuGet packages `bblanchon.PDFium.iOS` and `bblanchon.PDFiumV8.iOS` include the framework (zipped for Mac Catalyst) in `runtimes/<rid>/native`, so the .NET SDK automatically embeds, links, and signs it with the app's identity. Both packages require .NET 8 or later and iOS or Mac Catalyst 17.4 or later.
+
+> [!CAUTION] 
+> We recently changed the iOS NuGet packages. They now contain `pdfium.framework` instead of `libpdfium.dylib`. **P/Invoke declarations must load `@rpath/pdfium.framework/pdfium` instead of `pdfium` on iOS and Mac Catalyst**. The standalone `.dylib` remains available in the `.tgz` archives for other consumers.
+
 ### Static builds
 
 Our pre-compiled versions of PDFium include only shared/dynamic libraries (`.so`, `.dll`, `.dylib`...), and **we don't plan to add static builds** in the future.
@@ -340,6 +349,11 @@ The following projects use (or recommend using) our PDFium builds:
       <td><img src="https://github.com/kateinoigakukun.png" width="48" height="48" alt="Yuta Saito"></td>
       <td><a href="https://github.com/kateinoigakukun"><code>@kateinoigakukun</code></a></td>
       <td>Static builds</td>
+    </tr>
+    <tr>
+      <td><img src="https://github.com/kdpkke.png" width="48" height="48" alt="kdpkke"></td>
+      <td><a href="https://github.com/kateinoigakukun"><code>@kdpkke</code></a></td>
+      <td>framework files for iOS build</td>
     </tr>
     <tr>
       <td><img src="https://github.com/mara004.png" width="48" height="48" alt="mara004"></td>

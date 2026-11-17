@@ -56,7 +56,7 @@ while read -r LIBRARY; do
       cp "$SOURCE_DIR/v8/third_party/inspector_protocol/LICENSE" "$OUTPUT_DIR/inspector_protocol.txt"
       ;;
     lcms|lcms2|fx_lcms|fx_lcms2)
-      sed '/^$/,$d' "$SOURCE_DIR/third_party/lcms/include/lcms2.h" > "$OUTPUT_DIR/lcms.txt"
+      sed '/^$/,$d' "$SOURCE_DIR/third_party/lcms/src/include/lcms2.h" > "$OUTPUT_DIR/lcms.txt"
       ;;
     libpng|png)
       cp "$SOURCE_DIR/third_party/libpng/LICENSE" "$OUTPUT_DIR/libpng.txt"
@@ -66,10 +66,10 @@ while read -r LIBRARY; do
       cp "$SOURCE_DIR/third_party/libjpeg_turbo/README.ijg" "$OUTPUT_DIR/libjpeg_turbo.ijg"
       ;;
     libopenjpeg|libopenjpeg2|fx_libopenjpeg)
-      sed -n '1,/\*\//p' "$SOURCE_DIR/third_party/libopenjpeg/openjpeg.c" > "$OUTPUT_DIR/libopenjpeg.txt"
+      sed -n '1,/\*\//p' "$SOURCE_DIR/third_party/libopenjpeg/src/openjpeg.c" > "$OUTPUT_DIR/libopenjpeg.txt"
       ;;
     libtiff|fx_tiff|tiff)
-      sed '1d;s/^.\{0,3\}//;23,$d' "$SOURCE_DIR/third_party/libtiff/t4.h" > "$OUTPUT_DIR/libtiff.txt"
+      sed '1d;s/^.\{0,3\}//;23,$d' "$SOURCE_DIR/third_party/libtiff/src/t4.h" > "$OUTPUT_DIR/libtiff.txt"
       ;;
     libunwind)
       cp "$SOURCE_DIR/third_party/libunwind/src/LICENSE.TXT" "$OUTPUT_DIR/libunwind.txt"
