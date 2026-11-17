@@ -2,6 +2,7 @@
 
 IS_DEBUG=${PDFium_IS_DEBUG:-false}
 OS=${PDFium_TARGET_OS:?}
+TARGET_CPU=${PDFium_TARGET_CPU:?}
 TARGET_ENVIRONMENT=${PDFium_TARGET_ENVIRONMENT:-}
 VERSION=${PDFium_VERSION:-}
 PATCHES="$PWD/patches"
@@ -55,8 +56,8 @@ case "$OS-$BUILD_TYPE" in
     ;;
 
   emscripten-*)
-    mv "$BUILD/pdfium.html" "$STAGING_LIB"
-    mv "$BUILD/pdfium.js" "$STAGING_LIB"
+    [ "$TARGET_CPU" == "wasm" ] && mv "$BUILD/pdfium.html" "$STAGING_LIB"
+    [ "$TARGET_CPU" == "wasm" ] && mv "$BUILD/pdfium.js" "$STAGING_LIB"
     mv "$BUILD/pdfium.wasm" "$STAGING_LIB"
     rm -rf "$STAGING/include/cpp"
     rm "$STAGING/PDFiumConfig.cmake"
