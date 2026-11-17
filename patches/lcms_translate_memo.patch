@@ -1,6 +1,6 @@
 --- a/core/fxcodec/icc/icc_transform.cpp
 +++ b/core/fxcodec/icc/icc_transform.cpp
-@@ -116,6 +116,15 @@
+@@ -121,6 +121,15 @@ std::unique_ptr<IccTransform> IccTransform::CreateTransformSRGB(
        new IccTransform(hTransform, nSrcComponents, bLab, bNormal));
  }
  
@@ -15,16 +15,16 @@
 +
  void IccTransform::Translate(pdfium::span<const float> src_values,
                               pdfium::span<float, 3> dest_values) {
-   uint8_t output[4];
-@@ -129,14 +138,48 @@
-       inputs[i] = src_values[i];
-     }
-     cmsDoTransform(transform_, inputs.data(), output, 1);
+   CHECK_GE(src_values.size(), src_components_);
+@@ -128,13 +137,46 @@ void IccTransform::Translate(pdfium::span<const float> src_values,
+   uint8_t output[kMaxValidComponents];
+   if (lab_) {
+     cmsDoTransform(transform_, src_values.data(), output, 1);
 -  } else {
--    DataVector<uint8_t> inputs(std::max<size_t>(src_values.size(), 16));
--    for (size_t i = 0; i < src_values.size(); ++i) {
--      inputs[i] =
--          static_cast<int>(std::clamp(src_values[i] * 255.0f, 0.0f, 255.0f));
+-    std::array<uint8_t, kMaxValidComponents> inputs;
+-    for (auto [src, dst] :
+-         fxcrt::Zip(src_values.first(src_components_), inputs)) {
+-      dst = static_cast<uint8_t>(std::clamp(src * 255.0f, 0.0f, 255.0f));
 +    dest_values[0] = output[2] / 255.0f;
 +    dest_values[1] = output[1] / 255.0f;
 +    dest_values[2] = output[0] / 255.0f;
@@ -33,13 +33,12 @@
 +  // The transform consumes the quantized 8-bit tuple, so the tuple is a
 +  // complete key for the result (at most 4 components; more is rejected
 +  // by CreateTransformSRGB()).
-+  uint8_t inputs[16] = {};
-+  const size_t n = std::min<size_t>(src_values.size(), 4);
++  std::array<uint8_t, kMaxValidComponents> inputs = {};
 +  uint64_t key = 0;
-+  for (size_t i = 0; i < n; ++i) {
-+    inputs[i] =
-+        static_cast<int>(std::clamp(src_values[i] * 255.0f, 0.0f, 255.0f));
-+    key = (key << 8) | inputs[i];
++  for (auto [src, dst] :
++       fxcrt::Zip(src_values.first(src_components_), inputs)) {
++    dst = static_cast<uint8_t>(std::clamp(src * 255.0f, 0.0f, 255.0f));
++    key = (key << 8) | dst;
 +  }
 +  const uint64_t tag = key + 1;
 +  if (memo_.empty()) {
@@ -60,21 +59,20 @@
 +      insert_at = &e;
 +      break;
 +    }
-   }
-+  cmsDoTransform(transform_, inputs, output, 1);
++  }
++  cmsDoTransform(transform_, inputs.data(), output, 1);
 +  if (insert_at) {
 +    insert_at->out[0] = output[2];
 +    insert_at->out[1] = output[1];
 +    insert_at->out[2] = output[0];
 +    insert_at->tag = tag;
-+  }
+   }
    dest_values[0] = output[2] / 255.0f;
    dest_values[1] = output[1] / 255.0f;
-   dest_values[2] = output[0] / 255.0f;
 --- a/core/fxcodec/icc/icc_transform.h
 +++ b/core/fxcodec/icc/icc_transform.h
 @@ -20,6 +20,8 @@
- #include "third_party/lcms/include/lcms2.h"
+ #include "third_party/lcms/src/include/lcms2.h"
  #endif
  
 +#include <vector>
@@ -82,8 +80,8 @@
  namespace fxcodec {
  
  class IccTransform {
-@@ -50,6 +52,21 @@
-   const int src_components_;
+@@ -50,6 +52,21 @@ class IccTransform {
+   const size_t src_components_;
    const bool lab_;
    const bool normal_;
 +

@@ -1,19 +1,19 @@
 --- a/core/fxge/dib/cfx_scanlinecompositor.cpp
 +++ b/core/fxge/dib/cfx_scanlinecompositor.cpp
-@@ -18,6 +18,12 @@
- #include "core/fxcrt/zip.h"
- #include "core/fxge/dib/blend.h"
+@@ -22,6 +22,12 @@
+ #include "core/fxge/dib/cfx_scanlinecompositor_hwy.h"
  #include "core/fxge/dib/fx_dib.h"
-+
+ 
 +#if defined(__wasm_simd128__)
 +#include <wasm_simd128.h>
 +
 +#include <type_traits>
 +#endif
- 
- #if defined(PDF_USE_SKIA)
- #include <type_traits>
-@@ -373,6 +379,16 @@
++
+ #if defined(PDF_USE_LIBYUV)
+ #include "core/fxge/fx_libyuv_wrappers.h"
+ #endif
+@@ -383,6 +389,16 @@ void CompositeRow_Bgr2Bgra_Blend_Clip(pdfium::span<uint8_t> dest_span,
    });
  }
  
@@ -30,7 +30,7 @@
  void CompositeRow_Bgr2Bgra_NoBlend_Clip(pdfium::span<uint8_t> dest_span,
                                          pdfium::span<const uint8_t> src_span,
                                          int width,
-@@ -381,6 +397,15 @@
+@@ -391,6 +407,15 @@ void CompositeRow_Bgr2Bgra_NoBlend_Clip(pdfium::span<uint8_t> dest_span,
    uint8_t* dest_scan = dest_span.data();
    const uint8_t* src_scan = src_span.data();
    const uint8_t* clip_scan = clip_span.data();
@@ -46,7 +46,7 @@
    int src_gap = src_Bpp - 3;
    UNSAFE_TODO({
      for (int col = 0; col < width; col++) {
-@@ -426,9 +451,101 @@
+@@ -433,9 +458,101 @@ void CopyPixelToOpaqueBgra(const SrcPixelStruct& input,
    output.alpha = 255;
  }
  
@@ -71,7 +71,7 @@
 +// probe (comp_class_d200.tsv) puts the pixels-per-row average at 830
 +// corpus-wide with a median per-document average of 503 -- and the kernel
 +// hoists only two constants per row, so there is no per-row gating.
- template <typename DestPixelStruct, typename SrcPixelStruct>
++template <typename DestPixelStruct, typename SrcPixelStruct>
 +void CopyRowToOpaqueBgraSimd(pdfium::span<DestPixelStruct> dest_span,
 +                             pdfium::span<const SrcPixelStruct> src_span) {
 +  constexpr bool kDestBgra =
@@ -127,7 +127,7 @@
 +}
 +#endif  // defined(__wasm_simd128__)
 +
-+template <typename DestPixelStruct, typename SrcPixelStruct>
+ template <typename DestPixelStruct, typename SrcPixelStruct>
  void CopyRowToOpaqueBgra(pdfium::span<DestPixelStruct> dest_span,
                           pdfium::span<const SrcPixelStruct> src_span) {
 +#if defined(__wasm_simd128__)
@@ -148,12 +148,10 @@
    for (auto [dest, src] : fxcrt::Zip(dest_span, src_span)) {
      CopyPixelToOpaqueBgra(src, dest);
    }
-@@ -608,7 +725,312 @@
-   const int alpha_ratio = src_alpha * 255 / dest_alpha;
-   AlphaMergeToDest(input, output, alpha_ratio);
+@@ -640,6 +757,311 @@ void CompositePixelBgra2BgraNoBlend(const FX_BGRA_STRUCT<uint8_t>& input,
    output.alpha = dest_alpha;
-+}
-+
+ }
+ 
 +#if defined(__wasm_simd128__)
 +// floor(x / 255), exact for x in [0, 65280], in unsigned 32-bit lanes.
 +v128_t Div255U32(v128_t x) {
@@ -456,28 +454,27 @@
 +      CompositePixelBgra2BgraNoBlend(src_span[i], src_alpha, dest_span[i]);
 +    }
 +  }
- }
++}
 +#endif  // defined(__wasm_simd128__)
- 
++
  template <typename DestPixelStruct>
  void CompositeRowBgra2Bgra(pdfium::span<const FX_BGRA_STRUCT<uint8_t>> src_span,
-@@ -636,8 +1058,15 @@
-           CompositePixelBgra2BgraBlend(input, src_alpha, output, blend_type);
-         }
+                            pdfium::span<const uint8_t> clip_span,
+@@ -668,6 +1090,13 @@ void CompositeRowBgra2Bgra(pdfium::span<const FX_BGRA_STRUCT<uint8_t>> src_span,
        }
-+      return;
-+    }
+       return;
+     }
 +#if defined(__wasm_simd128__)
 +    if constexpr (std::is_same_v<DestPixelStruct, FX_BGRA_STRUCT<uint8_t>> ||
 +                  std::is_same_v<DestPixelStruct, FX_RGBA_STRUCT<uint8_t>>) {
 +      CompositeRowBgra2BgraNormalNoClipSimd(src_span, dest_span);
-       return;
-     }
++      return;
++    }
 +#endif
-     for (auto [input, output] : fxcrt::Zip(src_span, dest_span)) {
-       const uint8_t src_alpha =
-           CompositePixelBgra2BgraCommon(input, /*clip=*/255, output);
-@@ -1574,6 +2003,15 @@
+     if constexpr (std::is_same_v<DestPixelStruct, FX_BGRA_STRUCT<uint8_t>>) {
+       // SIMD: packed-BGRA, normal, no clip
+       CompositeRowBgra2BgraSimd(src_span, dest_span);
+@@ -1628,6 +2057,15 @@ void CompositeRow_Bgr2Bgra_NoBlend_Clip_RgbByteOrder(
    uint8_t* dest_scan = dest_span.data();
    const uint8_t* src_scan = src_span.data();
    const uint8_t* clip_scan = clip_span.data();
