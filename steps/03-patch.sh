@@ -26,6 +26,21 @@ case "$BUILD_TYPE" in
 esac
 
 apply_patch "$PATCHES/public_headers.patch"
+apply_patch "$PATCHES/lcms_translate_memo.patch"
+apply_patch "$PATCHES/t4_psfunc_memo.patch"
+# Wasm-only. Both measure neutral on native (fillrect even regresses small
+# cache-resident fills there, where libc memset switches to non-temporal
+# stores), and only pay off under a runtime that neither vectorizes nor
+# elides the bounds checks itself. See PERFORMANCE.md.
+if [ "$OS" == "emscripten" ]; then
+  apply_patch "$PATCHES/glyph_blend_perf.patch"
+  apply_patch "$PATCHES/fillrect_memset_perf.patch"
+  # Only take effect when compiling with -msimd128 (wasm-standalone); the
+  # added code is guarded by __wasm_simd128__.
+  apply_patch "$PATCHES/stretch_engine_wasm_simd.patch"
+  apply_patch "$PATCHES/compositor_wasm_simd.patch"
+apply_patch "$PATCHES/c3_compositor_wasm_simd.patch"
+fi
 apply_patch "$PATCHES/clang_rt.patch" build
 
 [ "$ENABLE_V8" == "true" ] && apply_patch "$PATCHES/v8/pdfium.patch"
@@ -51,6 +66,14 @@ case "$OS" in
   emscripten)
     apply_patch "$PATCHES/wasm/pdfium.patch"
     apply_patch "$PATCHES/wasm/build.patch" build
+    apply_patch "$PATCHES/wasm/adler32_simd_wasm.patch"
+    apply_patch "$PATCHES/wasm/inflate_chunk_wasm.patch"
+    apply_patch "$PATCHES/wasm/jpeg_simd_wasm.patch"
+    mkdir -p third_party/libjpeg_turbo/simd/wasm
+    cp "$PATCHES/wasm/jpeg_simd/"*.c third_party/libjpeg_turbo/simd/wasm/
+    if [ "$TARGET_CPU" == "wasm-standalone" ]; then
+      apply_patch "$PATCHES/wasm/callbacks.patch"
+    fi
     if [ "$ENABLE_V8" == "true" ]; then
       apply_patch "$PATCHES/wasm/v8.patch" v8
     fi
